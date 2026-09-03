@@ -1,0 +1,49 @@
+name: DOT Save
+
+on:
+  push:
+    paths:
+      - "data/files.json"
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  save:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate files.json
+        run: |
+          python - <<'PY'
+          import json
+
+          path = "data/files.json"
+
+          with open(path, "r", encoding="utf-8") as f:
+              data = json.load(f)
+
+          if not isinstance(data, dict):
+              raise SystemExit("files.json must contain an object")
+
+          if "files" not in data:
+              raise SystemExit("files.json does not contain files")
+
+          if not isinstance(data["files"], list):
+              raise SystemExit("files must be an array")
+
+          print(
+              f"DOT: {len(data['files'])} files found."
+          )
+          PY
+
+      - name: Save confirmation
+        run: |
+          echo "DOT data validated successfully."
+          echo "Commit: $GITHUB_SHA"
