@@ -1,0 +1,11 @@
+name = "dot-real-estate-api"
+main = "src/index.js"
+compatibility_date = "2026-09-03"
+
+[vars]
+ALLOWED_ORIGIN = "https://YOUR-USERNAME.github.io"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "dot-real-estate"
+database_id = "PUT-YOUR-D1-DATABASE-ID-HERE"
