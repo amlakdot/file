@@ -28,4 +28,4 @@ ALLOWED_ORIGIN = "https://amlakdot.github.io"
 
 binding = "DB"
 database_name = "dot-real-estate"
-database_id = "PUT-YOUR-D1-DATABASE-ID-HERE"
+database_id = "b7a00f5b-d847-4da5-832e-a50e6761b357"
