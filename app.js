@@ -1,2235 +1,2555 @@
-/* =========================================================
-   DOT Real Estate — app.js
-   ========================================================= */
+// =========================================================
+// DOT Real Estate
+// GitHub Pages / LocalStorage Version
+// =========================================================
 
-const API_BASE = window.DOT_API_BASE || "";
+"use strict";
+
+const STORAGE_KEY = "dot_real_estate_files";
+const AUTH_KEY = "dot_real_estate_auth";
+const USER_KEY = "dot_real_estate_user";
+
+// ---------------------------------------------------------
+// Demo users
+// ---------------------------------------------------------
+// توجه:
+// این رمزها فقط برای ورود ظاهری به سایت هستند.
+// چون پروژه بدون Backend است، امنیت واقعی ایجاد نمی‌کنند.
+// بعداً اگر Backend اضافه کردیم، احراز هویت واقعی را منتقل می‌کنیم.
+
+const USERS = {
+  admin: {
+    username: "admin",
+    password: "123456",
+    name: "مدیر",
+    role: "admin",
+  },
+
+  consultant: {
+    username: "consultant",
+    password: "123456",
+    name: "مشاور",
+    role: "consultant",
+  },
+};
+
+
+// =========================================================
+// Labels
+// =========================================================
+
+const FILE_TYPE_LABELS = {
+  sale: "ملک فروشی",
+  landlord: "مالک / موجر",
+  buyer: "خریدار",
+  tenant: "مستاجر",
+};
+
+const PROPERTY_TYPE_LABELS = {
+  apartment: "آپارتمان",
+  villa: "ویلا",
+  office: "دفتر",
+  commercial: "تجاری",
+  land: "زمین",
+  garden: "باغ",
+  any: "فرقی ندارد",
+};
+
+const CONDITION_LABELS = {
+  new: "نوساز",
+  unused: "کلید نخورده",
+  renovated: "بازسازی‌شده",
+  "not-renovated": "بازسازی‌نشده",
+  renovating: "در حال بازسازی",
+};
+
+const OCCUPANCY_LABELS = {
+  empty: "خالی",
+  tenant: "مستاجر دارد",
+  owner: "مالک ساکن است",
+  evacuating: "در حال تخلیه",
+};
+
+const KEY_HOLDER_LABELS = {
+  owner: "مالک",
+  tenant: "مستاجر",
+  guard: "نگهبان",
+  office: "دفتر",
+  other: "سایر",
+};
+
+const FAMILY_STATUS_LABELS = {
+  single: "مجرد",
+  married: "متأهل",
+  family: "خانواده",
+};
+
+const AMENITY_LABELS = {
+  parking: "پارکینگ",
+  elevator: "آسانسور",
+  storage: "انباری",
+  balcony: "بالکن",
+  terrace: "تراس",
+  yard: "حیاط",
+  pool: "استخر",
+  jacuzzi: "جکوزی",
+  roof: "روف‌گاردن",
+  lobby: "لابی",
+  guard: "نگهبانی",
+  package: "پکیج",
+  cooler: "کولر",
+  "floor-heating": "گرمایش از کف",
+  cabinet: "کابینت",
+  closet: "کمد دیواری",
+};
+
+
+// =========================================================
+// State
+// =========================================================
 
 const state = {
-    user: null,
-    files: [],
-    activeFilter: "all",
-    search: "",
-    editingFile: null,
-    selectedFile: null
+  files: [],
+  filteredFiles: [],
+  currentUser: null,
+  activeFilter: "all",
+  search: "",
+  editingId: null,
+  selectedFile: null,
 };
 
-const FILE_TYPES = {
-    sale: "ملک فروشی",
-    landlord: "مالک / موجر",
-    buyer: "خریدار",
-    tenant: "مستاجر"
-};
 
-const PROPERTY_TYPES = {
-    apartment: "آپارتمان",
-    villa: "ویلا",
-    office: "دفتر کار",
-    commercial: "تجاری",
-    land: "زمین",
-    garden: "باغ",
-    any: "فرقی ندارد"
-};
+// =========================================================
+// DOM
+// =========================================================
 
-const CONDITIONS = {
-    new: "نوساز",
-    unused: "کلید نخورده",
-    renovated: "بازسازی‌شده",
-    "not-renovated": "بازسازی نشده",
-    renovating: "در حال بازسازی"
-};
+const $ = (selector) =>
+  document.querySelector(selector);
 
-const OCCUPANCY = {
-    empty: "خالی",
-    tenant: "مستاجر دارد",
-    owner: "مالک ساکن است",
-    evacuating: "در حال تخلیه"
-};
+const $$ = (selector) =>
+  Array.from(document.querySelectorAll(selector));
 
-const KEY_HOLDERS = {
-    owner: "مالک",
-    tenant: "مستاجر",
-    guard: "نگهبان",
-    office: "دفتر",
-    other: "سایر"
-};
 
-const FAMILY_STATUS = {
-    single: "مجرد",
-    married: "متأهل",
-    family: "خانوادگی"
-};
+// =========================================================
+// Helpers
+// =========================================================
 
-const AMENITIES = {
-    parking: "پارکینگ",
-    elevator: "آسانسور",
-    storage: "انباری",
-    balcony: "بالکن",
-    terrace: "تراس",
-    yard: "حیاط",
-    pool: "استخر",
-    jacuzzi: "جکوزی",
-    roof: "روف‌گاردن",
-    lobby: "لابی",
-    guard: "نگهبانی",
-    package: "پکیج",
-    cooler: "کولر",
-    "floor-heating": "گرمایش از کف",
-    cabinet: "کابینت",
-    closet: "کمد دیواری"
-};
+function escapeHTML(value) {
+  if (value === null || value === undefined) {
+    return "";
+  }
 
-const $ = (selector, parent = document) => parent.querySelector(selector);
-const $$ = (selector, parent = document) => [
-    ...parent.querySelectorAll(selector)
-];
-
-/* =========================================================
-   Helpers
-   ========================================================= */
-
-function escapeHtml(value) {
-    if (value === null || value === undefined) {
-        return "";
-    }
-
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
-function formatNumber(value) {
-    if (value === null || value === undefined || value === "") {
-        return "—";
-    }
 
-    const number = Number(String(value).replace(/,/g, ""));
-
-    if (!Number.isFinite(number)) {
-        return escapeHtml(value);
-    }
-
-    return new Intl.NumberFormat("fa-IR").format(number);
+function generateId() {
+  return (
+    Date.now().toString(36) +
+    Math.random()
+      .toString(36)
+      .slice(2, 10)
+  );
 }
 
-function formatMoney(value) {
-    if (value === null || value === undefined || value === "") {
-        return "—";
-    }
 
-    return `${formatNumber(value)} تومان`;
+function nowISO() {
+  return new Date().toISOString();
 }
 
-function formatDate(value) {
-    if (!value) {
-        return "—";
-    }
 
-    const date = new Date(value);
+function calculateFollowUp(days) {
+  const date = new Date();
 
-    if (Number.isNaN(date.getTime())) {
-        return escapeHtml(value);
-    }
+  date.setDate(
+    date.getDate() + Number(days || 10)
+  );
 
-    return new Intl.DateTimeFormat("fa-IR", {
-        year: "numeric",
-        month: "long",
-        day: "numeric"
-    }).format(date);
+  return date.toISOString();
 }
 
-function getFileTypeLabel(type) {
-    return FILE_TYPES[type] || type || "پرونده";
-}
-
-function getPropertyTypeLabel(type) {
-    return PROPERTY_TYPES[type] || type || "—";
-}
-
-function getConditionLabel(value) {
-    return CONDITIONS[value] || value || "—";
-}
-
-function getOccupancyLabel(value) {
-    return OCCUPANCY[value] || value || "—";
-}
-
-function getKeyHolderLabel(value) {
-    return KEY_HOLDERS[value] || value || "—";
-}
-
-function getFamilyStatusLabel(value) {
-    return FAMILY_STATUS[value] || value || "—";
-}
-
-function normalizeSearch(value) {
-    return String(value || "")
-        .trim()
-        .toLowerCase()
-        .replace(/ي/g, "ی")
-        .replace(/ك/g, "ک");
-}
-
-function getFileName(file) {
-    return (
-        file.name ||
-        file.fullName ||
-        file.title ||
-        file.customerName ||
-        file.ownerName ||
-        file.buyerName ||
-        file.tenantName ||
-        "بدون نام"
-    );
-}
-
-function getFileLocation(file) {
-    return file.location || file.address || "موقعیت ثبت نشده";
-}
-
-function getFileCode(file) {
-    return file.code || file.fileCode || file.id || "—";
-}
-
-function getFollowUpDate(file) {
-    return (
-        file.followUpAt ||
-        file.follow_up_at ||
-        file.nextFollowUpAt ||
-        file.next_follow_up_at
-    );
-}
 
 function isFollowUp(file) {
+  if (!file?.followUpAt) {
+    return false;
+  }
+
+  return (
+    new Date(file.followUpAt).getTime() <=
+    Date.now()
+  );
+}
+
+
+function formatNumber(value) {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+    return "—";
+  }
+
+  return Number(value).toLocaleString("fa-IR");
+}
+
+
+function formatMoney(value) {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+    return "—";
+  }
+
+  return `${Number(value).toLocaleString("fa-IR")} تومان`;
+}
+
+
+function formatDate(value) {
+  if (!value) {
+    return "—";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "—";
+  }
+
+  return date.toLocaleDateString(
+    "fa-IR",
+    {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }
+  );
+}
+
+
+function getNextCode() {
+  const max = state.files.reduce(
+    (highest, file) =>
+      Math.max(
+        highest,
+        Number(file.code) || 0
+      ),
+    0
+  );
+
+  return max + 1;
+}
+
+
+function toast(message, type = "default") {
+  let element =
+    document.querySelector(".dot-toast");
+
+  if (!element) {
+    element = document.createElement("div");
+
+    element.className =
+      "dot-toast";
+
+    document.body.appendChild(element);
+  }
+
+  element.textContent = message;
+
+  element.dataset.type = type;
+
+  clearTimeout(
+    toast.timeout
+  );
+
+  element.classList.add("show");
+
+  toast.timeout = setTimeout(() => {
+    element.classList.remove("show");
+  }, 3000);
+}
+
+
+// =========================================================
+// Local Storage
+// =========================================================
+
+function loadFiles() {
+  try {
+    const raw =
+      localStorage.getItem(
+        STORAGE_KEY
+      );
+
+    if (!raw) {
+      state.files = [];
+      return;
+    }
+
+    const parsed =
+      JSON.parse(raw);
+
+    state.files =
+      Array.isArray(parsed)
+        ? parsed
+        : [];
+  } catch (error) {
+    console.error(error);
+
+    state.files = [];
+
+    toast(
+      "خواندن اطلاعات ذخیره‌شده با مشکل مواجه شد.",
+      "error"
+    );
+  }
+}
+
+
+function saveFiles() {
+  try {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(state.files)
+    );
+
+    return true;
+  } catch (error) {
+    console.error(error);
+
+    toast(
+      "ذخیره اطلاعات انجام نشد.",
+      "error"
+    );
+
+    return false;
+  }
+}
+
+
+// =========================================================
+// Authentication
+// =========================================================
+
+function checkAuth() {
+  try {
+    const auth =
+      localStorage.getItem(
+        AUTH_KEY
+      );
+
+    const username =
+      localStorage.getItem(
+        USER_KEY
+      );
+
     if (
-        file.followUpStatus === "followup" ||
-        file.status === "followup" ||
-        file.needsFollowUp === true ||
-        file.needs_follow_up === true
+      auth === "1" &&
+      username &&
+      USERS[username]
     ) {
-        return true;
+      state.currentUser =
+        USERS[username];
+
+      showApp();
+
+      return true;
     }
+  } catch {
+    // Ignore
+  }
 
-    const date = getFollowUpDate(file);
+  showLogin();
 
-    if (!date) {
-        return false;
-    }
-
-    const timestamp = new Date(date).getTime();
-
-    if (!Number.isFinite(timestamp)) {
-        return false;
-    }
-
-    return timestamp <= Date.now();
+  return false;
 }
 
-function showToast(message, type = "success") {
-    let container = $(".toast-container");
 
-    if (!container) {
-        container = document.createElement("div");
-        container.className = "toast-container";
-        document.body.appendChild(container);
-    }
+function login(username, password) {
+  const user =
+    USERS[username];
 
-    const toast = document.createElement("div");
-    toast.className = `toast ${type}`;
-    toast.textContent = message;
+  if (
+    !user ||
+    user.password !== password
+  ) {
+    return false;
+  }
 
-    container.appendChild(toast);
+  state.currentUser = user;
 
-    window.setTimeout(() => {
-        toast.style.opacity = "0";
-        toast.style.transform = "translateY(5px)";
+  localStorage.setItem(
+    AUTH_KEY,
+    "1"
+  );
 
-        window.setTimeout(() => {
-            toast.remove();
-        }, 180);
-    }, 3200);
+  localStorage.setItem(
+    USER_KEY,
+    user.username
+  );
+
+  return true;
 }
 
-function setButtonLoading(button, loading, text = "در حال انجام...") {
-    if (!button) {
-        return;
-    }
 
-    if (loading) {
-        if (!button.dataset.originalText) {
-            button.dataset.originalText = button.textContent;
-        }
+function logout() {
+  localStorage.removeItem(
+    AUTH_KEY
+  );
 
-        button.disabled = true;
-        button.textContent = text;
-    } else {
-        button.disabled = false;
+  localStorage.removeItem(
+    USER_KEY
+  );
 
-        if (button.dataset.originalText) {
-            button.textContent = button.dataset.originalText;
-            delete button.dataset.originalText;
-        }
-    }
+  state.currentUser = null;
+
+  showLogin();
 }
 
-function openModal(modal) {
-    if (!modal) {
-        return;
-    }
 
-    modal.classList.add("open");
-    document.body.style.overflow = "hidden";
-}
-
-function closeModal(modal) {
-    if (!modal) {
-        return;
-    }
-
-    modal.classList.remove("open");
-
-    if (!$(".modal.open")) {
-        document.body.style.overflow = "";
-    }
-}
-
-function closeAllModals() {
-    $$(".modal.open").forEach(modal => {
-        modal.classList.remove("open");
-    });
-
-    document.body.style.overflow = "";
-}
-
-/* =========================================================
-   API
-   ========================================================= */
-
-async function apiFetch(path, options = {}) {
-    const headers = new Headers(options.headers || {});
-
-    if (
-        options.body &&
-        !(options.body instanceof FormData) &&
-        !headers.has("Content-Type")
-    ) {
-        headers.set("Content-Type", "application/json");
-    }
-
-    const response = await fetch(`${API_BASE}${path}`, {
-        credentials: "include",
-        ...options,
-        headers
-    });
-
-    let data = null;
-
-    const contentType = response.headers.get("content-type") || "";
-
-    if (contentType.includes("application/json")) {
-        try {
-            data = await response.json();
-        } catch {
-            data = null;
-        }
-    } else {
-        try {
-            data = await response.text();
-        } catch {
-            data = null;
-        }
-    }
-
-    if (!response.ok) {
-        const message =
-            data?.error ||
-            data?.message ||
-            (typeof data === "string" && data) ||
-            `خطا در ارتباط با سرور (${response.status})`;
-
-        const error = new Error(message);
-        error.status = response.status;
-        error.data = data;
-
-        throw error;
-    }
-
-    return data;
-}
-
-async function login(username, password) {
-    return apiFetch("/api/login", {
-        method: "POST",
-        body: JSON.stringify({
-            username,
-            password
-        })
-    });
-}
-
-async function logout() {
-    return apiFetch("/api/logout", {
-        method: "POST"
-    });
-}
-
-async function getCurrentUser() {
-    return apiFetch("/api/me", {
-        method: "GET"
-    });
-}
-
-async function getFiles() {
-    return apiFetch("/api/files", {
-        method: "GET"
-    });
-}
-
-async function createFile(payload) {
-    return apiFetch("/api/files", {
-        method: "POST",
-        body: JSON.stringify(payload)
-    });
-}
-
-async function updateFile(id, payload) {
-    return apiFetch(`/api/files/${encodeURIComponent(id)}`, {
-        method: "PUT",
-        body: JSON.stringify(payload)
-    });
-}
-
-async function deleteFile(id) {
-    return apiFetch(`/api/files/${encodeURIComponent(id)}`, {
-        method: "DELETE"
-    });
-}
-
-/* =========================================================
-   Authentication
-   ========================================================= */
-
-async function checkSession() {
-    try {
-        const response = await getCurrentUser();
-
-        state.user =
-            response?.user ||
-            response?.data?.user ||
-            response?.data ||
-            response;
-
-        showApp();
-        await loadFiles();
-    } catch (error) {
-        state.user = null;
-        showLogin();
-    }
-}
+// =========================================================
+// Login / App
+// =========================================================
 
 function showLogin() {
-    const loginScreen = $(".login-screen");
-    const app = $(".app");
+  const loginScreen =
+    $("#loginScreen");
 
-    if (loginScreen) {
-        loginScreen.classList.remove("hidden");
-    }
+  const app =
+    $("#app");
 
-    if (app) {
-        app.classList.add("hidden");
-    }
+  if (loginScreen) {
+    loginScreen.classList.remove(
+      "hidden"
+    );
+  }
+
+  if (app) {
+    app.classList.add(
+      "hidden"
+    );
+  }
 }
+
 
 function showApp() {
-    const loginScreen = $(".login-screen");
-    const app = $(".app");
+  const loginScreen =
+    $("#loginScreen");
 
-    if (loginScreen) {
-        loginScreen.classList.add("hidden");
-    }
+  const app =
+    $("#app");
 
-    if (app) {
-        app.classList.remove("hidden");
-    }
+  if (loginScreen) {
+    loginScreen.classList.add(
+      "hidden"
+    );
+  }
+
+  if (app) {
+    app.classList.remove(
+      "hidden"
+    );
+  }
+
+  updateUserUI();
+
+  loadFiles();
+
+  renderHome();
 }
 
-async function handleLogin(event) {
-    event.preventDefault();
 
-    const form = event.currentTarget;
-    const usernameInput = $("#username");
-    const passwordInput = $("#password");
-    const errorElement = $("#loginError");
-    const submitButton = $('button[type="submit"]', form);
+function updateUserUI() {
+  const user =
+    state.currentUser;
 
-    const username = usernameInput?.value.trim() || "";
-    const password = passwordInput?.value || "";
+  if (!user) {
+    return;
+  }
 
-    if (!username || !password) {
-        if (errorElement) {
-            errorElement.textContent = "نام کاربری و رمز عبور را وارد کنید.";
-        }
+  const possibleElements = [
+    "#currentUserName",
+    "#userName",
+    "#loggedUserName",
+  ];
 
-        return;
+  possibleElements.forEach(
+    (selector) => {
+      const element =
+        $(selector);
+
+      if (element) {
+        element.textContent =
+          user.name;
+      }
     }
-
-    if (errorElement) {
-        errorElement.textContent = "";
-    }
-
-    setButtonLoading(submitButton, true, "در حال ورود...");
-
-    try {
-        const response = await login(username, password);
-
-        state.user =
-            response?.user ||
-            response?.data?.user ||
-            response?.data ||
-            response;
-
-        form.reset();
-
-        showApp();
-        await loadFiles();
-    } catch (error) {
-        console.error(error);
-
-        if (errorElement) {
-            errorElement.textContent =
-                error.status === 401
-                    ? "نام کاربری یا رمز عبور اشتباه است."
-                    : error.message || "ورود انجام نشد.";
-        }
-    } finally {
-        setButtonLoading(submitButton, false);
-    }
+  );
 }
 
-async function handleLogout() {
-    try {
-        await logout();
-    } catch (error) {
-        console.error(error);
-    }
 
-    state.user = null;
-    state.files = [];
-    state.editingFile = null;
-    state.selectedFile = null;
-
-    closeAllModals();
-    showLogin();
-}
-
-/* =========================================================
-   Files
-   ========================================================= */
-
-async function loadFiles() {
-    const container = $("#filesContainer");
-
-    if (container) {
-        container.innerHTML = `
-            <div class="loading">
-                <div class="spinner"></div>
-            </div>
-        `;
-    }
-
-    try {
-        const response = await getFiles();
-
-        const files =
-            response?.files ||
-            response?.data?.files ||
-            response?.data ||
-            response ||
-            [];
-
-        state.files = Array.isArray(files) ? files : [];
-
-        renderHome();
-        updateFollowUpCount();
-    } catch (error) {
-        console.error(error);
-
-        state.files = [];
-
-        if (container) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-state-inner">
-                        <div class="empty-icon">!</div>
-                        <h2>خطا در دریافت پرونده‌ها</h2>
-                        <p>${escapeHtml(
-                            error.message || "ارتباط با سرور برقرار نشد."
-                        )}</p>
-                        <button class="button button-primary" id="retryFilesButton">
-                            تلاش مجدد
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            $("#retryFilesButton")?.addEventListener("click", loadFiles);
-        }
-    }
-}
-
-function getFilteredFiles() {
-    let files = [...state.files];
-
-    if (state.activeFilter === "followup") {
-        files = files.filter(isFollowUp);
-    } else if (state.activeFilter !== "all") {
-        files = files.filter(file => {
-            const type = file.type || file.fileType;
-
-            return type === state.activeFilter;
-        });
-    }
-
-    const query = normalizeSearch(state.search);
-
-    if (query) {
-        files = files.filter(file => {
-            const searchable = [
-                getFileName(file),
-                getFileLocation(file),
-                getFileCode(file),
-                file.phone,
-                file.propertyType,
-                file.notes,
-                file.description,
-                file.area,
-                file.rooms
-            ]
-                .filter(Boolean)
-                .map(normalizeSearch)
-                .join(" ");
-
-            return searchable.includes(query);
-        });
-    }
-
-    files.sort((a, b) => {
-        const followupA = isFollowUp(a) ? 1 : 0;
-        const followupB = isFollowUp(b) ? 1 : 0;
-
-        if (followupA !== followupB) {
-            return followupB - followupA;
-        }
-
-        const dateA = new Date(
-            a.createdAt || a.created_at || 0
-        ).getTime();
-
-        const dateB = new Date(
-            b.createdAt || b.created_at || 0
-        ).getTime();
-
-        return dateB - dateA;
-    });
-
-    return files;
-}
+// =========================================================
+// Rendering
+// =========================================================
 
 function renderHome() {
-    const container = $("#filesContainer");
-    const emptyState = $("#emptyState");
+  applyFilters();
 
-    if (!container) {
-        return;
+  renderFiles();
+
+  updateFollowUpCount();
+}
+
+
+function applyFilters() {
+  let files = [...state.files];
+
+  if (
+    state.activeFilter !==
+    "all"
+  ) {
+    if (
+      state.activeFilter ===
+      "followup"
+    ) {
+      files =
+        files.filter(
+          isFollowUp
+        );
+    } else {
+      files =
+        files.filter(
+          file =>
+            file.type ===
+            state.activeFilter
+        );
     }
+  }
 
-    const files = getFilteredFiles();
+  if (state.search) {
+    const query =
+      state.search
+        .trim()
+        .toLowerCase();
 
-    if (!files.length) {
-        container.innerHTML = "";
+    files =
+      files.filter(
+        file => {
+          const text = [
+            file.code,
+            file.name,
+            file.phone,
+            file.location,
+            file.notes,
+            FILE_TYPE_LABELS[
+              file.type
+            ],
+          ]
+            .filter(Boolean)
+            .join(" ")
+            .toLowerCase();
 
-        if (emptyState) {
-            emptyState.classList.remove("hidden");
-
-            const title = $("h2", emptyState);
-            const text = $("p", emptyState);
-
-            if (state.search || state.activeFilter !== "all") {
-                if (title) {
-                    title.textContent = "پرونده‌ای پیدا نشد";
-                }
-
-                if (text) {
-                    text.textContent =
-                        "با تغییر جست‌وجو یا فیلتر دوباره امتحان کنید.";
-                }
-            } else {
-                if (title) {
-                    title.textContent = "هنوز پرونده‌ای ثبت نشده";
-                }
-
-                if (text) {
-                    text.textContent =
-                        "برای شروع، اولین پرونده را ثبت کنید.";
-                }
-            }
+          return text.includes(
+            query
+          );
         }
+      );
+  }
 
-        return;
+  files.sort(
+    (a, b) => {
+      const aFollow =
+        isFollowUp(a);
+
+      const bFollow =
+        isFollowUp(b);
+
+      if (
+        aFollow &&
+        !bFollow
+      ) {
+        return -1;
+      }
+
+      if (
+        !aFollow &&
+        bFollow
+      ) {
+        return 1;
+      }
+
+      return (
+        Number(b.code || 0) -
+        Number(a.code || 0)
+      );
     }
+  );
+
+  state.filteredFiles =
+    files;
+}
+
+
+function renderFiles() {
+  const container =
+    $("#filesContainer");
+
+  const emptyState =
+    $("#emptyState");
+
+  if (!container) {
+    return;
+  }
+
+  if (
+    state.filteredFiles.length ===
+    0
+  ) {
+    container.innerHTML = "";
 
     if (emptyState) {
-        emptyState.classList.add("hidden");
+      emptyState.classList.remove(
+        "hidden"
+      );
     }
 
-    container.innerHTML = `
-        <div class="files-grid">
-            ${files.map(renderFileCard).join("")}
-        </div>
-    `;
+    return;
+  }
 
-    $$(".file-card", container).forEach(card => {
-        card.addEventListener("click", () => {
-            const id = card.dataset.id;
+  if (emptyState) {
+    emptyState.classList.add(
+      "hidden"
+    );
+  }
 
-            const file = state.files.find(item => {
-                return String(item.id) === String(id);
-            });
-
-            if (file) {
-                openDetail(file);
-            }
-        });
-    });
+  container.innerHTML =
+    state.filteredFiles
+      .map(
+        renderFileCard
+      )
+      .join("");
 }
+
 
 function renderFileCard(file) {
-    const type = file.type || file.fileType || "sale";
-    const name = getFileName(file);
-    const location = getFileLocation(file);
-    const code = getFileCode(file);
-    const followup = isFollowUp(file);
+  const followUp =
+    isFollowUp(file);
 
-    let summary = "";
+  const typeLabel =
+    FILE_TYPE_LABELS[
+      file.type
+    ] ||
+    file.type;
 
-    if (type === "sale" || type === "landlord") {
-        summary = `
-            <div class="summary-item">
-                <span>نوع ملک</span>
-                <strong>${escapeHtml(
-                    getPropertyTypeLabel(file.propertyType)
-                )}</strong>
-            </div>
+  let mainInfo = "";
 
-            <div class="summary-item">
-                <span>متراژ</span>
-                <strong>${
-                    file.area
-                        ? `${formatNumber(file.area)} متر`
-                        : "—"
-                }</strong>
-            </div>
+  if (
+    file.type === "sale" ||
+    file.type === "landlord"
+  ) {
+    mainInfo = `
+      <div class="file-card-meta">
+        ${
+          file.propertyType
+            ? `
+              <span>
+                ${escapeHTML(
+                  PROPERTY_TYPE_LABELS[
+                    file.propertyType
+                  ] ||
+                  file.propertyType
+                )}
+              </span>
+            `
+            : ""
+        }
 
-            <div class="summary-item">
-                <span>اتاق</span>
-                <strong>${file.rooms ? formatNumber(file.rooms) : "—"}</strong>
-            </div>
+        ${
+          file.area
+            ? `
+              <span>
+                ${formatNumber(
+                  file.area
+                )} متر
+              </span>
+            `
+            : ""
+        }
 
-            <div class="summary-item">
-                <span>${
-                    type === "landlord" ? "اجاره پیشنهادی" : "قیمت"
-                }</span>
-                <strong>${escapeHtml(
-                    type === "landlord"
-                        ? formatMoney(file.suggestedRent)
-                        : formatMoney(file.price || file.amount)
-                )}</strong>
-            </div>
-        `;
-    } else if (type === "buyer") {
-        summary = `
-            <div class="summary-item">
-                <span>نوع ملک</span>
-                <strong>${escapeHtml(
-                    getPropertyTypeLabel(file.propertyType)
-                )}</strong>
-            </div>
-
-            <div class="summary-item">
-                <span>متراژ</span>
-                <strong>${
-                    file.area
-                        ? `${formatNumber(file.area)} متر`
-                        : "—"
-                }</strong>
-            </div>
-
-            <div class="summary-item">
-                <span>اتاق</span>
-                <strong>${file.rooms ? formatNumber(file.rooms) : "—"}</strong>
-            </div>
-
-            <div class="summary-item">
-                <span>سرمایه</span>
-                <strong>${escapeHtml(
-                    formatMoney(file.capital)
-                )}</strong>
-            </div>
-        `;
-    } else if (type === "tenant") {
-        summary = `
-            <div class="summary-item">
-                <span>نوع ملک</span>
-                <strong>${escapeHtml(
-                    getPropertyTypeLabel(file.propertyType)
-                )}</strong>
-            </div>
-
-            <div class="summary-item">
-                <span>متراژ</span>
-                <strong>${
-                    file.area
-                        ? `${formatNumber(file.area)} متر`
-                        : "—"
-                }</strong>
-            </div>
-
-            <div class="summary-item">
-                <span>ودیعه</span>
-                <strong>${escapeHtml(
-                    formatMoney(file.deposit)
-                )}</strong>
-            </div>
-
-            <div class="summary-item">
-                <span>اجاره</span>
-                <strong>${escapeHtml(
-                    formatMoney(file.rent)
-                )}</strong>
-            </div>
-        `;
-    }
-
-    return `
-        <article
-            class="file-card ${followup ? "is-followup" : ""}"
-            data-id="${escapeHtml(file.id)}"
-        >
-            <div class="file-card-top">
-                <span class="file-type-badge ${escapeHtml(type)}">
-                    ${escapeHtml(getFileTypeLabel(type))}
-                </span>
-
-                <span class="file-number">
-                    #${escapeHtml(code)}
-                </span>
-            </div>
-
-            <h3>${escapeHtml(name)}</h3>
-
-            <p class="file-location">
-                ${escapeHtml(location)}
-            </p>
-
-            <div class="file-summary">
-                ${summary}
-            </div>
-
-            <div class="file-card-footer">
-                ${
-                    followup
-                        ? `
-                            <span class="followup-badge">
-                                نیاز به پیگیری
-                            </span>
-                        `
-                        : `
-                            <span class="followup-badge normal">
-                                پیگیری: ${formatFollowUp(file)}
-                            </span>
-                        `
-                }
-
-                <span class="file-date">
-                    ${formatDate(
-                        file.createdAt ||
-                            file.created_at ||
-                            file.updatedAt ||
-                            file.updated_at
-                    )}
-                </span>
-            </div>
-        </article>
+        ${
+          file.rooms !== null &&
+          file.rooms !== undefined &&
+          file.rooms !== ""
+            ? `
+              <span>
+                ${formatNumber(
+                  file.rooms
+                )} خواب
+              </span>
+            `
+            : ""
+        }
+      </div>
     `;
+  }
+
+  if (file.type === "buyer") {
+    mainInfo = `
+      <div class="file-card-meta">
+        ${
+          file.propertyType
+            ? `
+              <span>
+                ${escapeHTML(
+                  PROPERTY_TYPE_LABELS[
+                    file.propertyType
+                  ] ||
+                  file.propertyType
+                )}
+              </span>
+            `
+            : ""
+        }
+
+        ${
+          file.area
+            ? `
+              <span>
+                تا ${formatNumber(
+                  file.area
+                )} متر
+              </span>
+            `
+            : ""
+        }
+      </div>
+    `;
+  }
+
+  if (file.type === "tenant") {
+    mainInfo = `
+      <div class="file-card-meta">
+        ${
+          file.propertyType
+            ? `
+              <span>
+                ${escapeHTML(
+                  PROPERTY_TYPE_LABELS[
+                    file.propertyType
+                  ] ||
+                  file.propertyType
+                )}
+              </span>
+            `
+            : ""
+        }
+
+        ${
+          file.rent
+            ? `
+              <span>
+                ${formatMoney(
+                  file.rent
+                )}
+              </span>
+            `
+            : ""
+        }
+      </div>
+    `;
+  }
+
+  return `
+    <article
+      class="file-card ${
+        followUp
+          ? "is-followup"
+          : ""
+      }"
+      data-id="${escapeHTML(
+        file.id
+      )}"
+      onclick="openDetail('${escapeHTML(
+        file.id
+      )}')"
+    >
+
+      <div class="file-card-top">
+
+        <span class="file-code">
+          #${formatNumber(
+            file.code
+          )}
+        </span>
+
+        <span class="file-type">
+          ${escapeHTML(
+            typeLabel
+          )}
+        </span>
+
+      </div>
+
+      <div class="file-card-title">
+        ${escapeHTML(
+          file.name
+        )}
+      </div>
+
+      ${
+        file.phone
+          ? `
+            <div class="file-card-phone">
+              ${escapeHTML(
+                file.phone
+              )}
+            </div>
+          `
+          : ""
+      }
+
+      ${
+        file.location
+          ? `
+            <div class="file-card-location">
+              ${escapeHTML(
+                file.location
+              )}
+            </div>
+          `
+          : ""
+      }
+
+      ${mainInfo}
+
+      ${
+        followUp
+          ? `
+            <div class="followup-badge">
+              نیاز به پیگیری
+            </div>
+          `
+          : ""
+      }
+
+    </article>
+  `;
 }
 
-function formatFollowUp(file) {
-    const date = getFollowUpDate(file);
-
-    if (!date) {
-        return "—";
-    }
-
-    const timestamp = new Date(date).getTime();
-
-    if (!Number.isFinite(timestamp)) {
-        return "—";
-    }
-
-    const diff = timestamp - Date.now();
-
-    if (diff <= 0) {
-        return "امروز";
-    }
-
-    const days = Math.ceil(diff / 86400000);
-
-    return `${formatNumber(days)} روز`;
-}
-
-/* =========================================================
-   Follow-up
-   ========================================================= */
 
 function updateFollowUpCount() {
-    const count = state.files.filter(isFollowUp).length;
+  const count =
+    state.files.filter(
+      isFollowUp
+    ).length;
 
-    const elements = [
-        $("#followUpCount"),
-        $("#followUpButton")
-    ].filter(Boolean);
+  const elements = [
+    "#followUpCount",
+    "#followupCount",
+  ];
 
-    const countElement = $("#followUpCount");
+  elements.forEach(
+    selector => {
+      const element =
+        $(selector);
 
-    if (countElement) {
-        countElement.textContent = formatNumber(count);
-        countElement.classList.toggle("hidden", count === 0);
+      if (element) {
+        element.textContent =
+          formatNumber(count);
+      }
     }
-
-    elements.forEach(element => {
-        element.dataset.count = count;
-    });
+  );
 }
 
-/* =========================================================
-   Form
-   ========================================================= */
 
-function resetFileForm() {
-    const form = $("#fileForm");
+// =========================================================
+// Modal helpers
+// =========================================================
 
-    if (!form) {
-        return;
-    }
+function openModal(element) {
+  if (!element) {
+    return;
+  }
 
-    form.reset();
+  element.classList.remove(
+    "hidden"
+  );
 
-    $("#editingFileId").value = "";
-
-    const defaultType = $('input[name="fileType"][value="sale"]');
-
-    if (defaultType) {
-        defaultType.checked = true;
-    }
-
-    if ($("#followUpDays")) {
-        $("#followUpDays").value = "10";
-    }
-
-    state.editingFile = null;
-
-    updateFormSections();
+  document.body.classList.add(
+    "modal-open"
+  );
 }
 
-function openNewFileModal() {
-    resetFileForm();
 
-    if ($("#modalEyebrow")) {
-        $("#modalEyebrow").textContent = "پرونده جدید";
-    }
+function closeModal(element) {
+  if (!element) {
+    return;
+  }
 
-    if ($("#modalTitle")) {
-        $("#modalTitle").textContent = "ثبت پرونده";
-    }
+  element.classList.add(
+    "hidden"
+  );
 
-    openModal($("#fileModal"));
+  document.body.classList.remove(
+    "modal-open"
+  );
 }
 
-function openEditFileModal(file) {
-    state.editingFile = file;
 
-    populateForm(file);
+// =========================================================
+// File Form
+// =========================================================
 
-    if ($("#modalEyebrow")) {
-        $("#modalEyebrow").textContent = "ویرایش پرونده";
+function resetForm() {
+  const form =
+    $("#fileForm");
+
+  if (!form) {
+    return;
+  }
+
+  form.reset();
+
+  state.editingId = null;
+
+  const editingId =
+    $("#editingFileId");
+
+  if (editingId) {
+    editingId.value = "";
+  }
+
+  const followUpDays =
+    $("#followUpDays");
+
+  if (followUpDays) {
+    followUpDays.value = "10";
+  }
+
+  const type =
+    $('input[name="fileType"]:checked');
+
+  if (!type) {
+    const first =
+      $('input[name="fileType"]');
+
+    if (first) {
+      first.checked = true;
     }
+  }
 
-    if ($("#modalTitle")) {
-        $("#modalTitle").textContent = "ویرایش پرونده";
-    }
-
-    openModal($("#fileModal"));
+  updateFormSections();
 }
 
-function setValue(id, value) {
-    const element = $(`#${id}`);
 
-    if (!element) {
-        return;
-    }
+function openNewFile() {
+  resetForm();
 
-    element.value =
-        value === null || value === undefined ? "" : value;
+  const eyebrow =
+    $("#modalEyebrow");
+
+  const title =
+    $("#modalTitle");
+
+  if (eyebrow) {
+    eyebrow.textContent =
+      "ثبت فایل جدید";
+  }
+
+  if (title) {
+    title.textContent =
+      "فایل جدید";
+  }
+
+  openModal(
+    $("#fileModal")
+  );
 }
 
-function setChecked(id, checked) {
-    const element = $(`#${id}`);
 
-    if (element) {
-        element.checked = Boolean(checked);
-    }
+function openEdit(file) {
+  if (!file) {
+    return;
+  }
+
+  state.editingId =
+    file.id;
+
+  populateForm(file);
+
+  const eyebrow =
+    $("#modalEyebrow");
+
+  const title =
+    $("#modalTitle");
+
+  if (eyebrow) {
+    eyebrow.textContent =
+      "ویرایش فایل";
+  }
+
+  if (title) {
+    title.textContent =
+      `ویرایش فایل #${file.code}`;
+  }
+
+  closeModal(
+    $("#detailModal")
+  );
+
+  openModal(
+    $("#fileModal")
+  );
 }
 
-function setRadio(name, value) {
-    if (!value) {
-        return;
-    }
-
-    const input = $(
-        `input[name="${name}"][value="${CSS.escape(String(value))}"]`
-    );
-
-    if (input) {
-        input.checked = true;
-    }
-}
-
-function populateAmenities(amenities) {
-    const values = Array.isArray(amenities)
-        ? amenities
-        : typeof amenities === "string"
-        ? amenities.split(",").map(value => value.trim())
-        : [];
-
-    $$(".amenity-input").forEach(input => {
-        input.checked = values.includes(input.value);
-    });
-
-    Object.keys(AMENITIES).forEach(key => {
-        const checkbox = $(
-            `.amenity-input[value="${CSS.escape(key)}"]`
-        );
-
-        if (checkbox) {
-            checkbox.checked = values.includes(key);
-        }
-    });
-}
 
 function populateForm(file) {
-    const form = $("#fileForm");
+  const form =
+    $("#fileForm");
 
-    if (!form) {
-        return;
+  if (!form) {
+    return;
+  }
+
+  form.reset();
+
+  const setValue = (
+    id,
+    value
+  ) => {
+    const element =
+      $(`#${id}`);
+
+    if (element) {
+      element.value =
+        value ??
+        "";
     }
+  };
 
-    form.reset();
+  setValue(
+    "editingFileId",
+    file.id
+  );
 
-    setValue("editingFileId", file.id);
-
-    setRadio(
-        "fileType",
-        file.type || file.fileType || "sale"
+  const typeInput =
+    $(
+      `input[name="fileType"][value="${file.type}"]`
     );
 
-    setValue("name", getFileName(file));
-    setValue("propertyType", file.propertyType);
-    setValue("area", file.area);
-    setValue("rooms", file.rooms);
-    setValue("year", file.year);
-    setValue("location", file.location);
-    setValue("phone", file.phone);
+  if (typeInput) {
+    typeInput.checked =
+      true;
+  }
 
-    setRadio("keyHolder", file.keyHolder);
-    setRadio("condition", file.condition);
-    setRadio("occupancy", file.occupancy);
+  setValue(
+    "name",
+    file.name
+  );
 
-    setValue("currentDeposit", file.currentDeposit);
-    setValue("currentRent", file.currentRent);
-    setValue("suggestedDeposit", file.suggestedDeposit);
-    setValue("suggestedRent", file.suggestedRent);
+  setValue(
+    "phone",
+    file.phone
+  );
 
-    setValue("capital", file.capital);
-    setValue("notes", file.notes);
+  setValue(
+    "propertyType",
+    file.propertyType
+  );
 
-    setValue("deposit", file.deposit);
-    setValue("rent", file.rent);
+  setValue(
+    "area",
+    file.area
+  );
 
-    setRadio("familyStatus", file.familyStatus);
-    setValue("familySize", file.familySize);
+  setValue(
+    "rooms",
+    file.rooms
+  );
 
-    setValue(
-        "followUpDays",
-        file.followUpDays || 10
-    );
+  setValue(
+    "year",
+    file.year
+  );
 
-    populateAmenities(file.amenities);
+  setValue(
+    "location",
+    file.location
+  );
 
-    updateFormSections();
+  setValue(
+    "keyHolder",
+    file.keyHolder
+  );
+
+  setValue(
+    "condition",
+    file.condition
+  );
+
+  setValue(
+    "occupancy",
+    file.occupancy
+  );
+
+  setValue(
+    "price",
+    file.price
+  );
+
+  setValue(
+    "currentDeposit",
+    file.currentDeposit
+  );
+
+  setValue(
+    "currentRent",
+    file.currentRent
+  );
+
+  setValue(
+    "suggestedDeposit",
+    file.suggestedDeposit
+  );
+
+  setValue(
+    "suggestedRent",
+    file.suggestedRent
+  );
+
+  setValue(
+    "capital",
+    file.capital
+  );
+
+  setValue(
+    "deposit",
+    file.deposit
+  );
+
+  setValue(
+    "rent",
+    file.rent
+  );
+
+  setValue(
+    "familyStatus",
+    file.familyStatus
+  );
+
+  setValue(
+    "familySize",
+    file.familySize
+  );
+
+  setValue(
+    "notes",
+    file.notes
+  );
+
+  setValue(
+    "followUpDays",
+    file.followUpDays ||
+      10
+  );
+
+  const amenities =
+    Array.isArray(
+      file.amenities
+    )
+      ? file.amenities
+      : [];
+
+  $$(
+    'input[name="amenities"]'
+  ).forEach(
+    checkbox => {
+      checkbox.checked =
+        amenities.includes(
+          checkbox.value
+        );
+    }
+  );
+
+  updateFormSections();
 }
+
 
 function updateFormSections() {
-    const type =
-        $('input[name="fileType"]:checked')?.value ||
-        "sale";
+  const type =
+    $(
+      'input[name="fileType"]:checked'
+    )?.value;
 
-    const propertySections = [
-        "#propertyFields",
-        "#propertyAmenities",
-        "#keyHolderField",
-        "#conditionField",
-        "#occupancyField"
-    ];
+  const propertySection =
+    $("#propertyFields");
 
-    const buyerSections = [
-        "#buyerFields"
-    ];
+  const buyerSection =
+    $("#buyerFields");
 
-    const tenantSections = [
-        "#tenantFields"
-    ];
+  const tenantSection =
+    $("#tenantFields");
 
-    propertySections.forEach(selector => {
-        const element = $(selector);
+  const landlordSection =
+    $("#landlordFields");
 
-        if (element) {
-            element.classList.toggle(
-                "hidden",
-                !(type === "sale" || type === "landlord")
-            );
-        }
-    });
-
-    buyerSections.forEach(selector => {
-        const element = $(selector);
-
-        if (element) {
-            element.classList.toggle(
-                "hidden",
-                type !== "buyer"
-            );
-        }
-    });
-
-    tenantSections.forEach(selector => {
-        const element = $(selector);
-
-        if (element) {
-            element.classList.toggle(
-                "hidden",
-                type !== "tenant"
-            );
-        }
-    });
-
-    const tenantFamilySize = $("#tenantFamilySize");
-
-    if (tenantFamilySize) {
-        const familyStatus =
-            $('input[name="familyStatus"]:checked')?.value;
-
-        tenantFamilySize.classList.toggle(
-            "hidden",
-            familyStatus !== "family"
-        );
-    }
-
-    const currentRentField = $("#currentRentField");
-    const currentDepositField = $("#currentDepositField");
-
-    const occupancy =
-        $('input[name="occupancy"]:checked')?.value;
-
-    if (currentRentField) {
-        currentRentField.classList.toggle(
-            "hidden",
-            !(type === "sale" && occupancy === "tenant")
-        );
-    }
-
-    if (currentDepositField) {
-        currentDepositField.classList.toggle(
-            "hidden",
-            !(type === "sale" && occupancy === "tenant")
-        );
-    }
-}
-
-function getRadioValue(name) {
-    return $(`input[name="${name}"]:checked`)?.value || "";
-}
-
-function getCheckedAmenities() {
-    return $$(".amenity-input:checked").map(
-        input => input.value
+  if (propertySection) {
+    propertySection.classList.toggle(
+      "hidden",
+      ![
+        "sale",
+        "landlord",
+      ].includes(type)
     );
+  }
+
+  if (buyerSection) {
+    buyerSection.classList.toggle(
+      "hidden",
+      type !== "buyer"
+    );
+  }
+
+  if (tenantSection) {
+    tenantSection.classList.toggle(
+      "hidden",
+      type !== "tenant"
+    );
+  }
+
+  if (landlordSection) {
+    landlordSection.classList.toggle(
+      "hidden",
+      type !== "landlord"
+    );
+  }
+
+  // Some versions of the HTML use
+  // individual field groups instead.
+  updateElementVisibility(
+    ".sale-only",
+    type === "sale"
+  );
+
+  updateElementVisibility(
+    ".landlord-only",
+    type === "landlord"
+  );
+
+  updateElementVisibility(
+    ".buyer-only",
+    type === "buyer"
+  );
+
+  updateElementVisibility(
+    ".tenant-only",
+    type === "tenant"
+  );
 }
 
-function numberOrNull(value) {
-    if (value === null || value === undefined) {
-        return null;
+
+function updateElementVisibility(
+  selector,
+  visible
+) {
+  $$(selector).forEach(
+    element => {
+      element.classList.toggle(
+        "hidden",
+        !visible
+      );
     }
+  );
+}
 
-    const normalized = String(value)
-        .replace(/,/g, "")
-        .trim();
 
-    if (!normalized) {
+// =========================================================
+// Collect form
+// =========================================================
+
+function getFormData() {
+  const form =
+    $("#fileForm");
+
+  if (!form) {
+    return null;
+  }
+
+  const get =
+    id =>
+      $(`#${id}`)?.value
+        ?.trim() || null;
+
+  const getNumber =
+    id => {
+      const value =
+        $(`#${id}`)?.value;
+
+      if (
+        value === undefined ||
+        value === null ||
+        value === ""
+      ) {
         return null;
-    }
+      }
 
-    const number = Number(normalized);
+      const number =
+        Number(value);
 
-    return Number.isFinite(number) ? number : null;
-}
-
-function stringOrNull(value) {
-    const normalized = String(value || "").trim();
-
-    return normalized || null;
-}
-
-function collectFormData() {
-    const type = getRadioValue("fileType");
-
-    const payload = {
-        type,
-        name: stringOrNull($("#name")?.value),
-        phone: stringOrNull($("#phone")?.value),
-        location: stringOrNull($("#location")?.value),
-        followUpDays:
-            numberOrNull($("#followUpDays")?.value) || 10
+      return Number.isFinite(
+        number
+      )
+        ? number
+        : null;
     };
 
-    if (type === "sale" || type === "landlord") {
-        payload.propertyType = stringOrNull(
-            $("#propertyType")?.value
-        );
-
-        payload.area = numberOrNull(
-            $("#area")?.value
-        );
-
-        payload.rooms = numberOrNull(
-            $("#rooms")?.value
-        );
-
-        payload.year = numberOrNull(
-            $("#year")?.value
-        );
-
-        payload.keyHolder = stringOrNull(
-            getRadioValue("keyHolder")
-        );
-
-        payload.condition = stringOrNull(
-            getRadioValue("condition")
-        );
-
-        payload.occupancy = stringOrNull(
-            getRadioValue("occupancy")
-        );
-
-        payload.currentDeposit = numberOrNull(
-            $("#currentDeposit")?.value
-        );
-
-        payload.currentRent = numberOrNull(
-            $("#currentRent")?.value
-        );
-
-        payload.suggestedDeposit = numberOrNull(
-            $("#suggestedDeposit")?.value
-        );
-
-        payload.suggestedRent = numberOrNull(
-            $("#suggestedRent")?.value
-        );
-
-        payload.amenities = getCheckedAmenities();
-    }
-
-    if (type === "buyer") {
-        payload.propertyType = stringOrNull(
-            $("#buyerPropertyType")?.value
-        );
-
-        payload.area = numberOrNull(
-            $("#buyerArea")?.value
-        );
-
-        payload.rooms = numberOrNull(
-            $("#buyerRooms")?.value
-        );
-
-        payload.year = numberOrNull(
-            $("#buyerYear")?.value
-        );
-
-        payload.capital = numberOrNull(
-            $("#capital")?.value
-        );
-
-        payload.notes = stringOrNull(
-            $("#buyerNotes")?.value ||
-                $("#notes")?.value
-        );
-    }
-
-    if (type === "tenant") {
-        payload.propertyType = stringOrNull(
-            $("#tenantPropertyType")?.value
-        );
-
-        payload.area = numberOrNull(
-            $("#tenantArea")?.value
-        );
-
-        payload.rooms = numberOrNull(
-            $("#tenantRooms")?.value
-        );
-
-        payload.year = numberOrNull(
-            $("#tenantYear")?.value
-        );
-
-        payload.deposit = numberOrNull(
-            $("#deposit")?.value
-        );
-
-        payload.rent = numberOrNull(
-            $("#rent")?.value
-        );
-
-        payload.familyStatus = stringOrNull(
-            getRadioValue("familyStatus")
-        );
-
-        payload.familySize = numberOrNull(
-            $("#familySize")?.value
-        );
-
-        payload.notes = stringOrNull(
-            $("#tenantNotes")?.value ||
-                $("#notes")?.value
-        );
-    }
-
-    if (type !== "buyer" && type !== "tenant") {
-        payload.notes = stringOrNull(
-            $("#notes")?.value
-        );
-    }
-
-    return payload;
-}
-
-function validateForm(payload) {
-    if (!payload.type) {
-        return "نوع پرونده را انتخاب کنید.";
-    }
-
-    if (!payload.name) {
-        return "نام را وارد کنید.";
-    }
-
-    if (!payload.phone) {
-        return "شماره تماس را وارد کنید.";
-    }
-
-    if (payload.type === "sale" || payload.type === "landlord") {
-        if (!payload.propertyType) {
-            return "نوع ملک را انتخاب کنید.";
-        }
-
-        if (!payload.location) {
-            return "موقعیت ملک را وارد کنید.";
-        }
-    }
-
-    if (payload.type === "buyer") {
-        if (!payload.propertyType) {
-            return "نوع ملک موردنظر را انتخاب کنید.";
-        }
-    }
-
-    if (payload.type === "tenant") {
-        if (!payload.propertyType) {
-            return "نوع ملک موردنظر را انتخاب کنید.";
-        }
-
-        if (payload.deposit === null) {
-            return "ودیعه را وارد کنید.";
-        }
-
-        if (payload.rent === null) {
-            return "اجاره را وارد کنید.";
-        }
-    }
-
-    if (
-        payload.followUpDays === null ||
-        payload.followUpDays < 1
-    ) {
-        return "مدت پیگیری باید حداقل ۱ روز باشد.";
-    }
-
-    return null;
-}
-
-async function handleFileSubmit(event) {
-    event.preventDefault();
-
-    const form = event.currentTarget;
-    const submitButton =
-        $('button[type="submit"]', form);
-
-    const payload = collectFormData();
-    const validationError = validateForm(payload);
-
-    if (validationError) {
-        showToast(validationError, "error");
-        return;
-    }
-
-    setButtonLoading(
-        submitButton,
-        true,
-        state.editingFile
-            ? "در حال ذخیره..."
-            : "در حال ثبت..."
+  const amenities =
+    $$(
+      'input[name="amenities"]:checked'
+    ).map(
+      checkbox =>
+        checkbox.value
     );
 
-    try {
-        if (state.editingFile) {
-            await updateFile(
-                state.editingFile.id,
-                payload
-            );
+  return {
+    type:
+      $(
+        'input[name="fileType"]:checked'
+      )?.value ||
+      "sale",
 
-            showToast("پرونده با موفقیت ویرایش شد.");
-        } else {
-            await createFile(payload);
+    name:
+      get("name"),
 
-            showToast("پرونده با موفقیت ثبت شد.");
-        }
+    phone:
+      get("phone"),
 
-        closeModal($("#fileModal"));
+    propertyType:
+      get("propertyType"),
 
-        state.editingFile = null;
+    area:
+      getNumber("area"),
 
-        await loadFiles();
-    } catch (error) {
-        console.error(error);
+    rooms:
+      getNumber("rooms"),
 
-        showToast(
-            error.message || "ذخیره پرونده انجام نشد.",
-            "error"
-        );
-    } finally {
-        setButtonLoading(
-            submitButton,
-            false
-        );
-    }
+    year:
+      getNumber("year"),
+
+    location:
+      get("location"),
+
+    keyHolder:
+      get("keyHolder"),
+
+    condition:
+      get("condition"),
+
+    occupancy:
+      get("occupancy"),
+
+    price:
+      getNumber("price"),
+
+    currentDeposit:
+      getNumber(
+        "currentDeposit"
+      ),
+
+    currentRent:
+      getNumber(
+        "currentRent"
+      ),
+
+    suggestedDeposit:
+      getNumber(
+        "suggestedDeposit"
+      ),
+
+    suggestedRent:
+      getNumber(
+        "suggestedRent"
+      ),
+
+    capital:
+      getNumber("capital"),
+
+    deposit:
+      getNumber("deposit"),
+
+    rent:
+      getNumber("rent"),
+
+    familyStatus:
+      get("familyStatus"),
+
+    familySize:
+      getNumber("familySize"),
+
+    notes:
+      get("notes"),
+
+    amenities,
+
+    followUpDays:
+      Number(
+        $(
+          "#followUpDays"
+        )?.value ||
+        10
+      ),
+  };
 }
 
-/* =========================================================
-   Detail
-   ========================================================= */
 
-function openDetail(file) {
-    state.selectedFile = file;
+function validateFormData(data) {
+  if (!data) {
+    return "اطلاعات فرم نامعتبر است.";
+  }
 
-    const type =
-        file.type ||
-        file.fileType ||
-        "sale";
+  if (!data.name) {
+    return "نام را وارد کنید.";
+  }
 
-    const title = getFileName(file);
+  if (!data.phone) {
+    return "شماره تماس را وارد کنید.";
+  }
 
-    if ($("#detailType")) {
-        $("#detailType").textContent =
-            getFileTypeLabel(type);
-    }
+  if (
+    !data.followUpDays ||
+    data.followUpDays < 1
+  ) {
+    return "مدت پیگیری نامعتبر است.";
+  }
 
-    if ($("#detailTitle")) {
-        $("#detailTitle").textContent = title;
-    }
-
-    renderDetailContent(file);
-
-    const editButton = $("#editDetailButton");
-    const deleteButton = $("#deleteDetailButton");
-
-    const role =
-        state.user?.role ||
-        state.user?.userRole ||
-        "";
-
-    const isAdmin =
-        role === "admin" ||
-        role === "administrator";
-
-    const createdBy =
-        file.createdBy ||
-        file.created_by ||
-        file.userId ||
-        file.user_id;
-
-    const currentUserId =
-        state.user?.id ||
-        state.user?.userId;
-
-    const canEdit =
-        isAdmin ||
-        !createdBy ||
-        String(createdBy) === String(currentUserId);
-
-    if (editButton) {
-        editButton.classList.toggle(
-            "hidden",
-            !canEdit
-        );
-    }
-
-    if (deleteButton) {
-        deleteButton.classList.toggle(
-            "hidden",
-            !isAdmin
-        );
-    }
-
-    openModal($("#detailModal"));
+  return null;
 }
 
-function detailItem(label, value, full = false) {
-    return `
-        <div class="detail-item ${full ? "full" : ""}">
-            <div class="detail-item-label">
-                ${escapeHtml(label)}
-            </div>
 
-            <div class="detail-item-value">
-                ${value || "—"}
-            </div>
-        </div>
-    `;
-}
-
-function renderDetailContent(file) {
-    const container = $("#detailContent");
-
-    if (!container) {
-        return;
-    }
-
-    const type =
-        file.type ||
-        file.fileType ||
-        "sale";
-
-    let html = "";
-
-    if (type === "sale" || type === "landlord") {
-        html += `
-            <section class="detail-section">
-                <h3>اطلاعات اصلی</h3>
-
-                <div class="detail-grid">
-                    ${detailItem(
-                        "نام",
-                        escapeHtml(getFileName(file))
-                    )}
-
-                    ${detailItem(
-                        "شماره تماس",
-                        escapeHtml(file.phone)
-                    )}
-
-                    ${detailItem(
-                        "نوع ملک",
-                        escapeHtml(
-                            getPropertyTypeLabel(
-                                file.propertyType
-                            )
-                        )
-                    )}
-
-                    ${detailItem(
-                        "متراژ",
-                        file.area
-                            ? `${formatNumber(file.area)} متر`
-                            : "—"
-                    )}
-
-                    ${detailItem(
-                        "تعداد اتاق",
-                        file.rooms
-                            ? formatNumber(file.rooms)
-                            : "—"
-                    )}
-
-                    ${detailItem(
-                        "سال ساخت",
-                        file.year
-                            ? formatNumber(file.year)
-                            : "—"
-                    )}
-
-                    ${detailItem(
-                        "موقعیت",
-                        escapeHtml(file.location),
-                        true
-                    )}
-
-                    ${detailItem(
-                        "کلید دست",
-                        escapeHtml(
-                            getKeyHolderLabel(
-                                file.keyHolder
-                            )
-                        )
-                    )}
-
-                    ${detailItem(
-                        "وضعیت",
-                        escapeHtml(
-                            getConditionLabel(
-                                file.condition
-                            )
-                        )
-                    )}
-
-                    ${detailItem(
-                        "سکونت",
-                        escapeHtml(
-                            getOccupancyLabel(
-                                file.occupancy
-                            )
-                        )
-                    )}
-                </div>
-            </section>
-        `;
-
-        if (
-            file.currentDeposit ||
-            file.currentRent ||
-            file.suggestedDeposit ||
-            file.suggestedRent
-        ) {
-            html += `
-                <section class="detail-section">
-                    <h3>اطلاعات مالی</h3>
-
-                    <div class="detail-grid">
-                        ${detailItem(
-                            "ودیعه فعلی",
-                            escapeHtml(
-                                formatMoney(
-                                    file.currentDeposit
-                                )
-                            )
-                        )}
-
-                        ${detailItem(
-                            "اجاره فعلی",
-                            escapeHtml(
-                                formatMoney(
-                                    file.currentRent
-                                )
-                            )
-                        )}
-
-                        ${detailItem(
-                            "ودیعه پیشنهادی",
-                            escapeHtml(
-                                formatMoney(
-                                    file.suggestedDeposit
-                                )
-                            )
-                        )}
-
-                        ${detailItem(
-                            "اجاره پیشنهادی",
-                            escapeHtml(
-                                formatMoney(
-                                    file.suggestedRent
-                                )
-                            )
-                        )}
-
-                        ${
-                            type === "sale"
-                                ? detailItem(
-                                      "قیمت",
-                                      escapeHtml(
-                                          formatMoney(
-                                              file.price ||
-                                                  file.amount
-                                          )
-                                      )
-                                  )
-                                : ""
-                        }
-                    </div>
-                </section>
-            `;
-        }
-    }
-
-    if (type === "buyer") {
-        html += `
-            <section class="detail-section">
-                <h3>مشخصات خریدار</h3>
-
-                <div class="detail-grid">
-                    ${detailItem(
-                        "نام",
-                        escapeHtml(getFileName(file))
-                    )}
-
-                    ${detailItem(
-                        "شماره تماس",
-                        escapeHtml(file.phone)
-                    )}
-
-                    ${detailItem(
-                        "نوع ملک",
-                        escapeHtml(
-                            getPropertyTypeLabel(
-                                file.propertyType
-                            )
-                        )
-                    )}
-
-                    ${detailItem(
-                        "متراژ",
-                        file.area
-                            ? `${formatNumber(file.area)} متر`
-                            : "—"
-                    )}
-
-                    ${detailItem(
-                        "اتاق",
-                        file.rooms
-                            ? formatNumber(file.rooms)
-                            : "—"
-                    )}
-
-                    ${detailItem(
-                        "سال ساخت",
-                        file.year
-                            ? formatNumber(file.year)
-                            : "—"
-                    )}
-
-                    ${detailItem(
-                        "سرمایه",
-                        escapeHtml(
-                            formatMoney(file.capital)
-                        )
-                    )}
-
-                    ${detailItem(
-                        "موقعیت",
-                        escapeHtml(file.location),
-                        true
-                    )}
-
-                    ${detailItem(
-                        "توضیحات",
-                        escapeHtml(file.notes),
-                        true
-                    )}
-                </div>
-            </section>
-        `;
-    }
-
-    if (type === "tenant") {
-        html += `
-            <section class="detail-section">
-                <h3>مشخصات مستاجر</h3>
-
-                <div class="detail-grid">
-                    ${detailItem(
-                        "نام",
-                        escapeHtml(getFileName(file))
-                    )}
-
-                    ${detailItem(
-                        "شماره تماس",
-                        escapeHtml(file.phone)
-                    )}
-
-                    ${detailItem(
-                        "نوع ملک",
-                        escapeHtml(
-                            getPropertyTypeLabel(
-                                file.propertyType
-                            )
-                        )
-                    )}
-
-                    ${detailItem(
-                        "متراژ",
-                        file.area
-                            ? `${formatNumber(file.area)} متر`
-                            : "—"
-                    )}
-
-                    ${detailItem(
-                        "اتاق",
-                        file.rooms
-                            ? formatNumber(file.rooms)
-                            : "—"
-                    )}
-
-                    ${detailItem(
-                        "سال ساخت",
-                        file.year
-                            ? formatNumber(file.year)
-                            : "—"
-                    )}
-
-                    ${detailItem(
-                        "ودیعه",
-                        escapeHtml(
-                            formatMoney(file.deposit)
-                        )
-                    )}
-
-                    ${detailItem(
-                        "اجاره",
-                        escapeHtml(
-                            formatMoney(file.rent)
-                        )
-                    )}
-
-                    ${detailItem(
-                        "وضعیت تأهل",
-                        escapeHtml(
-                            getFamilyStatusLabel(
-                                file.familyStatus
-                            )
-                        )
-                    )}
-
-                    ${
-                        file.familySize
-                            ? detailItem(
-                                  "تعداد اعضای خانواده",
-                                  formatNumber(
-                                      file.familySize
-                                  )
-                              )
-                            : ""
-                    }
-
-                    ${detailItem(
-                        "موقعیت",
-                        escapeHtml(file.location),
-                        true
-                    )}
-
-                    ${detailItem(
-                        "توضیحات",
-                        escapeHtml(file.notes),
-                        true
-                    )}
-                </div>
-            </section>
-        `;
-    }
-
-    const amenities = Array.isArray(file.amenities)
-        ? file.amenities
-        : [];
-
-    if (
-        (type === "sale" || type === "landlord") &&
-        amenities.length
-    ) {
-        html += `
-            <section class="detail-section">
-                <h3>امکانات</h3>
-
-                <div class="detail-amenities">
-                    ${amenities
-                        .map(
-                            amenity => `
-                                <span class="amenity-badge">
-                                    ${escapeHtml(
-                                        AMENITIES[amenity] ||
-                                            amenity
-                                    )}
-                                </span>
-                            `
-                        )
-                        .join("")}
-                </div>
-            </section>
-        `;
-    }
-
-    html += `
-        <section class="detail-section">
-            <h3>پیگیری</h3>
-
-            <div class="detail-grid">
-                ${detailItem(
-                    "وضعیت پیگیری",
-                    isFollowUp(file)
-                        ? '<span class="text-danger">نیاز به پیگیری</span>'
-                        : '<span class="text-success">در وضعیت عادی</span>'
-                )}
-
-                ${detailItem(
-                    "تاریخ پیگیری",
-                    escapeHtml(
-                        formatDate(
-                            getFollowUpDate(file)
-                        )
-                    )
-                )}
-
-                ${detailItem(
-                    "آخرین بروزرسانی",
-                    escapeHtml(
-                        formatDate(
-                            file.updatedAt ||
-                                file.updated_at
-                        )
-                    )
-                )}
-            </div>
-        </section>
-    `;
-
-    container.innerHTML = html;
-}
-
-/* =========================================================
-   Renew
-   ========================================================= */
-
-function openRenewModal() {
-    if (!state.selectedFile) {
-        return;
-    }
-
-    if ($("#renewTitle")) {
-        $("#renewTitle").textContent =
-            `تمدید پیگیری «${getFileName(
-                state.selectedFile
-            )}»`;
-    }
-
-    openModal($("#renewModal"));
-}
-
-async function renewFile(days) {
-    if (!state.selectedFile) {
-        return;
-    }
-
-    const file = state.selectedFile;
-
-    try {
-        await updateFile(file.id, {
-            followUpDays: Number(days)
-        });
-
-        showToast(
-            `پیگیری برای ${formatNumber(days)} روز تمدید شد.`
-        );
-
-        closeModal($("#renewModal"));
-        closeModal($("#detailModal"));
-
-        state.selectedFile = null;
-
-        await loadFiles();
-    } catch (error) {
-        console.error(error);
-
-        showToast(
-            error.message || "تمدید پیگیری انجام نشد.",
-            "error"
-        );
-    }
-}
-
-/* =========================================================
-   Delete
-   ========================================================= */
-
-async function handleDeleteSelectedFile() {
-    if (!state.selectedFile) {
-        return;
-    }
-
-    const file = state.selectedFile;
-
-    const confirmed = window.confirm(
-        `آیا از حذف پرونده «${getFileName(
-            file
-        )}» مطمئن هستید؟\n\nاین عملیات پرونده را از لیست فعال خارج می‌کند.`
+// =========================================================
+// Save File
+// =========================================================
+
+function saveFile(data) {
+  const error =
+    validateFormData(data);
+
+  if (error) {
+    toast(
+      error,
+      "error"
     );
 
-    if (!confirmed) {
-        return;
+    return false;
+  }
+
+  const editingId =
+    state.editingId;
+
+  if (editingId) {
+    const index =
+      state.files.findIndex(
+        file =>
+          String(file.id) ===
+          String(editingId)
+      );
+
+    if (index === -1) {
+      toast(
+        "فایل پیدا نشد.",
+        "error"
+      );
+
+      return false;
     }
 
-    const button = $("#deleteDetailButton");
+    const oldFile =
+      state.files[index];
 
-    setButtonLoading(
-        button,
-        true,
-        "در حال حذف..."
+    state.files[index] = {
+      ...oldFile,
+      ...data,
+      updatedAt:
+        nowISO(),
+      updatedBy:
+        state.currentUser?.username ||
+        null,
+    };
+
+    state.files[index]
+      .followUpAt =
+      calculateFollowUp(
+        data.followUpDays
+      );
+
+    toast(
+      "فایل با موفقیت ویرایش شد.",
+      "success"
+    );
+  } else {
+    const file = {
+      id:
+        generateId(),
+
+      code:
+        getNextCode(),
+
+      ...data,
+
+      followUpAt:
+        calculateFollowUp(
+          data.followUpDays
+        ),
+
+      createdBy:
+        state.currentUser?.username ||
+        null,
+
+      createdByName:
+        state.currentUser?.name ||
+        null,
+
+      createdAt:
+        nowISO(),
+
+      updatedAt:
+        nowISO(),
+
+      status:
+        "active",
+    };
+
+    state.files.unshift(
+      file
     );
 
-    try {
-        await deleteFile(file.id);
+    toast(
+      `فایل شماره ${file.code} ثبت شد.`,
+      "success"
+    );
+  }
 
-        showToast("پرونده با موفقیت حذف شد.");
+  if (!saveFiles()) {
+    return false;
+  }
 
-        closeModal($("#detailModal"));
+  closeModal(
+    $("#fileModal")
+  );
 
-        state.selectedFile = null;
+  renderHome();
 
-        await loadFiles();
-    } catch (error) {
-        console.error(error);
-
-        showToast(
-            error.message || "حذف پرونده انجام نشد.",
-            "error"
-        );
-    } finally {
-        setButtonLoading(
-            button,
-            false
-        );
-    }
+  return true;
 }
 
-/* =========================================================
-   Filters / Search
-   ========================================================= */
+
+// =========================================================
+// Detail
+// =========================================================
+
+function openDetail(id) {
+  const file =
+    state.files.find(
+      item =>
+        String(item.id) ===
+        String(id)
+    );
+
+  if (!file) {
+    return;
+  }
+
+  state.selectedFile =
+    file;
+
+  renderDetail(file);
+
+  openModal(
+    $("#detailModal")
+  );
+}
+
+
+function renderDetail(file) {
+  const type =
+    $("#detailType");
+
+  const title =
+    $("#detailTitle");
+
+  const content =
+    $("#detailContent");
+
+  if (type) {
+    type.textContent =
+      FILE_TYPE_LABELS[
+        file.type
+      ] ||
+      file.type;
+  }
+
+  if (title) {
+    title.textContent =
+      `#${file.code} — ${file.name}`;
+  }
+
+  if (!content) {
+    return;
+  }
+
+  const rows = [];
+
+  addDetailRow(
+    rows,
+    "شماره فایل",
+    `#${formatNumber(
+      file.code
+    )}`
+  );
+
+  addDetailRow(
+    rows,
+    "نوع فایل",
+    FILE_TYPE_LABELS[
+      file.type
+    ] ||
+    file.type
+  );
+
+  addDetailRow(
+    rows,
+    "نام",
+    file.name
+  );
+
+  addDetailRow(
+    rows,
+    "شماره تماس",
+    file.phone
+  );
+
+  addDetailRow(
+    rows,
+    "موقعیت",
+    file.location
+  );
+
+  addDetailRow(
+    rows,
+    "نوع ملک",
+    PROPERTY_TYPE_LABELS[
+      file.propertyType
+    ]
+  );
+
+  addDetailRow(
+    rows,
+    "متراژ",
+    file.area
+      ? `${formatNumber(
+          file.area
+        )} متر`
+      : null
+  );
+
+  addDetailRow(
+    rows,
+    "تعداد خواب",
+    file.rooms !== null &&
+    file.rooms !== undefined
+      ? formatNumber(
+          file.rooms
+        )
+      : null
+  );
+
+  addDetailRow(
+    rows,
+    "سال ساخت",
+    file.year
+      ? formatNumber(
+          file.year
+        )
+      : null
+  );
+
+  addDetailRow(
+    rows,
+    "وضعیت ملک",
+    CONDITION_LABELS[
+      file.condition
+    ]
+  );
+
+  addDetailRow(
+    rows,
+    "وضعیت سکونت",
+    OCCUPANCY_LABELS[
+      file.occupancy
+    ]
+  );
+
+  addDetailRow(
+    rows,
+    "دارنده کلید",
+    KEY_HOLDER_LABELS[
+      file.keyHolder
+    ]
+  );
+
+  if (
+    file.price !== null &&
+    file.price !== undefined
+  ) {
+    addDetailRow(
+      rows,
+      "قیمت",
+      formatMoney(
+        file.price
+      )
+    );
+  }
+
+  if (
+    file.currentDeposit !==
+      null &&
+    file.currentDeposit !==
+      undefined
+  ) {
+    addDetailRow(
+      rows,
+      "ودیعه فعلی",
+      formatMoney(
+        file.currentDeposit
+      )
+    );
+  }
+
+  if (
+    file.currentRent !==
+      null &&
+    file.currentRent !==
+      undefined
+  ) {
+    addDetailRow(
+      rows,
+      "اجاره فعلی",
+      formatMoney(
+        file.currentRent
+      )
+    );
+  }
+
+  if (
+    file.suggestedDeposit !==
+      null &&
+    file.suggestedDeposit !==
+      undefined
+  ) {
+    addDetailRow(
+      rows,
+      "ودیعه پیشنهادی",
+      formatMoney(
+        file.suggestedDeposit
+      )
+    );
+  }
+
+  if (
+    file.suggestedRent !==
+      null &&
+    file.suggestedRent !==
+      undefined
+  ) {
+    addDetailRow(
+      rows,
+      "اجاره پیشنهادی",
+      formatMoney(
+        file.suggestedRent
+      )
+    );
+  }
+
+  if (
+    file.capital !== null &&
+    file.capital !== undefined
+  ) {
+    addDetailRow(
+      rows,
+      "سرمایه",
+      formatMoney(
+        file.capital
+      )
+    );
+  }
+
+  if (
+    file.deposit !== null &&
+    file.deposit !== undefined
+  ) {
+    addDetailRow(
+      rows,
+      "ودیعه",
+      formatMoney(
+        file.deposit
+      )
+    );
+  }
+
+  if (
+    file.rent !== null &&
+    file.rent !== undefined
+  ) {
+    addDetailRow(
+      rows,
+      "اجاره",
+      formatMoney(
+        file.rent
+      )
+    );
+  }
+
+  if (file.familyStatus) {
+    addDetailRow(
+      rows,
+      "وضعیت تأهل",
+      FAMILY_STATUS_LABELS[
+        file.familyStatus
+      ]
+    );
+  }
+
+  if (
+    file.familySize !== null &&
+    file.familySize !== undefined
+  ) {
+    addDetailRow(
+      rows,
+      "تعداد اعضای خانواده",
+      formatNumber(
+        file.familySize
+      )
+    );
+  }
+
+  if (
+    Array.isArray(
+      file.amenities
+    ) &&
+    file.amenities.length
+  ) {
+    addDetailRow(
+      rows,
+      "امکانات",
+      file.amenities
+        .map(
+          item =>
+            AMENITY_LABELS[
+              item
+            ] ||
+            item
+        )
+        .join("، ")
+    );
+  }
+
+  addDetailRow(
+    rows,
+    "مدت پیگیری",
+    `${formatNumber(
+      file.followUpDays
+    )} روز`
+  );
+
+  addDetailRow(
+    rows,
+    "تاریخ پیگیری",
+    formatDate(
+      file.followUpAt
+    )
+  );
+
+  addDetailRow(
+    rows,
+    "ثبت‌کننده",
+    file.createdByName ||
+      file.createdBy
+  );
+
+  if (file.notes) {
+    addDetailRow(
+      rows,
+      "توضیحات",
+      file.notes
+    );
+  }
+
+  content.innerHTML = `
+    <div class="detail-grid">
+      ${rows.join("")}
+    </div>
+
+    ${
+      isFollowUp(file)
+        ? `
+          <div class="detail-followup">
+            این فایل نیاز به پیگیری دارد.
+          </div>
+        `
+        : ""
+    }
+  `;
+
+  updateDetailPermissions(
+    file
+  );
+}
+
+
+function addDetailRow(
+  rows,
+  label,
+  value
+) {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+    return;
+  }
+
+  rows.push(`
+    <div class="detail-row">
+      <div class="detail-label">
+        ${escapeHTML(
+          label
+        )}
+      </div>
+
+      <div class="detail-value">
+        ${escapeHTML(
+          value
+        )}
+      </div>
+    </div>
+  `);
+}
+
+
+function updateDetailPermissions(
+  file
+) {
+  const editButton =
+    $("#editDetailButton");
+
+  const deleteButton =
+    $("#deleteDetailButton");
+
+  const user =
+    state.currentUser;
+
+  const canEdit =
+    user &&
+    (
+      user.role ===
+        "admin" ||
+      String(
+        file.createdBy
+      ) ===
+        String(
+          user.username
+        )
+    );
+
+  if (editButton) {
+    editButton.classList.toggle(
+      "hidden",
+      !canEdit
+    );
+  }
+
+  if (deleteButton) {
+    deleteButton.classList.toggle(
+      "hidden",
+      user?.role !==
+        "admin"
+    );
+  }
+}
+
+
+// =========================================================
+// Renew
+// =========================================================
+
+function openRenew() {
+  if (!state.selectedFile) {
+    return;
+  }
+
+  const title =
+    $("#renewTitle");
+
+  if (title) {
+    title.textContent =
+      `پیگیری فایل #${state.selectedFile.code}`;
+  }
+
+  openModal(
+    $("#renewModal")
+  );
+}
+
+
+function renewFile(days) {
+  const file =
+    state.selectedFile;
+
+  if (!file) {
+    return;
+  }
+
+  file.followUpDays =
+    Number(days);
+
+  file.followUpAt =
+    calculateFollowUp(
+      Number(days)
+    );
+
+  file.updatedAt =
+    nowISO();
+
+  file.updatedBy =
+    state.currentUser?.username ||
+    null;
+
+  saveFiles();
+
+  closeModal(
+    $("#renewModal")
+  );
+
+  renderDetail(file);
+
+  renderHome();
+
+  toast(
+    `پیگیری برای ${days} روز تمدید شد.`,
+    "success"
+  );
+}
+
+
+// =========================================================
+// Delete
+// =========================================================
+
+function deleteSelectedFile() {
+  const file =
+    state.selectedFile;
+
+  if (!file) {
+    return;
+  }
+
+  if (
+    state.currentUser?.role !==
+    "admin"
+  ) {
+    toast(
+      "فقط مدیر می‌تواند فایل را حذف کند.",
+      "error"
+    );
+
+    return;
+  }
+
+  const confirmed =
+    window.confirm(
+      `فایل شماره ${file.code} بایگانی شود؟`
+    );
+
+  if (!confirmed) {
+    return;
+  }
+
+  const index =
+    state.files.findIndex(
+      item =>
+        String(item.id) ===
+        String(file.id)
+    );
+
+  if (index === -1) {
+    return;
+  }
+
+  state.files[index] = {
+    ...state.files[index],
+    status:
+      "archived",
+    updatedAt:
+      nowISO(),
+    updatedBy:
+      state.currentUser?.username ||
+      null,
+  };
+
+  // فایل‌های بایگانی‌شده
+  // در لیست اصلی نمایش داده نمی‌شوند.
+  state.files =
+    state.files.filter(
+      item =>
+        item.status !==
+        "archived"
+    );
+
+  saveFiles();
+
+  closeModal(
+    $("#detailModal")
+  );
+
+  renderHome();
+
+  toast(
+    "فایل بایگانی شد.",
+    "success"
+  );
+}
+
+
+// =========================================================
+// Filters
+// =========================================================
 
 function setFilter(filter) {
-    state.activeFilter = filter;
+  state.activeFilter =
+    filter;
 
-    $$(".filter-button").forEach(button => {
-        button.classList.toggle(
-            "active",
-            button.dataset.filter === filter
-        );
-    });
+  $$(".filter-button, .filter-btn").forEach(
+    button => {
+      const buttonFilter =
+        button.dataset.filter;
 
-    renderHome();
+      button.classList.toggle(
+        "active",
+        buttonFilter ===
+          filter
+      );
+    }
+  );
+
+  renderHome();
 }
 
-function handleSearch(event) {
-    state.search = event.currentTarget.value || "";
 
-    renderHome();
-}
-
-/* =========================================================
-   Event Binding
-   ========================================================= */
+// =========================================================
+// Events
+// =========================================================
 
 function bindEvents() {
-    $("#loginForm")?.addEventListener(
-        "submit",
-        handleLogin
-    );
+  // Login
+  const loginForm =
+    $("#loginForm");
 
-    $("#logoutButton")?.addEventListener(
-        "click",
-        handleLogout
-    );
+  if (loginForm) {
+    loginForm.addEventListener(
+      "submit",
+      event => {
+        event.preventDefault();
 
-    $("#newFileButton")?.addEventListener(
-        "click",
-        openNewFileModal
-    );
+        const username =
+          $("#username")?.value
+            .trim();
 
-    $("#emptyNewFileButton")?.addEventListener(
-        "click",
-        openNewFileModal
-    );
+        const password =
+          $("#password")?.value ||
+          "";
 
-    $("#fileForm")?.addEventListener(
-        "submit",
-        handleFileSubmit
-    );
+        const success =
+          login(
+            username,
+            password
+          );
 
-    $("#cancelFormButton")?.addEventListener(
-        "click",
-        () => closeModal($("#fileModal"))
-    );
+        if (!success) {
+          const error =
+            $("#loginError");
 
-    $("#closeModalButton")?.addEventListener(
-        "click",
-        () => closeModal($("#fileModal"))
-    );
+          if (error) {
+            error.textContent =
+              "نام کاربری یا رمز عبور اشتباه است.";
 
-    $("#closeDetailButton")?.addEventListener(
-        "click",
-        () => closeModal($("#detailModal"))
-    );
-
-    $("#closeRenewButton")?.addEventListener(
-        "click",
-        () => closeModal($("#renewModal"))
-    );
-
-    $("#editDetailButton")?.addEventListener(
-        "click",
-        () => {
-            if (!state.selectedFile) {
-                return;
-            }
-
-            closeModal($("#detailModal"));
-            openEditFileModal(
-                state.selectedFile
+            error.classList.remove(
+              "hidden"
             );
+          }
+
+          return;
         }
-    );
 
-    $("#renewDetailButton")?.addEventListener(
-        "click",
-        openRenewModal
-    );
+        const error =
+          $("#loginError");
 
-    $("#deleteDetailButton")?.addEventListener(
-        "click",
-        handleDeleteSelectedFile
-    );
+        if (error) {
+          error.textContent = "";
 
-    $("#searchInput")?.addEventListener(
-        "input",
-        handleSearch
-    );
-
-    $$(".filter-button").forEach(button => {
-        button.addEventListener(
-            "click",
-            () => {
-                setFilter(
-                    button.dataset.filter || "all"
-                );
-            }
-        );
-    });
-
-    $$('input[name="fileType"]').forEach(input => {
-        input.addEventListener(
-            "change",
-            updateFormSections
-        );
-    });
-
-    $$('input[name="occupancy"]').forEach(input => {
-        input.addEventListener(
-            "change",
-            updateFormSections
-        );
-    });
-
-    $$('input[name="familyStatus"]').forEach(input => {
-        input.addEventListener(
-            "change",
-            updateFormSections
-        );
-    });
-
-    $$(".renew-option").forEach(button => {
-        button.addEventListener(
-            "click",
-            () => {
-                const days = Number(
-                    button.dataset.days
-                );
-
-                if (
-                    Number.isFinite(days) &&
-                    days > 0
-                ) {
-                    renewFile(days);
-                }
-            }
-        );
-    });
-
-    $$(".modal").forEach(modal => {
-        modal.addEventListener(
-            "click",
-            event => {
-                if (event.target === modal) {
-                    closeModal(modal);
-                }
-            }
-        );
-    });
-
-    document.addEventListener(
-        "keydown",
-        event => {
-            if (event.key === "Escape") {
-                closeAllModals();
-            }
+          error.classList.add(
+            "hidden"
+          );
         }
-    );
 
-    $("#followUpButton")?.addEventListener(
+        showApp();
+      }
+    );
+  }
+
+
+  // Logout
+  const logoutButton =
+    $("#logoutButton");
+
+  if (logoutButton) {
+    logoutButton.addEventListener(
+      "click",
+      logout
+    );
+  }
+
+
+  // New file
+  const newFileButton =
+    $("#newFileButton");
+
+  if (newFileButton) {
+    newFileButton.addEventListener(
+      "click",
+      openNewFile
+    );
+  }
+
+
+  const emptyNewFileButton =
+    $("#emptyNewFileButton");
+
+  if (emptyNewFileButton) {
+    emptyNewFileButton.addEventListener(
+      "click",
+      openNewFile
+    );
+  }
+
+
+  // Search
+  const searchInput =
+    $("#searchInput");
+
+  if (searchInput) {
+    searchInput.addEventListener(
+      "input",
+      event => {
+        state.search =
+          event.target.value;
+
+        renderHome();
+      }
+    );
+  }
+
+
+  // Filters
+  $$(
+    "[data-filter]"
+  ).forEach(
+    button => {
+      button.addEventListener(
         "click",
         () => {
-            setFilter("followup");
-
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth"
-            });
+          setFilter(
+            button.dataset.filter
+          );
         }
+      );
+    }
+  );
+
+
+  // Follow-up button
+  const followUpButton =
+    $("#followUpButton");
+
+  if (followUpButton) {
+    followUpButton.addEventListener(
+      "click",
+      () => {
+        setFilter(
+          "followup"
+        );
+      }
     );
+  }
+
+
+  // File type
+  $$(
+    'input[name="fileType"]'
+  ).forEach(
+    input => {
+      input.addEventListener(
+        "change",
+        updateFormSections
+      );
+    }
+  );
+
+
+  // File form
+  const fileForm =
+    $("#fileForm");
+
+  if (fileForm) {
+    fileForm.addEventListener(
+      "submit",
+      event => {
+        event.preventDefault();
+
+        const data =
+          getFormData();
+
+        saveFile(data);
+      }
+    );
+  }
+
+
+  // Cancel form
+  const cancelFormButton =
+    $("#cancelFormButton");
+
+  if (cancelFormButton) {
+    cancelFormButton.addEventListener(
+      "click",
+      () => {
+        closeModal(
+          $("#fileModal")
+        );
+      }
+    );
+  }
+
+
+  // Close buttons
+  const closeModalButton =
+    $("#closeModalButton");
+
+  if (closeModalButton) {
+    closeModalButton.addEventListener(
+      "click",
+      () => {
+        closeModal(
+          $("#fileModal")
+        );
+      }
+    );
+  }
+
+
+  const closeDetailButton =
+    $("#closeDetailButton");
+
+  if (closeDetailButton) {
+    closeDetailButton.addEventListener(
+      "click",
+      () => {
+        closeModal(
+          $("#detailModal")
+        );
+      }
+    );
+  }
+
+
+  const closeRenewButton =
+    $("#closeRenewButton");
+
+  if (closeRenewButton) {
+    closeRenewButton.addEventListener(
+      "click",
+      () => {
+        closeModal(
+          $("#renewModal")
+        );
+      }
+    );
+  }
+
+
+  // Edit detail
+  const editDetailButton =
+    $("#editDetailButton");
+
+  if (editDetailButton) {
+    editDetailButton.addEventListener(
+      "click",
+      () => {
+        openEdit(
+          state.selectedFile
+        );
+      }
+    );
+  }
+
+
+  // Renew detail
+  const renewDetailButton =
+    $("#renewDetailButton");
+
+  if (renewDetailButton) {
+    renewDetailButton.addEventListener(
+      "click",
+      openRenew
+    );
+  }
+
+
+  // Delete
+  const deleteDetailButton =
+    $("#deleteDetailButton");
+
+  if (deleteDetailButton) {
+    deleteDetailButton.addEventListener(
+      "click",
+      deleteSelectedFile
+    );
+  }
+
+
+  // Renew options
+  $$(
+    "[data-days]"
+  ).forEach(
+    button => {
+      button.addEventListener(
+        "click",
+        () => {
+          renewFile(
+            Number(
+              button.dataset.days
+            )
+          );
+        }
+      );
+    }
+  );
+
+
+  // Close modal by clicking backdrop
+  $$(".modal").forEach(
+    modal => {
+      modal.addEventListener(
+        "click",
+        event => {
+          if (
+            event.target ===
+            modal
+          ) {
+            closeModal(
+              modal
+            );
+          }
+        }
+      );
+    }
+  );
+
+
+  // Escape
+  document.addEventListener(
+    "keydown",
+    event => {
+      if (
+        event.key !==
+        "Escape"
+      ) {
+        return;
+      }
+
+      $$(".modal:not(.hidden)").forEach(
+        modal => {
+          closeModal(
+            modal
+          );
+        }
+      );
+    }
+  );
 }
 
-/* =========================================================
-   Init
-   ========================================================= */
 
-async function init() {
+// =========================================================
+// Demo data helper
+// =========================================================
+// برای زمانی که بخواهیم بعداً تست کنیم.
+
+function clearAllData() {
+  const confirmed =
+    window.confirm(
+      "تمام فایل‌های ذخیره‌شده روی این دستگاه حذف شوند؟"
+    );
+
+  if (!confirmed) {
+    return;
+  }
+
+  state.files = [];
+
+  localStorage.removeItem(
+    STORAGE_KEY
+  );
+
+  renderHome();
+
+  toast(
+    "تمام اطلاعات این دستگاه حذف شد.",
+    "success"
+  );
+}
+
+
+// =========================================================
+// Init
+// =========================================================
+
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
     bindEvents();
+
     updateFormSections();
-    showLogin();
 
-    await checkSession();
-}
+    checkAuth();
+  }
+);
 
-if (document.readyState === "loading") {
-    document.addEventListener(
-        "DOMContentLoaded",
-        init
-    );
-} else {
-    init();
-}
+
+// =========================================================
+// Global functions
+// =========================================================
+
+window.openDetail =
+  openDetail;
+
+window.openNewFile =
+  openNewFile;
+
+window.clearAllData =
+  clearAllData;
