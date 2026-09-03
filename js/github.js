@@ -7,6 +7,7 @@ import { state } from "./state.js";
 import { $, formatDateTime, showToast } from "./helpers.js";
 import { updateFollowUpStatuses } from "./files.js";
 import { renderHome } from "./render.js";
+import { decryptAllFiles, encryptAllFiles } from "./crypto.js";
 
 export async function githubRequest(url, options = {}) {
   const TIMEOUT = 15000;
@@ -173,9 +174,11 @@ export async function loadFiles(options = {}) {
     }
 
     const result = await getFilesFromGitHub();
-    state.files = Array.isArray(result.database.files)
+    const rawFiles = Array.isArray(result.database.files)
       ? result.database.files
       : [];
+    // شماره تلفن‌ها را بعد از خواندن از GitHub رمزگشایی کن
+    state.files = await decryptAllFiles(rawFiles);
     state.lastSyncSha = result.sha;
 
     updateFollowUpStatuses();
@@ -211,7 +214,9 @@ export async function saveDatabase(newFiles, commitMessage) {
 
     database.version = 1;
     database.updatedAt = new Date().toISOString();
-    database.files = newFiles;
+    // قبل از ذخیره در GitHub، شماره تلفن‌ها را رمزنگاری کن
+    // state.files همچنان نسخه رمزگشایی‌شده را نگه می‌دارد
+    database.files = await encryptAllFiles(newFiles);
 
     const content = JSON.stringify(database, null, 2);
     const bytes = new TextEncoder().encode(content);
