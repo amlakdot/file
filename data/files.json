@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-03T21:25:20.752Z",
+  "updatedAt": "2026-09-03T21:27:36.223Z",
   "files": [
     {
       "id": "file-1788464205733-477-4xyrw190o",
@@ -10,7 +10,7 @@
       "createdAt": "2026-09-03T19:36:45.733Z",
       "updatedAt": "2026-09-03T19:36:45.733Z",
       "name": "تست",
-      "phone": "enc:G4KCnC53UOZLAhv3+1QTExMID3Ag8tzkWgYVyVv9XaAtE6rKrdqm",
+      "phone": "enc:tfHMp+zVWG+MkWJ+rjod6sFPxE+KxvRI7U3mWL0L3BaO2Yrb93Fy",
       "propertyType": "apartment",
       "area": 100,
       "rooms": 2,
@@ -47,7 +47,7 @@
       "createdAt": "2026-09-03T19:38:53.493Z",
       "updatedAt": "2026-09-03T19:38:53.493Z",
       "name": "سی",
-      "phone": "enc:BGOJS6+pxn3qx9VZb1a+GszADu3KGXwhr15zGP6XkLvyvDbIKWAp",
+      "phone": "enc:9epHJv7G8vaKKqf+xzd2Mk5WvAl7bP9fLGq87CDmp9Hkd0kW/dWf",
       "propertyType": "apartment",
       "area": 0,
       "rooms": 0,
@@ -77,7 +77,7 @@
       "createdAt": "2026-09-03T21:25:16.528Z",
       "updatedAt": "2026-09-03T21:25:16.528Z",
       "name": "xix",
-      "phone": "enc:x9Kj/9NVIBpt96nRhcXKi0a6aAJzs4pr9UshevnyVVoyUuRddN/R",
+      "phone": "enc:IUPdGiv99cCANY0PBiblEIhp+3WpRoiarUzMWiQayduX69tRKfkc",
       "propertyType": "apartment",
       "area": 0,
       "rooms": 0,
@@ -98,6 +98,41 @@
       "familySize": 0,
       "tenantNotes": "",
       "amenities": []
+    },
+    {
+      "id": "file-1788470854715-662-pa7fx8ktn",
+      "type": "sale",
+      "status": "active",
+      "followUpDate": "2026-09-04T20:30:00.000Z",
+      "createdAt": "2026-09-03T21:27:34.715Z",
+      "updatedAt": "2026-09-03T21:27:34.715Z",
+      "name": "ava",
+      "phone": "enc:TDCUeoUJ7zUq9V82fAVCkk0t8K5cNRLvJEOjhbunlxKiEAisx2+b",
+      "propertyType": "apartment",
+      "area": 0,
+      "rooms": 0,
+      "year": 0,
+      "location": "",
+      "keyHolder": "owner",
+      "condition": "new",
+      "occupancy": "empty",
+      "currentDeposit": 0,
+      "currentRent": 0,
+      "suggestedDeposit": 0,
+      "suggestedRent": 0,
+      "capital": 0,
+      "buyerNotes": "",
+      "tenantDeposit": 0,
+      "tenantRent": 0,
+      "familyStatus": "single",
+      "familySize": 0,
+      "tenantNotes": "",
+      "amenities": [
+        "pool",
+        "guard",
+        "cooler",
+        "floor-heating"
+      ]
     }
   ]
 }
