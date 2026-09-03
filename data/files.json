@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-03T19:36:48.237Z",
+  "updatedAt": "2026-09-03T19:38:54.246Z",
   "files": [
     {
       "id": "file-1788464205733-477-4xyrw190o",
@@ -38,6 +38,36 @@
         "cooler",
         "cabinet"
       ]
+    },
+    {
+      "id": "file-1788464333493-459-iqnd89afl",
+      "type": "sale",
+      "status": "active",
+      "followUpDate": "2026-09-12T20:30:00.000Z",
+      "createdAt": "2026-09-03T19:38:53.493Z",
+      "updatedAt": "2026-09-03T19:38:53.493Z",
+      "name": "سی",
+      "phone": "09223867713",
+      "propertyType": "apartment",
+      "area": 0,
+      "rooms": 0,
+      "year": 0,
+      "location": "",
+      "keyHolder": "owner",
+      "condition": "new",
+      "occupancy": "empty",
+      "currentDeposit": 0,
+      "currentRent": 0,
+      "suggestedDeposit": 0,
+      "suggestedRent": 0,
+      "capital": 0,
+      "buyerNotes": "",
+      "tenantDeposit": 0,
+      "tenantRent": 0,
+      "familyStatus": "single",
+      "familySize": 0,
+      "tenantNotes": "",
+      "amenities": []
     }
   ]
 }
