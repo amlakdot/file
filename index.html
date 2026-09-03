@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#111315">
+    <meta name="description" content="پنل مدیریت فایل‌های املاک DOT">
 
     <title>DOT | مدیریت فایل‌ها</title>
 
@@ -11,9 +15,9 @@
 
 <body>
 
-    <!-- =========================
+    <!-- ==================================================
          LOGIN
-    ========================== -->
+    =================================================== -->
 
     <section id="loginScreen" class="login-screen">
 
@@ -24,66 +28,130 @@
             </div>
 
             <h1>پنل فایل‌های املاک</h1>
-            <p>برای ورود کد دسترسی را وارد کنید.</p>
+
+            <p>
+                برای ورود، نام کاربری و رمز عبور خود را وارد کنید.
+            </p>
 
             <form id="loginForm">
 
                 <div class="input-group">
-                    <label for="accessCode">کد دسترسی</label>
+
+                    <label for="username">
+                        نام کاربری
+                    </label>
+
+                    <input
+                        type="text"
+                        id="username"
+                        placeholder="نام کاربری"
+                        autocomplete="username"
+                        maxlength="50"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="input-group">
+
+                    <label for="password">
+                        رمز عبور
+                    </label>
 
                     <input
                         type="password"
-                        id="accessCode"
-                        placeholder="کد دسترسی"
-                        autocomplete="off"
+                        id="password"
+                        placeholder="رمز عبور"
+                        autocomplete="current-password"
+                        maxlength="128"
                         required
                     >
+
                 </div>
 
-                <button class="primary-btn" type="submit">
+
+                <button
+                    class="primary-btn"
+                    type="submit"
+                >
                     ورود به پنل
                 </button>
 
             </form>
 
-            <div id="loginError" class="login-error"></div>
+
+            <div
+                id="loginError"
+                class="login-error"
+                role="alert"
+                aria-live="polite"
+            ></div>
 
         </div>
 
     </section>
 
 
-    <!-- =========================
-         APP
-    ========================== -->
+
+    <!-- ==================================================
+         APPLICATION
+    =================================================== -->
 
     <div id="app" class="app hidden">
 
-        <!-- HEADER -->
+
+        <!-- ==================================================
+             HEADER
+        =================================================== -->
 
         <header class="topbar">
 
             <div class="brand">
-                <div class="brand-logo">DOT</div>
+
+                <div class="brand-logo">
+                    DOT
+                </div>
 
                 <div>
-                    <strong>املاک دات</strong>
-                    <span>مدیریت فایل‌ها</span>
+
+                    <strong>
+                        املاک دات
+                    </strong>
+
+                    <span>
+                        مدیریت فایل‌ها
+                    </span>
+
                 </div>
+
             </div>
+
 
             <div class="header-actions">
 
                 <button
                     id="followUpButton"
                     class="notification-btn"
+                    type="button"
                     title="فایل‌های نیازمند پیگیری"
+                    aria-label="فایل‌های نیازمند پیگیری"
                 >
+
                     <span>●</span>
-                    <b id="followUpCount">0</b>
+
+                    <b id="followUpCount">
+                        ۰
+                    </b>
+
                 </button>
 
-                <button id="logoutButton" class="logout-btn">
+
+                <button
+                    id="logoutButton"
+                    class="logout-btn"
+                    type="button"
+                >
                     خروج
                 </button>
 
@@ -92,66 +160,119 @@
         </header>
 
 
-        <!-- MAIN -->
+
+        <!-- ==================================================
+             MAIN
+        =================================================== -->
 
         <main class="container">
+
 
             <!-- PAGE HEADER -->
 
             <section class="page-header">
 
                 <div>
-                    <h1>فایل‌ها</h1>
-                    <p id="fileCountText">۰ فایل ثبت شده</p>
+
+                    <h1>
+                        فایل‌ها
+                    </h1>
+
+                    <p id="fileCountText">
+                        ۰ فایل ثبت شده
+                    </p>
+
                 </div>
 
-                <button id="newFileButton" class="primary-btn">
+
+                <button
+                    id="newFileButton"
+                    class="primary-btn"
+                    type="button"
+                >
                     + ثبت فایل جدید
                 </button>
 
             </section>
 
 
-            <!-- FILTERS -->
+
+            <!-- ==================================================
+                 SEARCH / FILTER
+            =================================================== -->
 
             <section class="toolbar">
 
+
                 <div class="search-box">
 
-                    <span>⌕</span>
+                    <span>
+                        ⌕
+                    </span>
 
                     <input
-                        type="text"
+                        type="search"
                         id="searchInput"
                         placeholder="جست‌وجو در فایل‌ها..."
+                        autocomplete="off"
                     >
 
                 </div>
 
 
+
                 <div class="filters">
 
-                    <button class="filter-btn active" data-filter="all">
+                    <button
+                        class="filter-btn active"
+                        data-filter="all"
+                        type="button"
+                    >
                         همه
                     </button>
 
-                    <button class="filter-btn" data-filter="sale">
+
+                    <button
+                        class="filter-btn"
+                        data-filter="sale"
+                        type="button"
+                    >
                         فروشی
                     </button>
 
-                    <button class="filter-btn" data-filter="rent">
+
+                    <button
+                        class="filter-btn"
+                        data-filter="landlord"
+                        type="button"
+                    >
                         موجر
                     </button>
 
-                    <button class="filter-btn" data-filter="buyer">
+
+                    <button
+                        class="filter-btn"
+                        data-filter="buyer"
+                        type="button"
+                    >
                         خریدار
                     </button>
 
-                    <button class="filter-btn" data-filter="tenant">
+
+                    <button
+                        class="filter-btn"
+                        data-filter="tenant"
+                        type="button"
+                    >
                         مستاجر
                     </button>
 
-                    <button class="filter-btn" data-filter="followup">
+
+                    <button
+                        class="filter-btn"
+                        data-filter="followup"
+                        type="button"
+                    >
                         نیاز به پیگیری
                     </button>
 
@@ -160,24 +281,46 @@
             </section>
 
 
-            <!-- FILES -->
 
-            <section id="filesContainer" class="files-grid"></section>
+            <!-- ==================================================
+                 FILES
+            =================================================== -->
+
+            <section
+                id="filesContainer"
+                class="files-grid"
+                aria-live="polite"
+            ></section>
 
 
-            <!-- EMPTY STATE -->
 
-            <div id="emptyState" class="empty-state hidden">
+            <!-- ==================================================
+                 EMPTY STATE
+            =================================================== -->
 
-                <div class="empty-icon">□</div>
+            <div
+                id="emptyState"
+                class="empty-state hidden"
+            >
 
-                <h2>فایلی پیدا نشد</h2>
+                <div class="empty-icon">
+                    □
+                </div>
+
+                <h2>
+                    فایلی پیدا نشد
+                </h2>
 
                 <p>
-                    هنوز فایلی ثبت نکرده‌اید یا نتیجه‌ای برای جست‌وجو وجود ندارد.
+                    هنوز فایلی ثبت نکرده‌اید یا نتیجه‌ای برای
+                    جست‌وجو وجود ندارد.
                 </p>
 
-                <button id="emptyNewFileButton" class="primary-btn">
+                <button
+                    id="emptyNewFileButton"
+                    class="primary-btn"
+                    type="button"
+                >
                     ثبت اولین فایل
                 </button>
 
@@ -188,36 +331,71 @@
     </div>
 
 
-    <!-- =========================
-         FILE MODAL
-    ========================== -->
 
-    <div id="fileModal" class="modal hidden">
+    <!-- ==================================================
+         NEW / EDIT FILE MODAL
+    =================================================== -->
+
+    <div
+        id="fileModal"
+        class="modal hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalTitle"
+    >
 
         <div class="modal-overlay"></div>
 
+
         <div class="modal-box">
+
+
+            <!-- MODAL HEADER -->
 
             <div class="modal-header">
 
                 <div>
-                    <span id="modalEyebrow">ثبت فایل</span>
-                    <h2 id="modalTitle">فایل جدید</h2>
+
+                    <span id="modalEyebrow">
+                        ثبت فایل
+                    </span>
+
+                    <h2 id="modalTitle">
+                        فایل جدید
+                    </h2>
+
                 </div>
 
-                <button id="closeModalButton" class="close-btn">
+
+                <button
+                    id="closeModalButton"
+                    class="close-btn"
+                    type="button"
+                    aria-label="بستن"
+                >
                     ×
                 </button>
 
             </div>
 
 
+
+            <!-- ==================================================
+                 FILE FORM
+            =================================================== -->
+
             <form id="fileForm">
 
-                <input type="hidden" id="editingFileId">
+                <input
+                    type="hidden"
+                    id="editingFileId"
+                >
 
 
-                <!-- FILE TYPE -->
+
+                <!-- ==================================================
+                     FILE TYPE
+                =================================================== -->
 
                 <div class="form-section">
 
@@ -225,7 +403,11 @@
                         نوع فایل
                     </div>
 
+
                     <div class="file-types">
+
+
+                        <!-- SALE -->
 
                         <label class="type-option">
 
@@ -237,28 +419,48 @@
                             >
 
                             <span>
-                                <b>ملک فروشی</b>
-                                <small>فایل فروش ملک</small>
+
+                                <b>
+                                    ملک فروشی
+                                </b>
+
+                                <small>
+                                    فایل فروش ملک
+                                </small>
+
                             </span>
 
                         </label>
 
+
+
+                        <!-- LANDLORD -->
 
                         <label class="type-option">
 
                             <input
                                 type="radio"
                                 name="fileType"
-                                value="rent"
+                                value="landlord"
                             >
 
                             <span>
-                                <b>مالک / موجر</b>
-                                <small>فایل اجاره</small>
+
+                                <b>
+                                    مالک / موجر
+                                </b>
+
+                                <small>
+                                    فایل اجاره
+                                </small>
+
                             </span>
 
                         </label>
 
+
+
+                        <!-- BUYER -->
 
                         <label class="type-option">
 
@@ -269,12 +471,22 @@
                             >
 
                             <span>
-                                <b>خریدار</b>
-                                <small>متقاضی خرید</small>
+
+                                <b>
+                                    خریدار
+                                </b>
+
+                                <small>
+                                    متقاضی خرید
+                                </small>
+
                             </span>
 
                         </label>
 
+
+
+                        <!-- TENANT -->
 
                         <label class="type-option">
 
@@ -285,8 +497,15 @@
                             >
 
                             <span>
-                                <b>مستاجر</b>
-                                <small>متقاضی اجاره</small>
+
+                                <b>
+                                    مستاجر
+                                </b>
+
+                                <small>
+                                    متقاضی اجاره
+                                </small>
+
                             </span>
 
                         </label>
@@ -296,11 +515,15 @@
                 </div>
 
 
-                <!-- =====================
-                     PROPERTY FORM
-                ====================== -->
+
+                <!-- ==================================================
+                     PROPERTY
+                =================================================== -->
 
                 <div id="propertyFields">
+
+
+                    <!-- PROPERTY INFORMATION -->
 
                     <div class="form-section">
 
@@ -311,22 +534,33 @@
 
                         <div class="form-grid">
 
+
+                            <!-- NAME -->
+
                             <div class="input-group">
 
-                                <label>نام فایل / مالک</label>
+                                <label for="propertyName">
+                                    نام فایل / مالک
+                                </label>
 
                                 <input
                                     type="text"
                                     id="propertyName"
                                     placeholder="مثلاً آقای محمدی"
+                                    maxlength="150"
                                 >
 
                             </div>
 
 
+
+                            <!-- PROPERTY TYPE -->
+
                             <div class="input-group">
 
-                                <label>نوع ملک</label>
+                                <label for="propertyType">
+                                    نوع ملک
+                                </label>
 
                                 <select id="propertyType">
 
@@ -359,78 +593,114 @@
                             </div>
 
 
+
+                            <!-- AREA -->
+
                             <div class="input-group">
 
-                                <label>متراژ</label>
+                                <label for="propertyArea">
+                                    متراژ
+                                </label>
 
                                 <input
                                     type="number"
                                     id="propertyArea"
                                     placeholder="مثلاً ۱۲۰"
                                     min="0"
+                                    max="1000000"
                                 >
 
                             </div>
 
 
+
+                            <!-- ROOMS -->
+
                             <div class="input-group">
 
-                                <label>تعداد اتاق</label>
+                                <label for="propertyRooms">
+                                    تعداد اتاق
+                                </label>
 
                                 <input
                                     type="number"
                                     id="propertyRooms"
                                     placeholder="مثلاً ۲"
                                     min="0"
+                                    max="100"
                                 >
 
                             </div>
 
 
+
+                            <!-- YEAR -->
+
                             <div class="input-group">
 
-                                <label>سال ساخت</label>
+                                <label for="propertyYear">
+                                    سال ساخت
+                                </label>
 
                                 <input
                                     type="number"
                                     id="propertyYear"
                                     placeholder="مثلاً ۱۴۰۴"
                                     min="0"
+                                    max="3000"
                                 >
 
                             </div>
 
 
+
+                            <!-- LOCATION -->
+
                             <div class="input-group">
 
-                                <label>آدرس محدوده</label>
+                                <label for="propertyLocation">
+                                    آدرس محدوده
+                                </label>
 
                                 <input
                                     type="text"
                                     id="propertyLocation"
                                     placeholder="مثلاً بومهن، بلوار اصلی"
+                                    maxlength="250"
                                 >
 
                             </div>
 
 
+
+                            <!-- PHONE -->
+
                             <div class="input-group">
 
-                                <label>شماره تلفن مالک</label>
+                                <label for="propertyPhone">
+                                    شماره تلفن مالک
+                                </label>
 
                                 <input
                                     type="tel"
                                     id="propertyPhone"
                                     placeholder="09xxxxxxxxx"
                                     dir="ltr"
+                                    inputmode="tel"
+                                    maxlength="20"
                                 >
 
                             </div>
 
 
+
+                            <!-- KEY HOLDER -->
+
                             <div class="input-group">
 
-                                <label>کلید نزد</label>
+                                <label for="keyHolder">
+                                    کلید نزد
+                                </label>
 
                                 <select id="keyHolder">
 
@@ -463,7 +733,10 @@
                     </div>
 
 
-                    <!-- CONDITION -->
+
+                    <!-- ==================================================
+                         PROPERTY CONDITION
+                    =================================================== -->
 
                     <div class="form-section">
 
@@ -471,11 +744,17 @@
                             وضعیت ملک
                         </div>
 
+
                         <div class="form-grid">
+
+
+                            <!-- CONDITION -->
 
                             <div class="input-group">
 
-                                <label>وضعیت / شرایط</label>
+                                <label for="propertyCondition">
+                                    وضعیت / شرایط
+                                </label>
 
                                 <select id="propertyCondition">
 
@@ -504,9 +783,14 @@
                             </div>
 
 
+
+                            <!-- OCCUPANCY -->
+
                             <div class="input-group">
 
-                                <label>وضعیت سکونت</label>
+                                <label for="occupancy">
+                                    وضعیت سکونت
+                                </label>
 
                                 <select id="occupancy">
 
@@ -533,19 +817,27 @@
                         </div>
 
 
+
                         <!-- CURRENT TENANT -->
 
-                        <div id="currentTenantFields" class="conditional-box hidden">
+                        <div
+                            id="currentTenantFields"
+                            class="conditional-box hidden"
+                        >
 
                             <div class="conditional-title">
                                 اطلاعات مستاجر فعلی
                             </div>
 
+
                             <div class="form-grid">
+
 
                                 <div class="input-group">
 
-                                    <label>رهن فعلی</label>
+                                    <label for="currentDeposit">
+                                        رهن فعلی
+                                    </label>
 
                                     <input
                                         type="number"
@@ -559,7 +851,9 @@
 
                                 <div class="input-group">
 
-                                    <label>اجاره فعلی</label>
+                                    <label for="currentRent">
+                                        اجاره فعلی
+                                    </label>
 
                                     <input
                                         type="number"
@@ -577,19 +871,29 @@
                     </div>
 
 
-                    <!-- RENT TERMS -->
 
-                    <div id="rentTermsSection" class="form-section hidden">
+                    <!-- ==================================================
+                         RENT TERMS
+                    =================================================== -->
+
+                    <div
+                        id="rentTermsSection"
+                        class="form-section hidden"
+                    >
 
                         <div class="section-title">
                             شرایط اجاره پیشنهادی
                         </div>
 
+
                         <div class="form-grid">
+
 
                             <div class="input-group">
 
-                                <label>رهن پیشنهادی</label>
+                                <label for="suggestedDeposit">
+                                    رهن پیشنهادی
+                                </label>
 
                                 <input
                                     type="number"
@@ -603,7 +907,9 @@
 
                             <div class="input-group">
 
-                                <label>اجاره پیشنهادی</label>
+                                <label for="suggestedRent">
+                                    اجاره پیشنهادی
+                                </label>
 
                                 <input
                                     type="number"
@@ -619,7 +925,10 @@
                     </div>
 
 
-                    <!-- AMENITIES -->
+
+                    <!-- ==================================================
+                         AMENITIES
+                    =================================================== -->
 
                     <div class="form-section">
 
@@ -627,85 +936,150 @@
                             امکانات
                         </div>
 
+
                         <div class="amenities">
 
+
                             <label>
-                                <input type="checkbox" value="parking">
+                                <input
+                                    type="checkbox"
+                                    value="parking"
+                                >
                                 پارکینگ
                             </label>
 
+
                             <label>
-                                <input type="checkbox" value="elevator">
+                                <input
+                                    type="checkbox"
+                                    value="elevator"
+                                >
                                 آسانسور
                             </label>
 
+
                             <label>
-                                <input type="checkbox" value="storage">
+                                <input
+                                    type="checkbox"
+                                    value="storage"
+                                >
                                 انباری
                             </label>
 
+
                             <label>
-                                <input type="checkbox" value="balcony">
+                                <input
+                                    type="checkbox"
+                                    value="balcony"
+                                >
                                 بالکن
                             </label>
 
+
                             <label>
-                                <input type="checkbox" value="terrace">
+                                <input
+                                    type="checkbox"
+                                    value="terrace"
+                                >
                                 تراس
                             </label>
 
+
                             <label>
-                                <input type="checkbox" value="yard">
+                                <input
+                                    type="checkbox"
+                                    value="yard"
+                                >
                                 حیاط
                             </label>
 
+
                             <label>
-                                <input type="checkbox" value="pool">
+                                <input
+                                    type="checkbox"
+                                    value="pool"
+                                >
                                 استخر
                             </label>
 
+
                             <label>
-                                <input type="checkbox" value="jacuzzi">
+                                <input
+                                    type="checkbox"
+                                    value="jacuzzi"
+                                >
                                 سونا / جکوزی
                             </label>
 
+
                             <label>
-                                <input type="checkbox" value="roof">
+                                <input
+                                    type="checkbox"
+                                    value="roof"
+                                >
                                 روف‌گاردن
                             </label>
 
+
                             <label>
-                                <input type="checkbox" value="lobby">
+                                <input
+                                    type="checkbox"
+                                    value="lobby"
+                                >
                                 لابی
                             </label>
 
+
                             <label>
-                                <input type="checkbox" value="guard">
+                                <input
+                                    type="checkbox"
+                                    value="guard"
+                                >
                                 سرایداری
                             </label>
 
+
                             <label>
-                                <input type="checkbox" value="package">
+                                <input
+                                    type="checkbox"
+                                    value="package"
+                                >
                                 پکیج
                             </label>
 
+
                             <label>
-                                <input type="checkbox" value="cooler">
+                                <input
+                                    type="checkbox"
+                                    value="cooler"
+                                >
                                 کولر / اسپلیت
                             </label>
 
+
                             <label>
-                                <input type="checkbox" value="floor-heating">
+                                <input
+                                    type="checkbox"
+                                    value="floor-heating"
+                                >
                                 گرمایش از کف
                             </label>
 
+
                             <label>
-                                <input type="checkbox" value="cabinet">
+                                <input
+                                    type="checkbox"
+                                    value="cabinet"
+                                >
                                 کابینت
                             </label>
 
+
                             <label>
-                                <input type="checkbox" value="closet">
+                                <input
+                                    type="checkbox"
+                                    value="closet"
+                                >
                                 کمد دیواری
                             </label>
 
@@ -716,11 +1090,15 @@
                 </div>
 
 
-                <!-- =====================
-                     BUYER FORM
-                ====================== -->
 
-                <div id="buyerFields" class="hidden">
+                <!-- ==================================================
+                     BUYER
+                =================================================== -->
+
+                <div
+                    id="buyerFields"
+                    class="hidden"
+                >
 
                     <div class="form-section">
 
@@ -728,94 +1106,177 @@
                             اطلاعات خریدار
                         </div>
 
+
                         <div class="form-grid">
 
+
+                            <!-- NAME -->
+
                             <div class="input-group">
-                                <label>نام</label>
+
+                                <label for="buyerName">
+                                    نام
+                                </label>
+
                                 <input
                                     type="text"
                                     id="buyerName"
                                     placeholder="نام خریدار"
+                                    maxlength="150"
                                 >
+
                             </div>
 
 
+
+                            <!-- PHONE -->
+
                             <div class="input-group">
-                                <label>شماره تماس</label>
+
+                                <label for="buyerPhone">
+                                    شماره تماس
+                                </label>
+
                                 <input
                                     type="tel"
                                     id="buyerPhone"
                                     placeholder="09xxxxxxxxx"
                                     dir="ltr"
+                                    inputmode="tel"
+                                    maxlength="20"
                                 >
+
                             </div>
 
 
+
+                            <!-- PROPERTY TYPE -->
+
                             <div class="input-group">
-                                <label>نوع ملک موردنظر</label>
+
+                                <label for="buyerPropertyType">
+                                    نوع ملک موردنظر
+                                </label>
 
                                 <select id="buyerPropertyType">
 
-                                    <option value="apartment">آپارتمان</option>
-                                    <option value="villa">ویلایی</option>
-                                    <option value="office">اداری</option>
-                                    <option value="commercial">تجاری</option>
-                                    <option value="land">زمین</option>
-                                    <option value="garden">باغ</option>
-                                    <option value="any">فرقی ندارد</option>
+                                    <option value="apartment">
+                                        آپارتمان
+                                    </option>
+
+                                    <option value="villa">
+                                        ویلایی
+                                    </option>
+
+                                    <option value="office">
+                                        اداری
+                                    </option>
+
+                                    <option value="commercial">
+                                        تجاری
+                                    </option>
+
+                                    <option value="land">
+                                        زمین
+                                    </option>
+
+                                    <option value="garden">
+                                        باغ
+                                    </option>
+
+                                    <option value="any">
+                                        فرقی ندارد
+                                    </option>
 
                                 </select>
 
                             </div>
 
 
+
+                            <!-- AREA -->
+
                             <div class="input-group">
-                                <label>متراژ موردنظر</label>
+
+                                <label for="buyerArea">
+                                    متراژ موردنظر
+                                </label>
 
                                 <input
                                     type="text"
                                     id="buyerArea"
                                     placeholder="مثلاً ۸۰ تا ۱۲۰"
+                                    maxlength="100"
                                 >
 
                             </div>
 
 
+
+                            <!-- ROOMS -->
+
                             <div class="input-group">
-                                <label>تعداد اتاق</label>
+
+                                <label for="buyerRooms">
+                                    تعداد اتاق
+                                </label>
 
                                 <input
                                     type="number"
                                     id="buyerRooms"
                                     min="0"
+                                    max="100"
                                 >
+
                             </div>
 
 
+
+                            <!-- YEAR -->
+
                             <div class="input-group">
-                                <label>سال ساخت</label>
+
+                                <label for="buyerYear">
+                                    سال ساخت
+                                </label>
 
                                 <input
                                     type="text"
                                     id="buyerYear"
                                     placeholder="مثلاً بالای ۱۳۹۵"
+                                    maxlength="100"
                                 >
+
                             </div>
 
 
+
+                            <!-- LOCATION -->
+
                             <div class="input-group">
-                                <label>محدوده موردنظر</label>
+
+                                <label for="buyerLocation">
+                                    محدوده موردنظر
+                                </label>
 
                                 <input
                                     type="text"
                                     id="buyerLocation"
                                     placeholder="مثلاً بومهن"
+                                    maxlength="250"
                                 >
+
                             </div>
 
 
+
+                            <!-- CAPITAL -->
+
                             <div class="input-group">
-                                <label>سرمایه</label>
+
+                                <label for="buyerCapital">
+                                    سرمایه
+                                </label>
 
                                 <input
                                     type="number"
@@ -823,12 +1284,16 @@
                                     placeholder="تومان"
                                     min="0"
                                 >
+
                             </div>
 
                         </div>
 
                     </div>
 
+
+
+                    <!-- BUYER NOTES -->
 
                     <div class="form-section">
 
@@ -839,6 +1304,7 @@
                         <textarea
                             id="buyerNotes"
                             placeholder="نیازها، شرایط، توضیحات و..."
+                            maxlength="3000"
                         ></textarea>
 
                     </div>
@@ -846,11 +1312,16 @@
                 </div>
 
 
-                <!-- =====================
-                     TENANT FORM
-                ====================== -->
 
-                <div id="tenantFields" class="hidden">
+                <!-- ==================================================
+                     TENANT
+                =================================================== -->
+
+                <div
+                    id="tenantFields"
+                    class="hidden"
+                >
+
 
                     <div class="form-section">
 
@@ -858,87 +1329,158 @@
                             اطلاعات مستاجر
                         </div>
 
+
                         <div class="form-grid">
 
+
+                            <!-- NAME -->
+
                             <div class="input-group">
-                                <label>نام</label>
+
+                                <label for="tenantName">
+                                    نام
+                                </label>
 
                                 <input
                                     type="text"
                                     id="tenantName"
                                     placeholder="نام مستاجر"
+                                    maxlength="150"
                                 >
 
                             </div>
 
 
+
+                            <!-- PHONE -->
+
                             <div class="input-group">
-                                <label>شماره تماس</label>
+
+                                <label for="tenantPhone">
+                                    شماره تماس
+                                </label>
 
                                 <input
                                     type="tel"
                                     id="tenantPhone"
                                     placeholder="09xxxxxxxxx"
                                     dir="ltr"
+                                    inputmode="tel"
+                                    maxlength="20"
                                 >
 
                             </div>
 
 
+
+                            <!-- PROPERTY TYPE -->
+
                             <div class="input-group">
-                                <label>نوع ملک موردنظر</label>
+
+                                <label for="tenantPropertyType">
+                                    نوع ملک موردنظر
+                                </label>
 
                                 <select id="tenantPropertyType">
 
-                                    <option value="apartment">آپارتمان</option>
-                                    <option value="villa">ویلایی</option>
-                                    <option value="office">اداری</option>
-                                    <option value="commercial">تجاری</option>
-                                    <option value="any">فرقی ندارد</option>
+                                    <option value="apartment">
+                                        آپارتمان
+                                    </option>
+
+                                    <option value="villa">
+                                        ویلایی
+                                    </option>
+
+                                    <option value="office">
+                                        اداری
+                                    </option>
+
+                                    <option value="commercial">
+                                        تجاری
+                                    </option>
+
+                                    <option value="land">
+                                        زمین
+                                    </option>
+
+                                    <option value="garden">
+                                        باغ
+                                    </option>
+
+                                    <option value="any">
+                                        فرقی ندارد
+                                    </option>
 
                                 </select>
 
                             </div>
 
 
+
+                            <!-- AREA -->
+
                             <div class="input-group">
-                                <label>متراژ</label>
+
+                                <label for="tenantArea">
+                                    متراژ
+                                </label>
 
                                 <input
                                     type="text"
                                     id="tenantArea"
                                     placeholder="مثلاً ۸۰ تا ۱۲۰"
+                                    maxlength="100"
                                 >
 
                             </div>
 
 
+
+                            <!-- ROOMS -->
+
                             <div class="input-group">
-                                <label>تعداد اتاق</label>
+
+                                <label for="tenantRooms">
+                                    تعداد اتاق
+                                </label>
 
                                 <input
                                     type="number"
                                     id="tenantRooms"
                                     min="0"
+                                    max="100"
                                 >
 
                             </div>
 
 
+
+                            <!-- YEAR -->
+
                             <div class="input-group">
-                                <label>سال ساخت</label>
+
+                                <label for="tenantYear">
+                                    سال ساخت
+                                </label>
 
                                 <input
                                     type="text"
                                     id="tenantYear"
                                     placeholder="مثلاً بالای ۱۳۹۵"
+                                    maxlength="100"
                                 >
 
                             </div>
 
 
+
+                            <!-- DEPOSIT -->
+
                             <div class="input-group">
-                                <label>رهن</label>
+
+                                <label for="tenantDeposit">
+                                    رهن
+                                </label>
 
                                 <input
                                     type="number"
@@ -950,8 +1492,14 @@
                             </div>
 
 
+
+                            <!-- RENT -->
+
                             <div class="input-group">
-                                <label>اجاره</label>
+
+                                <label for="tenantRent">
+                                    اجاره
+                                </label>
 
                                 <input
                                     type="number"
@@ -963,8 +1511,14 @@
                             </div>
 
 
+
+                            <!-- FAMILY STATUS -->
+
                             <div class="input-group">
-                                <label>وضعیت خانوادگی</label>
+
+                                <label for="tenantFamilyStatus">
+                                    وضعیت خانوادگی
+                                </label>
 
                                 <select id="tenantFamilyStatus">
 
@@ -985,30 +1539,42 @@
                             </div>
 
 
+
+                            <!-- FAMILY SIZE -->
+
                             <div
                                 id="familySizeField"
                                 class="input-group hidden"
                             >
 
-                                <label>تعداد نفرات</label>
+                                <label for="tenantFamilySize">
+                                    تعداد نفرات
+                                </label>
 
                                 <input
                                     type="number"
                                     id="tenantFamilySize"
                                     min="1"
+                                    max="100"
                                 >
 
                             </div>
 
 
+
+                            <!-- LOCATION -->
+
                             <div class="input-group">
 
-                                <label>محدوده موردنظر</label>
+                                <label for="tenantLocation">
+                                    محدوده موردنظر
+                                </label>
 
                                 <input
                                     type="text"
                                     id="tenantLocation"
                                     placeholder="مثلاً بومهن"
+                                    maxlength="250"
                                 >
 
                             </div>
@@ -1017,6 +1583,9 @@
 
                     </div>
 
+
+
+                    <!-- TENANT NOTES -->
 
                     <div class="form-section">
 
@@ -1027,6 +1596,7 @@
                         <textarea
                             id="tenantNotes"
                             placeholder="شرایط، شغل، نیازها و..."
+                            maxlength="3000"
                         ></textarea>
 
                     </div>
@@ -1034,9 +1604,10 @@
                 </div>
 
 
-                <!-- =====================
+
+                <!-- ==================================================
                      FOLLOW UP
-                ====================== -->
+                =================================================== -->
 
                 <div class="form-section">
 
@@ -1044,13 +1615,16 @@
                         پیگیری
                     </div>
 
+
                     <div class="followup-box">
+
 
                         <div class="input-group">
 
-                            <label>
+                            <label for="followUpDays">
                                 مهلت پیگیری بعد از ثبت
                             </label>
+
 
                             <div class="number-input">
 
@@ -1059,17 +1633,23 @@
                                     id="followUpDays"
                                     value="10"
                                     min="1"
+                                    max="3650"
                                 >
 
-                                <span>روز</span>
+                                <span>
+                                    روز
+                                </span>
 
                             </div>
 
                         </div>
 
+
                         <div class="followup-info">
+
                             بعد از پایان این مدت، فایل به‌صورت خودکار
                             «نیاز به پیگیری» می‌شود.
+
                         </div>
 
                     </div>
@@ -1077,7 +1657,10 @@
                 </div>
 
 
-                <!-- ACTIONS -->
+
+                <!-- ==================================================
+                     FORM ACTIONS
+                =================================================== -->
 
                 <div class="form-actions">
 
@@ -1088,6 +1671,7 @@
                     >
                         انصراف
                     </button>
+
 
                     <button
                         type="submit"
@@ -1105,26 +1689,41 @@
     </div>
 
 
-    <!-- =========================
-         DETAIL MODAL
-    ========================== -->
 
-    <div id="detailModal" class="modal hidden">
+    <!-- ==================================================
+         DETAIL MODAL
+    =================================================== -->
+
+    <div
+        id="detailModal"
+        class="modal hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="detailTitle"
+    >
 
         <div class="modal-overlay"></div>
 
+
         <div class="modal-box detail-modal">
+
 
             <div class="modal-header">
 
                 <div>
+
                     <span id="detailType"></span>
+
                     <h2 id="detailTitle"></h2>
+
                 </div>
+
 
                 <button
                     id="closeDetailButton"
                     class="close-btn"
+                    type="button"
+                    aria-label="بستن"
                 >
                     ×
                 </button>
@@ -1132,28 +1731,36 @@
             </div>
 
 
+
             <div id="detailContent"></div>
+
 
 
             <div class="detail-actions">
 
+
                 <button
                     id="editDetailButton"
                     class="secondary-btn"
+                    type="button"
                 >
                     ویرایش
                 </button>
 
+
                 <button
                     id="renewDetailButton"
                     class="secondary-btn"
+                    type="button"
                 >
                     تمدید پیگیری
                 </button>
 
+
                 <button
                     id="deleteDetailButton"
                     class="danger-btn"
+                    type="button"
                 >
                     حذف فایل
                 </button>
@@ -1165,36 +1772,85 @@
     </div>
 
 
-    <!-- =========================
-         RENEW MODAL
-    ========================== -->
 
-    <div id="renewModal" class="modal hidden">
+    <!-- ==================================================
+         RENEW FOLLOW-UP MODAL
+    =================================================== -->
+
+    <div
+        id="renewModal"
+        class="modal hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="renewTitle"
+    >
 
         <div class="modal-overlay"></div>
 
+
         <div class="small-modal">
+
 
             <button
                 id="closeRenewButton"
                 class="close-btn"
+                type="button"
+                aria-label="بستن"
             >
                 ×
             </button>
 
-            <h2>تمدید پیگیری</h2>
+
+            <h2 id="renewTitle">
+                تمدید پیگیری
+            </h2>
+
 
             <p>
                 پیگیری این فایل را برای چند روز دیگر تمدید کنیم؟
             </p>
 
+
             <div class="renew-options">
 
-                <button data-days="3">۳ روز</button>
-                <button data-days="7">۷ روز</button>
-                <button data-days="10">۱۰ روز</button>
-                <button data-days="14">۱۴ روز</button>
-                <button data-days="30">۳۰ روز</button>
+                <button
+                    type="button"
+                    data-days="3"
+                >
+                    ۳ روز
+                </button>
+
+
+                <button
+                    type="button"
+                    data-days="7"
+                >
+                    ۷ روز
+                </button>
+
+
+                <button
+                    type="button"
+                    data-days="10"
+                >
+                    ۱۰ روز
+                </button>
+
+
+                <button
+                    type="button"
+                    data-days="14"
+                >
+                    ۱۴ روز
+                </button>
+
+
+                <button
+                    type="button"
+                    data-days="30"
+                >
+                    ۳۰ روز
+                </button>
 
             </div>
 
@@ -1203,7 +1859,13 @@
     </div>
 
 
+
+    <!-- ==================================================
+         JAVASCRIPT
+    =================================================== -->
+
     <script src="app.js"></script>
 
 </body>
+
 </html>
