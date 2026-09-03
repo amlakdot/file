@@ -63,6 +63,37 @@ button {
 
 /* =========================
    LOGIN
+/* =========================
+   SYNC DOT FIX
+========================= */
+.sync-dot.success,
+.sync-dot.online {
+    background: var(--success);
+}
+
+.sync-dot.loading {
+    background: var(--warning);
+    animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+}
+
+/* =========================
+   STATUS BADGE
+========================= */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    color: #111;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
 ========================= */
 
 .login-screen {
