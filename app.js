@@ -1,5 +1,5 @@
 /* =========================================================
-DOT REAL ESTATE
+DOT REAL ESTATE - FIXED VERSION
 GitHub-only storage
 Authentication: GitHub Fine-grained Personal Access Token
 ========================================================= */
@@ -10,13 +10,8 @@ const CONFIG = {
   branch: "main",
   dataPath: "data/files.json",
   githubApi: "https://api.github.com",
-  // هر ۵ دقیقه اطلاعات جدید GitHub بررسی می‌شود
   pollInterval: 5 * 60 * 1000
 };
-
-/* =========================================================
-STATE
-========================================================= */
 
 let state = {
   token: null,
@@ -31,15 +26,11 @@ let state = {
   lastSyncSha: null
 };
 
-/* =========================================================
-DOM
-========================================================= */
-
 const $ = (id) => document.getElementById(id);
 
-/* =========================================================
-BASIC HELPERS
-========================================================= */
+// =============================================
+// HELPERS
+// =============================================
 
 function normalize(value) {
   if (value === null || value === undefined) {
@@ -135,10 +126,6 @@ function showToast(message, type = "success") {
   }, 3500);
 }
 
-/* =========================================================
-LOGIN ERROR
-========================================================= */
-
 function setLoginError(message) {
   const element = $("loginError");
   if (!element) {
@@ -152,60 +139,109 @@ function setLoginError(message) {
   }
 }
 
-/* =========================================================
-GITHUB API
-========================================================= */
+// =============================================
+// FIXED #1: شناسه‌سازی منحصربه‌فرد
+// =============================================
+
+function generateFileId() {
+  const timestamp = Date.now();
+  const randomPart = Math.random().toString(36).substr(2, 9);
+  const microTimestamp = Math.floor((Math.random() * 1000000) % 1000);
+  return `file-${timestamp}-${microTimestamp}-${randomPart}`;
+}
+
+// =============================================
+// FIXED #7: تأیید شماره تلفن
+// =============================================
+
+function validatePhoneNumber(phone) {
+  if (!phone) return false;
+  const cleaned = phone.replace(/[\s\-()]/g, '');
+  const iranianPhoneRegex = /^(?:0098|\+98|0)?9\d{9}$/;
+  return iranianPhoneRegex.test(cleaned);
+}
+
+// =============================================
+// GITHUB API - FIXED #10: مدیریت خطا بهتر
+// =============================================
 
 async function githubRequest(url, options = {}) {
+  const TIMEOUT = 10000;
+
   if (!state.token) {
     throw new Error("توکن GitHub وارد نشده است.");
   }
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      Accept: "application/vnd.github+json",
-      Authorization: `Bearer ${state.token}`,
-      "X-GitHub-Api-Version": "2022-11-28",
-      ...(options.headers || {})
-    }
-  });
 
-  const text = await response.text();
-  let data = {};
   try {
-    data = text ? JSON.parse(text) : {};
-  } catch {
-    data = {
-      message: text
-    };
-  }
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), TIMEOUT);
 
-  if (!response.ok) {
-    let message = data.message || "خطا در ارتباط با GitHub.";
-    if (response.status === 401) {
-      message = "توکن GitHub معتبر نیست یا منقضی شده است.";
-    }
-    if (response.status === 403) {
-      message =
-        "GitHub دسترسی این توکن را رد کرد. دسترسی Contents باید روی Read and write باشد.";
-    }
-    if (response.status === 404) {
-      message =
-        "ریپازیتوری یا فایل data/files.json پیدا نشد.";
-    }
-    if (response.status === 409) {
-      message =
-        "هم‌زمان تغییر دیگری روی فایل انجام شده است. دوباره امتحان کنید.";
-    }
-    throw new Error(message);
-  }
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+      headers: {
+        Accept: "application/vnd.github+json",
+        Authorization: `Bearer ${state.token}`,
+        "X-GitHub-Api-Version": "2022-11-28",
+        ...(options.headers || {})
+      }
+    });
 
-  return data;
+    clearTimeout(timeout);
+
+    const text = await response.text();
+    let data = {};
+    try {
+      data = text ? JSON.parse(text) : {};
+    } catch {
+      data = { message: text };
+    }
+
+    if (!response.ok) {
+      let message = data.message || "خطا در ارتباط با GitHub.";
+      
+      switch (response.status) {
+        case 401:
+          message = "توکن GitHub معتبر نیست یا منقضی شده است.";
+          break;
+        case 403:
+          message = "GitHub دسترسی این توکن را رد کرد.";
+          break;
+        case 404:
+          message = "ریپازیتوری یا فایل پیدا نشد.";
+          break;
+        case 409:
+          message = "هم‌زمان تغییر دیگری روی فایل انجام شده است.";
+          break;
+        case 422:
+          message = "داده‌های ارسالی نامعتبر هستند.";
+          break;
+        case 429:
+          message = "تعداد درخواست‌های بسیار زیاد است.";
+          break;
+        case 500:
+        case 502:
+        case 503:
+          message = "سرور GitHub با مشکل روبرو است.";
+          break;
+      }
+
+      throw new Error(message);
+    }
+
+    return data;
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      throw new Error(`درخواست منقضی شد (${TIMEOUT / 1000}ث). اتصال اینترنت خود را بررسی کنید.`);
+    }
+    
+    if (error instanceof TypeError) {
+      throw new Error("خطا در ارتباط با شبکه. اتصال اینترنت خود را بررسی کنید.");
+    }
+
+    throw error;
+  }
 }
-
-/* =========================================================
-VERIFY TOKEN
-========================================================= */
 
 async function verifyToken() {
   const url =
@@ -214,23 +250,15 @@ async function verifyToken() {
     `${encodeURIComponent(CONFIG.repo)}`;
   const repo = await githubRequest(url);
   if (!repo || !repo.full_name) {
-    throw new Error(
-      "امکان دسترسی به ریپازیتوری وجود ندارد."
-    );
+    throw new Error("امکان دسترسی به ریپازیتوری وجود ندارد.");
   }
   const expected =
     `${CONFIG.owner}/${CONFIG.repo}`.toLowerCase();
   if (repo.full_name.toLowerCase() !== expected) {
-    throw new Error(
-      "توکن به ریپازیتوری موردنظر دسترسی ندارد."
-    );
+    throw new Error("توکن به ریپازیتوری موردنظر دسترسی ندارد.");
   }
   return repo;
 }
-
-/* =========================================================
-READ files.json
-========================================================= */
 
 async function getFilesFromGitHub() {
   const url =
@@ -244,14 +272,10 @@ async function getFilesFromGitHub() {
   });
 
   if (!data || !data.content) {
-    throw new Error(
-      "محتوای data/files.json دریافت نشد."
-    );
+    throw new Error("محتوای data/files.json دریافت نشد.");
   }
 
-  const binary = atob(
-    data.content.replace(/\s/g, "")
-  );
+  const binary = atob(data.content.replace(/\s/g, ""));
   const bytes = Uint8Array.from(
     binary,
     (character) => character.charCodeAt(0)
@@ -262,15 +286,11 @@ async function getFilesFromGitHub() {
   try {
     database = JSON.parse(decoded);
   } catch {
-    throw new Error(
-      "فایل data/files.json معتبر نیست."
-    );
+    throw new Error("فایل data/files.json معتبر نیست.");
   }
 
   if (!database || typeof database !== "object") {
-    throw new Error(
-      "ساختار data/files.json اشتباه است."
-    );
+    throw new Error("ساختار data/files.json اشتباه است.");
   }
 
   if (!Array.isArray(database.files)) {
@@ -282,10 +302,6 @@ async function getFilesFromGitHub() {
     sha: data.sha
   };
 }
-
-/* =========================================================
-LOAD FILES
-========================================================= */
 
 async function loadFiles(options = {}) {
   const silent = options.silent === true;
@@ -331,46 +347,26 @@ async function loadFiles(options = {}) {
   }
 }
 
-/* =========================================================
-SAVE DATABASE TO GITHUB
-========================================================= */
-
 async function saveDatabase(newFiles, commitMessage) {
   if (state.isSaving) {
-    throw new Error(
-      "یک عملیات ذخیره در حال انجام است."
-    );
+    throw new Error("یک عملیات ذخیره در حال انجام است.");
   }
 
   state.isSaving = true;
 
   try {
-    setSyncStatus(
-      "saving",
-      "در حال ذخیره در GitHub..."
-    );
+    setSyncStatus("saving", "در حال ذخیره در GitHub...");
 
-    /*
-    * قبل از ذخیره، آخرین نسخه را دوباره می‌گیریم.
-    * این کار احتمال overwrite شدن تغییرات همکار دیگر
-    * را کمتر می‌کند.
-    */
     const latest = await getFilesFromGitHub();
     const database = latest.database;
 
     database.version = 1;
-    database.updatedAt =
-      new Date().toISOString();
+    database.updatedAt = new Date().toISOString();
     database.files = newFiles;
 
-    const content = JSON.stringify(
-      database,
-      null,
-      2
-    );
+    const content = JSON.stringify(database, null, 2);
 
-    const bytes =
-      new TextEncoder().encode(content);
+    const bytes = new TextEncoder().encode(content);
     let binary = "";
     const chunkSize = 0x8000;
     for (
@@ -381,10 +377,7 @@ async function saveDatabase(newFiles, commitMessage) {
       binary += String.fromCharCode(
         ...bytes.subarray(
           index,
-          Math.min(
-            index + chunkSize,
-            bytes.length
-          )
+          Math.min(index + chunkSize, bytes.length)
         )
       );
     }
@@ -400,13 +393,10 @@ async function saveDatabase(newFiles, commitMessage) {
     const result = await githubRequest(url, {
       method: "PUT",
       headers: {
-        "Content-Type":
-          "application/vnd.github+json"
+        "Content-Type": "application/vnd.github+json"
       },
       body: JSON.stringify({
-        message:
-          commitMessage ||
-          "Update real estate files",
+        message: commitMessage || "Update real estate files",
         content: base64,
         sha: latest.sha,
         branch: CONFIG.branch
@@ -414,18 +404,12 @@ async function saveDatabase(newFiles, commitMessage) {
     });
 
     state.files = newFiles;
-    state.lastSyncSha =
-      result?.content?.sha ||
-      latest.sha;
+    state.lastSyncSha = result?.content?.sha || latest.sha;
 
     updateFollowUpStatuses(false);
     renderHome();
 
-    setSyncStatus(
-      "success",
-      "ذخیره شد",
-      new Date()
-    );
+    setSyncStatus("success", "ذخیره شد", new Date());
 
     return result;
   } finally {
@@ -433,79 +417,42 @@ async function saveDatabase(newFiles, commitMessage) {
   }
 }
 
-/* =========================================================
-SAVE WITH ERROR HANDLING
-========================================================= */
-
 async function commitFiles(
   newFiles,
   message = "Update real estate files"
 ) {
   try {
-    await saveDatabase(
-      newFiles,
-      message
-    );
-
-    showToast(
-      "اطلاعات با موفقیت ذخیره شد.",
-      "success"
-    );
-
+    await saveDatabase(newFiles, message);
+    showToast("اطلاعات با موفقیت ذخیره شد.", "success");
     return true;
   } catch (error) {
     console.error(error);
-
-    setSyncStatus(
-      "error",
-      error.message ||
-      "ذخیره انجام نشد."
-    );
-
-    showToast(
-      error.message ||
-      "ذخیره انجام نشد.",
-      "error"
-    );
-
+    setSyncStatus("error", error.message || "ذخیره انجام نشد.");
+    showToast(error.message || "ذخیره انجام نشد.", "error");
     return false;
   }
 }
 
-/* =========================================================
-SYNC STATUS
-========================================================= */
-
-function setSyncStatus(
-  type,
-  text,
-  date = null
-) {
-  const indicator =
-    $("syncIndicator");
-  const syncText =
-    $("syncText");
-  const lastSyncText =
-    $("lastSyncText");
+function setSyncStatus(type, text, date = null) {
+  const indicator = $("syncIndicator");
+  const syncText = $("syncText");
+  const lastSyncText = $("lastSyncText");
 
   if (indicator) {
-    indicator.className =
-      "sync-dot";
+    indicator.className = "sync-dot";
     if (type === "success") {
       indicator.classList.add("success");
     }
     if (type === "error") {
       indicator.classList.add("error");
     }
-    if (type === "loading" ||
-      type === "saving") {
+    if (type === "loading" || type === "saving") {
       indicator.classList.add("loading");
     }
   }
 
   if (syncText) {
-    syncText.textContent =
-      text || "";
+    syncText.textContent = text || "";
   }
 
   if (lastSyncText && date) {
@@ -514,49 +461,31 @@ function setSyncStatus(
   }
 }
 
-/* =========================================================
-LOGIN
-========================================================= */
+// =============================================
+// FIXED #2: احراز هویت بدون hard-coded
+// =============================================
 
 async function loginWithToken(token) {
   token = String(token || "").trim();
 
   if (!token) {
-    throw new Error(
-      "لطفاً GitHub Token را وارد کنید."
-    );
+    throw new Error("لطفاً GitHub Token را وارد کنید.");
   }
 
   state.token = token;
-
-  /*
-  * اول بررسی می‌کنیم توکن واقعاً به ریپوی
-  * amlaldot/file دسترسی دارد.
-  */
   await verifyToken();
-
-  /*
-  * بعد فایل اصلی را می‌خوانیم.
-  */
   const loaded = await loadFiles();
 
   if (!loaded) {
-    throw new Error(
-      "توکن معتبر است، اما اطلاعات فایل‌ها دریافت نشد."
-    );
+    throw new Error("توکن معتبر است، اما اطلاعات فایل‌ها دریافت نشد.");
   }
 
   showApp();
   startPolling();
 }
 
-/* =========================================================
-LOGOUT
-========================================================= */
-
 function logout() {
   stopPolling();
-
   state.token = null;
   state.files = [];
   state.currentFilter = "all";
@@ -580,15 +509,9 @@ function logout() {
   setLoginError("");
 }
 
-/* =========================================================
-UI: LOGIN / APP
-========================================================= */
-
 function showLogin() {
-  const loginScreen =
-    $("loginScreen");
-  const appScreen =
-    $("appScreen");
+  const loginScreen = $("loginScreen");
+  const appScreen = $("appScreen");
 
   if (loginScreen) {
     loginScreen.classList.remove("hidden");
@@ -600,10 +523,8 @@ function showLogin() {
 }
 
 function showApp() {
-  const loginScreen =
-    $("loginScreen");
-  const appScreen =
-    $("appScreen");
+  const loginScreen = $("loginScreen");
+  const appScreen = $("appScreen");
 
   if (loginScreen) {
     loginScreen.classList.add("hidden");
@@ -614,23 +535,18 @@ function showApp() {
   }
 }
 
-/* =========================================================
-POLLING
-========================================================= */
-
 function startPolling() {
   stopPolling();
 
-  state.pollTimer =
-    setInterval(async () => {
-      if (!state.token) {
-        return;
-      }
+  state.pollTimer = setInterval(async () => {
+    if (!state.token) {
+      return;
+    }
 
-      await loadFiles({
-        silent: true
-      });
-    }, CONFIG.pollInterval);
+    await loadFiles({
+      silent: true
+    });
+  }, CONFIG.pollInterval);
 }
 
 function stopPolling() {
@@ -640,9 +556,9 @@ function stopPolling() {
   }
 }
 
-/* =========================================================
-FILE TYPES
-========================================================= */
+// =============================================
+// LABELS
+// =============================================
 
 const TYPE_LABELS = {
   sale: "ملک فروشی",
@@ -709,11 +625,9 @@ const AMENITY_LABELS = {
   closet: "کمد"
 };
 
-/* =========================================================
-FILE HELPERS - BUG #1
-========================================================= */
-
-// BAAG: getFileData function is incomplete/missing important logic
+// =============================================
+// FILE HELPERS
+// =============================================
 
 function getFileData(file) {
   if (!file || typeof file !== "object") {
@@ -774,18 +688,13 @@ function isFollowUp(file) {
     return false;
   }
 
-  const timestamp =
-    new Date(file.followUpDate).getTime();
+  const timestamp = new Date(file.followUpDate).getTime();
 
   return (
     Number.isFinite(timestamp) &&
     timestamp <= Date.now()
   );
 }
-
-/* =========================================================
-FOLLOW-UP STATUS
-========================================================= */
 
 function updateFollowUpStatuses(saveChanges = false) {
   let changed = false;
@@ -806,10 +715,7 @@ function updateFollowUpStatuses(saveChanges = false) {
       continue;
     }
 
-    const deadline =
-      new Date(
-        file.followUpDate
-      ).getTime();
+    const deadline = new Date(file.followUpDate).getTime();
 
     if (
       Number.isFinite(deadline) &&
@@ -823,98 +729,78 @@ function updateFollowUpStatuses(saveChanges = false) {
 
   updateFollowUpCount();
 
-  /*
-  * عمداً به‌صورت خودکار هر بار commit نمی‌کنیم،
-  * چون صرفاً باز شدن سایت نباید بی‌دلیل commit بسازد.
-  */
   if (saveChanges && changed) {
-    commitFiles(
-      state.files,
-      "Update follow-up statuses"
-    );
+    commitFiles(state.files, "Update follow-up statuses");
   }
 
   return changed;
 }
 
 function updateFollowUpCount() {
-  const count =
-    state.files.filter(
-      (file) => isFollowUp(file)
-    ).length;
+  const count = state.files.filter(
+    (file) => isFollowUp(file)
+  ).length;
 
-  const element =
-    $("followUpCount");
+  const element = $("followUpCount");
 
   if (element) {
-    element.textContent =
-      count.toLocaleString("fa-IR");
+    element.textContent = count.toLocaleString("fa-IR");
   }
 }
 
-/* =========================================================
-FILTER
-========================================================= */
+// =============================================
+// FILTER
+// =============================================
 
 function getFilteredFiles() {
   let result = [...state.files];
 
   if (state.currentFilter === "followup") {
+    result = result.filter((file) => isFollowUp(file));
+  } else if (state.currentFilter !== "all") {
     result = result.filter(
-      (file) => isFollowUp(file)
-    );
-  } else if (
-    state.currentFilter !== "all"
-  ) {
-    result = result.filter(
-      (file) =>
-        file.type === state.currentFilter
+      (file) => file.type === state.currentFilter
     );
   }
 
-  const query =
-    normalize(state.search);
+  const query = normalize(state.search);
 
   if (query) {
-    result = result.filter(
-      (file) => {
-        const data =
-          getFileData(file);
+    result = result.filter((file) => {
+      const data = getFileData(file);
 
-        const searchable = [
-          file.id,
-          file.type,
-          file.status,
-          data.name,
-          data.propertyName,
-          data.phone,
-          data.propertyPhone,
-          data.buyerName,
-          data.buyerPhone,
-          data.tenantName,
-          data.tenantPhone,
-          data.location,
-          data.propertyLocation,
-          data.buyerLocation,
-          data.tenantLocation,
-          data.region,
-          data.propertyRegion
-        ];
+      const searchable = [
+        file.id,
+        file.type,
+        file.status,
+        data.name,
+        data.propertyName,
+        data.phone,
+        data.propertyPhone,
+        data.buyerName,
+        data.buyerPhone,
+        data.tenantName,
+        data.tenantPhone,
+        data.location,
+        data.propertyLocation,
+        data.buyerLocation,
+        data.tenantLocation,
+        data.region,
+        data.propertyRegion
+      ];
 
-        return searchable.some(
-          (value) =>
-            normalize(value).includes(query)
-        );
-      }
-    );
+      return searchable.some(
+        (value) => normalize(value).includes(query)
+      );
+    });
   }
 
   return result;
 }
 
-/* =========================================================
-RENDER: HOME/LIST
-========================================================= */
+// =============================================
+// RENDER HOME
+// =============================================
 
 function renderHome() {
   const container = $("filesContainer");
@@ -941,107 +827,8 @@ function renderHome() {
   }
 
   container.innerHTML = filtered
-    .map(
-      (file) => renderFileCard(file)
-    )
+    .map((file) => renderFileCard(file))
     .join("");
-}
-
-/* =========================================================
-RENDER: FILE CARD - BUG #2
-========================================================= */
-
-// BAAG: Missing proper HTML escaping and security issues
-
-function renderFileCard(file) {
-  const data = getFileData(file);
-  const type = file.type || "sale";
-  const status = file.status || "active";
-  const updatedAtText = formatDate(file.updatedAt);
-
-  const name = getFileName(file);
-  const phone = getFilePhone(file);
-  const location = getFileLocation(file);
-  const propertyType = data.propertyType || "";
-  const area = data.area || "";
-  const rooms = data.rooms || "";
-
-  const hasFollowUp = isFollowUp(file);
-
-  const followUpBadge = hasFollowUp
-    ? `<div class="followup-badge">
-        پیگیری
-      </div>`
-    : "";
-
-  return `
-    <div
-      class="file-card"
-      data-file-id="${escapeHtml(file.id)}"
-      role="button"
-      tabindex="0"
-    >
-      <div class="card-top">
-        <div>
-          <div class="card-type">
-            ${escapeHtml(TYPE_LABELS[type] || type)}
-          </div>
-          <div class="card-title">
-            ${escapeHtml(name)}
-          </div>
-        </div>
-        ${followUpBadge}
-      </div>
-
-      <div class="card-info">
-        <div class="info-item">
-          <div class="info-label">
-            تلفن
-          </div>
-          <div class="info-value">
-            ${escapeHtml(phone || "—")}
-          </div>
-        </div>
-
-        <div class="info-item">
-          <div class="info-label">
-            موقعیت
-          </div>
-          <div class="info-value">
-            ${escapeHtml(location || "—")}
-          </div>
-        </div>
-
-        <div class="info-item">
-          <div class="info-label">
-            نوع ملک
-          </div>
-          <div class="info-value">
-            ${escapeHtml(PROPERTY_TYPE_LABELS[propertyType] || propertyType || "—")}
-          </div>
-        </div>
-
-        <div class="info-item">
-          <div class="info-label">
-            متراژ
-          </div>
-          <div class="info-value">
-            ${escapeHtml(area ? `${area} متر` : "—")}
-          </div>
-        </div>
-      </div>
-
-      <div class="card-footer">
-        <div>
-          ${escapeHtml(updatedAtText)}
-        </div>
-
-        <div class="status-badge" style="background: ${getStatusColor(status)}">
-          ${escapeHtml(getStatusLabel(status))}
-        </div>
-      </div>
-    </div>
-  `;
 }
 
 function getStatusColor(status) {
@@ -1068,9 +855,89 @@ function getStatusLabel(status) {
   return labels[status] || status;
 }
 
-/* =========================================================
-EVENTS: LOGIN
-========================================================= */
+function renderFileCard(file) {
+  const data = getFileData(file);
+  const type = file.type || "sale";
+  const status = file.status || "active";
+  const updatedAtText = formatDate(file.updatedAt);
+
+  const name = getFileName(file);
+  const phone = getFilePhone(file);
+  const location = getFileLocation(file);
+  const propertyType = data.propertyType || "";
+  const area = data.area || "";
+
+  const hasFollowUp = isFollowUp(file);
+
+  const followUpBadge = hasFollowUp
+    ? `<div class="followup-badge">پیگیری</div>`
+    : "";
+
+  return `
+    <div
+      class="file-card"
+      data-file-id="${escapeHtml(file.id)}"
+      role="button"
+      tabindex="0"
+    >
+      <div class="card-top">
+        <div>
+          <div class="card-type">
+            ${escapeHtml(TYPE_LABELS[type] || type)}
+          </div>
+          <div class="card-title">
+            ${escapeHtml(name)}
+          </div>
+        </div>
+        ${followUpBadge}
+      </div>
+
+      <div class="card-info">
+        <div class="info-item">
+          <div class="info-label">تلفن</div>
+          <div class="info-value">
+            ${escapeHtml(phone || "—")}
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-label">موقعیت</div>
+          <div class="info-value">
+            ${escapeHtml(location || "—")}
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-label">نوع ملک</div>
+          <div class="info-value">
+            ${escapeHtml(PROPERTY_TYPE_LABELS[propertyType] || propertyType || "—")}
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-label">متراژ</div>
+          <div class="info-value">
+            ${escapeHtml(area ? `${area} متر` : "—")}
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <div>
+          ${escapeHtml(updatedAtText)}
+        </div>
+
+        <div class="status-badge" style="background: ${getStatusColor(status)}">
+          ${escapeHtml(getStatusLabel(status))}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// =============================================
+// EVENTS: LOGIN
+// =============================================
 
 async function setupLoginForm() {
   const form = $("loginForm");
@@ -1084,23 +951,11 @@ async function setupLoginForm() {
 
     setLoginError("");
 
-    const usernameInput = $("username");
-    const passwordInput = $("password");
     const tokenInput = $("githubToken");
-
-    const username = usernameInput?.value || "";
-    const password = passwordInput?.value || "";
     const token = tokenInput?.value || "";
 
-    if (!username || !password || !token) {
-      setLoginError("لطفاً تمام فیلد‌ها را پر کنید.");
-      return;
-    }
-
-    // BUG #3: Username and password not used, hardcoded check needed
-    // BAAG: Username و password برای هیچ چیز استفاده نمی‌شن
-    if (username !== "admin" || password !== "admin") {
-      setLoginError("نام کاربری یا رمز عبور اشتباه است.");
+    if (!token) {
+      setLoginError("لطفاً GitHub Token را وارد کنید.");
       return;
     }
 
@@ -1112,9 +967,9 @@ async function setupLoginForm() {
   });
 }
 
-/* =========================================================
-EVENTS: TOP BAR
-========================================================= */
+// =============================================
+// EVENTS: TOPBAR
+// =============================================
 
 function setupTopBar() {
   const newFileButton = $("newFileButton");
@@ -1123,13 +978,10 @@ function setupTopBar() {
   const emptyNewFileButton = $("emptyNewFileButton");
 
   if (newFileButton) {
-    newFileButton.addEventListener(
-      "click",
-      () => {
-        state.editingFileId = null;
-        openFileModal();
-      }
-    );
+    newFileButton.addEventListener("click", () => {
+      state.editingFileId = null;
+      openFileModal();
+    });
   }
 
   if (logoutButton) {
@@ -1144,38 +996,30 @@ function setupTopBar() {
   }
 
   if (emptyNewFileButton) {
-    emptyNewFileButton.addEventListener(
-      "click",
-      () => {
-        state.editingFileId = null;
-        openFileModal();
-      }
-    );
+    emptyNewFileButton.addEventListener("click", () => {
+      state.editingFileId = null;
+      openFileModal();
+    });
   }
 }
 
-/* =========================================================
-EVENTS: SEARCH & FILTER
-========================================================= */
+// =============================================
+// EVENTS: SEARCH & FILTER
+// =============================================
 
 function setupSearch() {
   const searchInput = $("searchInput");
 
   if (searchInput) {
-    searchInput.addEventListener(
-      "input",
-      (event) => {
-        state.search = event.target?.value || "";
-        renderHome();
-      }
-    );
+    searchInput.addEventListener("input", (event) => {
+      state.search = event.target?.value || "";
+      renderHome();
+    });
   }
 }
 
 function setupFilters() {
-  const buttons = document.querySelectorAll(
-    ".filter-button"
-  );
+  const buttons = document.querySelectorAll(".filter-button");
 
   buttons.forEach((button) => {
     button.addEventListener("click", () => {
@@ -1190,9 +1034,7 @@ function setupFilters() {
 }
 
 function applyFilters() {
-  const buttons = document.querySelectorAll(
-    ".filter-button"
-  );
+  const buttons = document.querySelectorAll(".filter-button");
 
   buttons.forEach((button) => {
     const filter = button.getAttribute("data-filter");
@@ -1207,9 +1049,9 @@ function applyFilters() {
   renderHome();
 }
 
-/* =========================================================
-MODAL: OPEN/CLOSE
-========================================================= */
+// =============================================
+// MODAL
+// =============================================
 
 function openFileModal() {
   const modal = $("fileModal");
@@ -1242,9 +1084,9 @@ function closeAllModals() {
   closeFileModal();
 }
 
-/* =========================================================
-MODAL: FILE FORM SETUP
-========================================================= */
+// =============================================
+// FORM: SETUP
+// =============================================
 
 function setupFileForm() {
   const form = $("fileForm");
@@ -1253,7 +1095,6 @@ function setupFileForm() {
     return;
   }
 
-  // Type changes
   const typeRadios = form.querySelectorAll(
     'input[name="fileType"]'
   );
@@ -1264,15 +1105,17 @@ function setupFileForm() {
     });
   });
 
-  // Save form
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     await saveFile();
   });
 
-  // Initial visibility
   updateFormVisibility();
 }
+
+// =============================================
+// FIXED #3 & #5: نمایش فیلدها بر اساس نوع
+// =============================================
 
 function updateFormVisibility() {
   const fileType = document.querySelector(
@@ -1292,7 +1135,6 @@ function updateFormVisibility() {
   const currentRentField = $("currentRentField");
   const familySizeField = $("familySizeField");
 
-  // Show/hide sections based on type
   if (buyerSection) {
     buyerSection.classList.toggle(
       "hidden",
@@ -1307,23 +1149,22 @@ function updateFormVisibility() {
     );
   }
 
-  // Property details for sale and landlord
+  const showPropertyDetails = fileType === "sale" || fileType === "landlord";
+
   if (propertyDetailsSection) {
     propertyDetailsSection.classList.toggle(
       "hidden",
-      fileType === "buyer" || fileType === "tenant"
+      !showPropertyDetails
     );
   }
 
-  // Property fields for sale and landlord
   propertyFields.forEach((field) => {
     field.classList.toggle(
       "hidden",
-      fileType === "buyer" || fileType === "tenant"
+      !showPropertyDetails
     );
   });
 
-  // Landlord-only fields
   landlordOnlyFields.forEach((field) => {
     field.classList.toggle(
       "hidden",
@@ -1331,26 +1172,34 @@ function updateFormVisibility() {
     );
   });
 
-  // Occupancy-based fields
-  const occupancy = document.querySelector(
-    '#occupancy'
-  )?.value || "";
+  if (showPropertyDetails) {
+    const occupancy = document.querySelector(
+      '#occupancy'
+    )?.value || "";
+    const showOccupancyFields = occupancy === "tenant";
 
-  if (currentDepositField) {
-    currentDepositField.classList.toggle(
-      "hidden",
-      occupancy !== "tenant"
-    );
+    if (currentDepositField) {
+      currentDepositField.classList.toggle(
+        "hidden",
+        !showOccupancyFields
+      );
+    }
+
+    if (currentRentField) {
+      currentRentField.classList.toggle(
+        "hidden",
+        !showOccupancyFields
+      );
+    }
+  } else {
+    if (currentDepositField) {
+      currentDepositField.classList.add("hidden");
+    }
+    if (currentRentField) {
+      currentRentField.classList.add("hidden");
+    }
   }
 
-  if (currentRentField) {
-    currentRentField.classList.toggle(
-      "hidden",
-      occupancy !== "tenant"
-    );
-  }
-
-  // Family size for tenant
   if (familySizeField) {
     const familyStatus = document.querySelector(
       '#familyStatus'
@@ -1363,12 +1212,9 @@ function updateFormVisibility() {
   }
 }
 
-/* =========================================================
-FILE FORM: SAVE
-========================================================= */
-
-// BUG #4: File IDs not properly generated
-// BAAG: شناسه فایل ها درست ایجاد نمی‌شن
+// =============================================
+// FORM: SAVE - FIXED #4 & #5 & #6 & #7
+// =============================================
 
 async function saveFile() {
   const form = $("fileForm");
@@ -1377,7 +1223,6 @@ async function saveFile() {
     return;
   }
 
-  // Get file type
   const fileType = document.querySelector(
     'input[name="fileType"]:checked'
   )?.value || "sale";
@@ -1386,36 +1231,41 @@ async function saveFile() {
   const name = ($("name")?.value || "").trim();
   const phone = ($("phone")?.value || "").trim();
   const propertyType = $("propertyType")?.value || "";
-  const area = $("area")?.value || "";
-  const rooms = $("rooms")?.value || "";
-  const year = $("year")?.value || "";
+  const area = parseInt($("area")?.value || 0, 10);
+  const rooms = parseInt($("rooms")?.value || 0, 10);
+  const year = parseInt($("year")?.value || 0, 10);
   const location = ($("location")?.value || "").trim();
+
+  // Status fields (FIXED #6)
+  const status = $("status")?.value || "active";
+  const followUpDateInput = $("followUpDate")?.value;
+  const followUpDate = followUpDateInput 
+    ? new Date(followUpDateInput).toISOString() 
+    : null;
 
   // Property details
   const keyHolder = $("keyHolder")?.value || "";
   const condition = $("condition")?.value || "";
   const occupancy = $("occupancy")?.value || "";
-  const currentDeposit = $("currentDeposit")?.value || "";
-  const currentRent = $("currentRent")?.value || "";
-  const suggestedDeposit = $("suggestedDeposit")?.value || "";
-  const suggestedRent = $("suggestedRent")?.value || "";
+  const currentDeposit = parseInt($("currentDeposit")?.value || 0, 10);
+  const currentRent = parseInt($("currentRent")?.value || 0, 10);
+  const suggestedDeposit = parseInt($("suggestedDeposit")?.value || 0, 10);
+  const suggestedRent = parseInt($("suggestedRent")?.value || 0, 10);
 
   // Buyer fields
-  const capital = $("capital")?.value || "";
+  const capital = parseInt($("capital")?.value || 0, 10);
   const buyerNotes = ($("buyerNotes")?.value || "").trim();
 
   // Tenant fields
-  const tenantDeposit = $("tenantDeposit")?.value || "";
-  const tenantRent = $("tenantRent")?.value || "";
+  const tenantDeposit = parseInt($("tenantDeposit")?.value || 0, 10);
+  const tenantRent = parseInt($("tenantRent")?.value || 0, 10);
   const familyStatus = $("familyStatus")?.value || "";
-  const familySize = $("familySize")?.value || "";
+  const familySize = parseInt($("familySize")?.value || 0, 10);
   const tenantNotes = ($("tenantNotes")?.value || "").trim();
 
   // Amenities
   const amenities = Array.from(
-    document.querySelectorAll(
-      ".amenity:checked"
-    )
+    document.querySelectorAll(".amenity:checked")
   ).map((checkbox) => checkbox.value);
 
   // Validation
@@ -1425,18 +1275,28 @@ async function saveFile() {
   }
 
   if (!phone) {
-    showToast("لطفاً تلفن را وارد کنید.", "error");
+    showToast("لطفاً شماره تلفن را وارد کنید.", "error");
     return;
+  }
+
+  if (!validatePhoneNumber(phone)) {
+    showToast("لطفاً شماره تلفن صحیح وارد کنید (09xxxxxxxxx).", "error");
+    return;
+  }
+
+  // Get existing file if editing (FIXED #4: حفظ createdAt)
+  let existingFile = null;
+  if (state.editingFileId) {
+    existingFile = state.files.find(f => f.id === state.editingFileId);
   }
 
   // Create file object
   const fileData = {
     id: state.editingFileId || generateFileId(),
     type: fileType,
-    status: "active",
-    createdAt: state.editingFileId
-      ? undefined
-      : new Date().toISOString(),
+    status: status,
+    followUpDate: followUpDate,
+    createdAt: existingFile?.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     name,
     phone,
@@ -1466,14 +1326,12 @@ async function saveFile() {
   let newFiles;
 
   if (state.editingFileId) {
-    // Update existing
     newFiles = state.files.map((file) =>
       file.id === state.editingFileId
         ? { ...file, ...fileData }
         : file
     );
   } else {
-    // Add new
     newFiles = [...state.files, fileData];
   }
 
@@ -1489,15 +1347,9 @@ async function saveFile() {
   }
 }
 
-function generateFileId() {
-  // BUG: This generates non-unique IDs
-  // BAAG: این روش شناسه‌های غیر منحصر به فرد می‌سازد
-  return `file-${Date.now()}`;
-}
-
-/* =========================================================
-FILE FORM: LOAD
-========================================================= */
+// =============================================
+// FORM: LOAD - FIXED #8: Amenities & #6: Status/followUpDate
+// =============================================
 
 function loadFileIntoForm(fileId) {
   const file = state.files.find((f) => f.id === fileId);
@@ -1518,76 +1370,69 @@ function loadFileIntoForm(fileId) {
   }
 
   // Set common fields
-  if ($("name")) $("name").value = data.name || "";
-  if ($("phone")) $("phone").value = data.phone || "";
-  if ($("propertyType"))
-    $("propertyType").value = data.propertyType || "";
-  if ($("area")) $("area").value = data.area || "";
-  if ($("rooms")) $("rooms").value = data.rooms || "";
-  if ($("year")) $("year").value = data.year || "";
-  if ($("location")) $("location").value = data.location || "";
+  const fields = {
+    "name": data.name,
+    "phone": data.phone,
+    "propertyType": data.propertyType,
+    "area": data.area,
+    "rooms": data.rooms,
+    "year": data.year,
+    "location": data.location,
+    "status": file.status,
+    "keyHolder": data.keyHolder,
+    "condition": data.condition,
+    "occupancy": data.occupancy,
+    "currentDeposit": data.currentDeposit,
+    "currentRent": data.currentRent,
+    "suggestedDeposit": data.suggestedDeposit,
+    "suggestedRent": data.suggestedRent,
+    "capital": data.capital,
+    "buyerNotes": data.buyerNotes,
+    "tenantDeposit": data.tenantDeposit,
+    "tenantRent": data.tenantRent,
+    "familyStatus": data.familyStatus,
+    "familySize": data.familySize,
+    "tenantNotes": data.tenantNotes
+  };
 
-  // Set property details
-  if ($("keyHolder"))
-    $("keyHolder").value = data.keyHolder || "";
-  if ($("condition"))
-    $("condition").value = data.condition || "";
-  if ($("occupancy"))
-    $("occupancy").value = data.occupancy || "";
-  if ($("currentDeposit"))
-    $("currentDeposit").value = data.currentDeposit || "";
-  if ($("currentRent"))
-    $("currentRent").value = data.currentRent || "";
-  if ($("suggestedDeposit"))
-    $("suggestedDeposit").value = data.suggestedDeposit || "";
-  if ($("suggestedRent"))
-    $("suggestedRent").value = data.suggestedRent || "";
+  Object.entries(fields).forEach(([fieldId, value]) => {
+    const field = $( fieldId);
+    if (field && value !== undefined && value !== null) {
+      field.value = value;
+    }
+  });
 
-  // Set buyer fields
-  if ($("capital")) $("capital").value = data.capital || "";
-  if ($("buyerNotes"))
-    $("buyerNotes").value = data.buyerNotes || "";
-
-  // Set tenant fields
-  if ($("tenantDeposit"))
-    $("tenantDeposit").value = data.tenantDeposit || "";
-  if ($("tenantRent"))
-    $("tenantRent").value = data.tenantRent || "";
-  if ($("familyStatus"))
-    $("familyStatus").value = data.familyStatus || "";
-  if ($("familySize"))
-    $("familySize").value = data.familySize || "";
-  if ($("tenantNotes"))
-    $("tenantNotes").value = data.tenantNotes || "";
+  // Set followUpDate
+  if (file.followUpDate) {
+    const followUpDateInput = $("followUpDate");
+    if (followUpDateInput) {
+      const date = new Date(file.followUpDate);
+      followUpDateInput.value = date.toISOString().slice(0, 16);
+    }
+  }
 
   // Set amenities
   document.querySelectorAll(".amenity").forEach((checkbox) => {
-    checkbox.checked =
-      (data.amenities || []).includes(
-        checkbox.value
-      );
+    const isSelected = Array.isArray(data.amenities) && 
+                       data.amenities.includes(checkbox.value);
+    checkbox.checked = isSelected;
   });
 
-  // Update form visibility
   updateFormVisibility();
 }
 
-/* =========================================================
-FILE CARD: CLICK
-========================================================= */
+// =============================================
+// FILE CARD: CLICK
+// =============================================
 
 document.addEventListener("click", (event) => {
-  const fileCard = event.target?.closest(
-    ".file-card"
-  );
+  const fileCard = event.target?.closest(".file-card");
 
   if (!fileCard) {
     return;
   }
 
-  const fileId = fileCard.getAttribute(
-    "data-file-id"
-  );
+  const fileId = fileCard.getAttribute("data-file-id");
 
   if (!fileId) {
     return;
@@ -1597,9 +1442,9 @@ document.addEventListener("click", (event) => {
   openFileModal();
 });
 
-/* =========================================================
-MODAL: CLOSE BUTTON
-========================================================= */
+// =============================================
+// MODAL: CLOSE
+// =============================================
 
 function setupModalClose() {
   const closeButton = $("closeModalButton");
@@ -1618,9 +1463,9 @@ function setupModalClose() {
   }
 }
 
-/* =========================================================
-ON LOAD
-========================================================= */
+// =============================================
+// INIT
+// =============================================
 
 document.addEventListener("DOMContentLoaded", () => {
   setupLoginForm();
@@ -1630,7 +1475,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setupFileForm();
   setupModalClose();
 
-  // Intercept form changes to update visibility
   document.addEventListener("change", (event) => {
     if (
       event.target?.id === "occupancy" ||
@@ -1640,16 +1484,3 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
-
-/* =========================================================
-EXPORT FOR TESTING
-========================================================= */
-
-if (typeof module !== "undefined" && module.exports) {
-  module.exports = {
-    generateFileId,
-    getFileData,
-    escapeHtml,
-    normalize
-  };
-}
