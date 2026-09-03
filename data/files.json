@@ -1,5 +1,43 @@
 {
   "version": 1,
-  "updatedAt": null,
-  "files": []
+  "updatedAt": "2026-09-03T19:36:48.237Z",
+  "files": [
+    {
+      "id": "file-1788464205733-477-4xyrw190o",
+      "type": "landlord",
+      "status": "active",
+      "followUpDate": null,
+      "createdAt": "2026-09-03T19:36:45.733Z",
+      "updatedAt": "2026-09-03T19:36:45.733Z",
+      "name": "تست",
+      "phone": "09223867713",
+      "propertyType": "apartment",
+      "area": 100,
+      "rooms": 2,
+      "year": 1405,
+      "location": "بومهن خ حاج منصور دات",
+      "keyHolder": "owner",
+      "condition": "new",
+      "occupancy": "evacuating",
+      "currentDeposit": 0,
+      "currentRent": 0,
+      "suggestedDeposit": 200000000,
+      "suggestedRent": 2000000,
+      "capital": 0,
+      "buyerNotes": "",
+      "tenantDeposit": 0,
+      "tenantRent": 0,
+      "familyStatus": "single",
+      "familySize": 0,
+      "tenantNotes": "",
+      "amenities": [
+        "parking",
+        "yard",
+        "guard",
+        "package",
+        "cooler",
+        "cabinet"
+      ]
+    }
+  ]
 }
