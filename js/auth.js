@@ -7,6 +7,7 @@ import { state } from "./state.js";
 import { $, setLoginError } from "./helpers.js";
 import { verifyToken, loadFiles } from "./github.js";
 import { closeFileModal } from "./modal.js";
+import { clearCryptoCache } from "./crypto.js";
 
 export async function loginWithToken(token) {
   token = String(token || "").trim();
@@ -36,6 +37,7 @@ export function logout() {
   state.editingFileId = null;
   state.lastSyncSha = null;
 
+  clearCryptoCache();
   closeFileModal();
 
   if ($("loginForm")) $("loginForm").reset();
