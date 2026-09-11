@@ -1,41 +1,5 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-11T07:10:59.089Z",
-  "files": [
-    {
-      "id": "file-1788470854715-662-pa7fx8ktn",
-      "type": "sale",
-      "status": "followup",
-      "followUpDate": "2026-09-04T20:30:00.000Z",
-      "createdAt": "2026-09-03T21:27:34.715Z",
-      "updatedAt": "2026-09-03T21:27:34.715Z",
-      "name": "ava",
-      "phone": "enc:N9j6YmOhcrq4DqFFssZAm4UJ7CVK/jCfVbUqhMwOOCG+aSYd1KTx",
-      "propertyType": "apartment",
-      "area": 0,
-      "rooms": 0,
-      "year": 0,
-      "location": "",
-      "keyHolder": "owner",
-      "condition": "new",
-      "occupancy": "empty",
-      "currentDeposit": 0,
-      "currentRent": 0,
-      "suggestedDeposit": 0,
-      "suggestedRent": 0,
-      "capital": 0,
-      "buyerNotes": "",
-      "tenantDeposit": 0,
-      "tenantRent": 0,
-      "familyStatus": "single",
-      "familySize": 0,
-      "tenantNotes": "",
-      "amenities": [
-        "pool",
-        "guard",
-        "cooler",
-        "floor-heating"
-      ]
-    }
-  ]
+  "updatedAt": "2026-09-11T07:11:03.787Z",
+  "files": []
 }
