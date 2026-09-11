@@ -8,5 +8,8 @@ export const CONFIG = {
   branch: "main",
   dataPath: "data/files.json",
   githubApi: "https://api.github.com",
-  pollInterval: 5 * 60 * 1000
+  /** فاصله پایه polling وقتی تب فعال است */
+  pollInterval: 3 * 60 * 1000,
+  /** حداقل فاصله بین دو pull خودکار */
+  minPollGap: 60 * 1000
 };
