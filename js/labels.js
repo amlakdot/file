@@ -22,9 +22,14 @@ export const PROPERTY_TYPE_LABELS = {
 export const KEY_HOLDER_LABELS = {
   owner: "مالک",
   tenant: "مستاجر",
-  guard: "نگهبان",
-  office: "دفتر",
+  guard: "سرایدار / نگهبان",
+  office: "املاک / دفتر",
   other: "سایر"
+};
+
+export const FLOOR_LABELS = {
+  basement: "زیرزمین",
+  ground: "همکف"
 };
 
 export const CONDITION_LABELS = {
