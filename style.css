@@ -725,6 +725,17 @@ select {
     padding-top: 4px;
 }
 
+.modal-actions .primary-button {
+    margin-right: auto;
+}
+
+.modal-actions .danger-button:disabled,
+.modal-actions .secondary-button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+}
+
 /* =========================
    DETAIL
 ========================= */
