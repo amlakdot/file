@@ -138,7 +138,13 @@ document.addEventListener("DOMContentLoaded", () => {
   setupModalClose();
 
   document.addEventListener("change", (e) => {
-    if (e.target?.id === "occupancy" || e.target?.id === "familyStatus") {
+    const id = e.target?.id;
+    if (
+      id === "occupancy" ||
+      id === "familyStatus" ||
+      id === "propertyType" ||
+      id === "keyHolder"
+    ) {
       updateFormVisibility();
     }
   });
