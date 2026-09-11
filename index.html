@@ -316,10 +316,20 @@
                     </div>
                 </div>
 
-                <!-- FOLLOW UP -->
+                <!-- STATUS -->
                 <div class="form-section">
-                    <div class="section-title">پیگیری</div>
+                    <div class="section-title">وضعیت فایل</div>
                     <div class="form-grid">
+                        <div class="field">
+                            <label for="fileStatus">وضعیت</label>
+                            <select id="fileStatus">
+                                <option value="active">فعال</option>
+                                <option value="followup">نیاز به پیگیری</option>
+                                <option value="pending">در انتظار</option>
+                                <option value="archived">بایگانی</option>
+                                <option value="done">انجام شده</option>
+                            </select>
+                        </div>
                         <div class="field">
                             <label for="followUpDays">پیگیری بعد از چند روز؟</label>
                             <input id="followUpDays" type="number" min="1" value="10">
@@ -330,6 +340,8 @@
                 <!-- ACTIONS -->
                 <div class="modal-actions">
                     <button id="cancelFormButton" type="button" class="ghost-button">انصراف</button>
+                    <button id="shareFileButton" type="button" class="secondary-button">اشتراک‌گذاری</button>
+                    <button id="deleteFileButton" type="button" class="danger-button hidden">حذف فایل</button>
                     <button type="submit" class="primary-button">ذخیره</button>
                 </div>
             </form>
