@@ -62,6 +62,10 @@
                     <span id="followUpCount">0</span>
                 </button>
 
+                <button id="manualSyncButton" class="header-button" type="button" title="همگام‌سازی">
+                    همگام‌سازی
+                </button>
+
                 <button id="newFileButton" class="primary-button" type="button">
                     + فایل جدید
                 </button>
@@ -79,9 +83,41 @@
                     <input
                         id="searchInput"
                         type="search"
-                        placeholder="جست‌وجوی نام، شماره، منطقه و..."
+                        placeholder="نام، تلفن، منطقه، قیمت، طبقه، امکانات، پلاک..."
                         autocomplete="off"
                     >
+                </div>
+            </div>
+
+            <div class="advanced-filters">
+                <div class="field">
+                    <label for="regionFilter">منطقه</label>
+                    <input id="regionFilter" type="text" placeholder="مثلاً سعادت‌آباد" autocomplete="off">
+                </div>
+                <div class="field">
+                    <label for="priceMinFilter">حداقل مبلغ</label>
+                    <input id="priceMinFilter" class="money-input" type="text" inputmode="numeric" placeholder="0">
+                </div>
+                <div class="field">
+                    <label for="priceMaxFilter">حداکثر مبلغ</label>
+                    <input id="priceMaxFilter" class="money-input" type="text" inputmode="numeric" placeholder="مثلاً 10,000,000,000">
+                </div>
+                <div class="field">
+                    <label for="sortBySelect">مرتب‌سازی</label>
+                    <select id="sortBySelect">
+                        <option value="updatedAt">آخرین بروزرسانی</option>
+                        <option value="createdAt">تاریخ ثبت</option>
+                        <option value="price">مبلغ</option>
+                        <option value="name">نام</option>
+                        <option value="area">متراژ</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="sortDirSelect">ترتیب</label>
+                    <select id="sortDirSelect">
+                        <option value="desc">نزولی</option>
+                        <option value="asc">صعودی</option>
+                    </select>
                 </div>
             </div>
 
@@ -92,6 +128,7 @@
                 <button class="filter-button" data-filter="buyer" type="button">خریدار</button>
                 <button class="filter-button" data-filter="tenant" type="button">مستاجر</button>
                 <button class="filter-button" data-filter="followup" type="button">نیاز به پیگیری</button>
+                <button class="filter-button" data-filter="trash" type="button">سطل بازیابی</button>
             </div>
 
             <div class="sync-status">
@@ -104,8 +141,8 @@
 
             <div id="emptyState" class="empty-state hidden">
                 <div class="empty-icon">⌂</div>
-                <h2>فایلی پیدا نشد</h2>
-                <p>هنوز فایلی با این مشخصات ثبت نشده است.</p>
+                <h2 id="emptyTitle">فایلی پیدا نشد</h2>
+                <p id="emptyDesc">هنوز فایلی با این مشخصات ثبت نشده است.</p>
                 <button id="emptyNewFileButton" class="primary-button" type="button">
                     ثبت فایل جدید
                 </button>
@@ -223,6 +260,10 @@
                         <div class="field field-full">
                             <label for="location">موقعیت</label>
                             <input id="location" type="text" placeholder="محله، خیابان، منطقه...">
+                        </div>
+                        <div class="field property-field">
+                            <label for="plaque">پلاک (اختیاری)</label>
+                            <input id="plaque" type="text" placeholder="پلاک ثبتی / پلاک ساختمان">
                         </div>
                     </div>
                 </div>
@@ -405,6 +446,34 @@
                     <button id="saveFileButton" type="submit" class="primary-button">ذخیره</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+
+    <!-- =========================
+         DETAIL MODAL
+    ========================== -->
+    <div id="detailModal" class="modal hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-card large-modal">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-eyebrow">جزئیات فایل</div>
+                    <h2 id="detailTitle">فایل</h2>
+                </div>
+                <button id="closeDetailButton" class="close-button" type="button">×</button>
+            </div>
+            <div id="detailBody" class="detail-body"></div>
+            <div class="modal-actions detail-actions">
+                <button id="detailCopyPhoneButton" type="button" class="ghost-button">کپی تلفن</button>
+                <button id="detailCopyAddressButton" type="button" class="ghost-button">کپی آدرس</button>
+                <button id="detailWhatsAppButton" type="button" class="secondary-button">واتساپ</button>
+                <button id="detailShareCopyButton" type="button" class="secondary-button">کپی متن</button>
+                <button id="detailEditButton" type="button" class="primary-button">ویرایش</button>
+                <button id="detailArchiveButton" type="button" class="danger-button">انتقال به سطل</button>
+                <button id="detailRestoreButton" type="button" class="primary-button hidden">بازگردانی</button>
+                <button id="detailPurgeButton" type="button" class="danger-button hidden">حذف دائمی</button>
+            </div>
         </div>
     </div>
 
