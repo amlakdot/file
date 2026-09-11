@@ -5,7 +5,7 @@
 import { CONFIG } from "./config.js";
 import { state } from "./state.js";
 import { $, formatDateTime, showToast } from "./helpers.js";
-import { updateFollowUpStatuses } from "./files.js";
+import { updateFollowUpStatuses, purgeExpiredTrash } from "./files.js";
 import { renderHome } from "./render.js";
 import { decryptAllFiles, encryptAllFiles } from "./crypto.js";
 
@@ -181,8 +181,23 @@ export async function loadFiles(options = {}) {
     state.files = await decryptAllFiles(rawFiles);
     state.lastSyncSha = result.sha;
 
-    updateFollowUpStatuses();
+    const purged = purgeExpiredTrash();
+    const followChanged = updateFollowUpStatuses();
+
+    // اگر وضعیت پیگیری یا پاکسازی سطل عوض شد، روی GitHub هم ذخیره کن
+    if ((purged || followChanged) && !state.isSaving && !options.skipPersist) {
+      try {
+        const msg = purged
+          ? "Purge expired trash / update follow-ups"
+          : "Auto-update follow-up statuses";
+        await saveDatabase(state.files, msg);
+      } catch (persistErr) {
+        console.warn("persist follow-up/purge failed:", persistErr);
+      }
+    }
+
     renderHome();
+    state.lastPollAt = Date.now();
 
     setSyncStatus("success", "همگام با GitHub", new Date());
     return true;
@@ -250,6 +265,7 @@ export async function saveDatabase(newFiles, commitMessage) {
 
     state.files = newFiles;
     state.lastSyncSha = result?.content?.sha || latest.sha;
+    state.lastLocalChangeAt = Date.now();
 
     updateFollowUpStatuses();
     renderHome();
