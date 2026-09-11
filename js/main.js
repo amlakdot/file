@@ -13,7 +13,8 @@ import {
 import {
   setupFileForm,
   updateFormVisibility,
-  loadFileIntoForm
+  loadFileIntoForm,
+  resetFormFields
 } from "./form.js";
 import { applyFilters, renderHome } from "./render.js";
 
@@ -34,25 +35,47 @@ function setupLoginForm() {
     try {
       await loginWithToken(token);
     } catch (err) {
-      setLoginError(err.message);
+      setLoginError(err.message || "ورود ناموفق بود.");
     }
   });
 }
 
 function setupTopBar() {
-  $("newFileButton")?.addEventListener("click", () => {
+  $("newFileButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     state.editingFileId = null;
     openFileModal();
   });
 
-  $("logoutButton")?.addEventListener("click", logout);
+  // رفع باگ خروج
+  const logoutBtn = $("logoutButton");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      try {
+        logout();
+      } catch (err) {
+        console.error("logout error:", err);
+        state.token = null;
+        state.files = [];
+        $("loginScreen")?.classList.remove("hidden");
+        $("appScreen")?.classList.add("hidden");
+      }
+    });
+  }
 
-  $("followUpButton")?.addEventListener("click", () => {
+  $("followUpButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     state.currentFilter = "followup";
     applyFilters();
   });
 
-  $("emptyNewFileButton")?.addEventListener("click", () => {
+  $("emptyNewFileButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     state.editingFileId = null;
     openFileModal();
   });
@@ -67,7 +90,9 @@ function setupSearch() {
 
 function setupFilters() {
   document.querySelectorAll(".filter-button").forEach((btn) => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       const filter = btn.getAttribute("data-filter");
       if (filter) {
         state.currentFilter = filter;
@@ -79,10 +104,17 @@ function setupFilters() {
 
 // کلیک روی کارت → ویرایش
 document.addEventListener("click", (e) => {
+  // اگر روی دکمه یا کنترل داخل کارت کلیک شد، ادیت باز نشود
+  if (e.target.closest("button, a, input, select, textarea, label")) {
+    return;
+  }
+
   const card = e.target?.closest(".file-card");
   if (!card) return;
+
   const fileId = card.getAttribute("data-file-id");
   if (!fileId) return;
+
   state.editingFileId = fileId;
   openFileModal();
 });
@@ -92,10 +124,10 @@ document.addEventListener("click", (e) => {
 // =============================================
 
 document.addEventListener("DOMContentLoaded", () => {
-  // اتصال handlerهای فرم به مودال (جلوگیری از وابستگی دایره‌ای)
   setFormHandlers({
     loadFileIntoForm,
-    updateFormVisibility
+    updateFormVisibility,
+    resetFormFields
   });
 
   setupLoginForm();
