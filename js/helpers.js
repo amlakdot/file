@@ -18,6 +18,43 @@ export function escapeHtml(value) {
     .replace(/'/g, "&#039;");
 }
 
+/**
+ * تبدیل ارقام فارسی/عربی به لاتین
+ */
+export function toEnglishDigits(value) {
+  return String(value ?? "")
+    .replace(/[۰-۹]/g, (d) => "۰۱۲۳۴۵۶۷۸۹".indexOf(d))
+    .replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+}
+
+/**
+ * فقط رقم‌ها را نگه می‌دارد
+ */
+export function parseMoney(value) {
+  if (value === null || value === undefined || value === "") return 0;
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? Math.trunc(value) : 0;
+  }
+  const cleaned = toEnglishDigits(value).replace(/[^\d]/g, "");
+  if (!cleaned) return 0;
+  const n = parseInt(cleaned, 10);
+  return Number.isFinite(n) ? n : 0;
+}
+
+/**
+ * فرمت نمایش عدد با جداکننده سه‌رقمی: 10,000,000
+ */
+export function formatGroupedNumber(value) {
+  if (value === null || value === undefined || value === "") return "";
+  const n = typeof value === "number" ? value : parseMoney(value);
+  if (!Number.isFinite(n) || n === 0) {
+    // اگر صفر واقعی از ورودی خالی آمده، خالی برگردان
+    if (value === "" || value === null || value === undefined) return "";
+  }
+  if (!Number.isFinite(n)) return "";
+  return Math.trunc(n).toLocaleString("en-US");
+}
+
 export function formatNumber(value) {
   if (
     value === null ||
@@ -27,14 +64,14 @@ export function formatNumber(value) {
   ) {
     return "";
   }
-  return Number(value).toLocaleString("fa-IR");
+  return Number(value).toLocaleString("en-US");
 }
 
 export function formatMoney(value) {
   if (value === null || value === undefined || value === "") return "—";
-  const number = Number(value);
-  if (!Number.isFinite(number)) return escapeHtml(value);
-  return `${number.toLocaleString("fa-IR")} تومان`;
+  const number = parseMoney(value);
+  if (!number) return "—";
+  return `${number.toLocaleString("en-US")} تومان`;
 }
 
 export function formatDate(dateValue) {
@@ -93,14 +130,11 @@ export function generateFileId() {
 
 export function validatePhoneNumber(phone) {
   if (!phone) return false;
-  const cleaned = phone.replace(/[\s\-()]/g, "");
+  const cleaned = toEnglishDigits(phone).replace(/[\s\-()]/g, "");
   const iranianPhoneRegex = /^(?:0098|\+98|0)?9\d{9}$/;
   return iranianPhoneRegex.test(cleaned);
 }
 
-/**
- * کپی متن در کلیپ‌بورد
- */
 export async function copyToClipboard(text) {
   const value = String(text || "");
   if (!value) return false;
@@ -111,7 +145,7 @@ export async function copyToClipboard(text) {
       return true;
     }
   } catch {
-    // fallback below
+    // fallback
   }
 
   try {
@@ -132,9 +166,6 @@ export async function copyToClipboard(text) {
   }
 }
 
-/**
- * اشتراک‌گذاری فایل (Web Share API یا کپی متن)
- */
 export async function shareFileText(title, text) {
   const payload = {
     title: title || "املاک DOT",
@@ -152,4 +183,44 @@ export async function shareFileText(title, text) {
 
   const ok = await copyToClipboard(text);
   return ok ? "copied" : "failed";
+}
+
+/**
+ * اتصال فرمت‌کننده پول به اینپوت‌های کلاس money-input
+ */
+export function setupMoneyInputs(root = document) {
+  const inputs = root.querySelectorAll(".money-input");
+
+  inputs.forEach((input) => {
+    if (input.dataset.moneyBound === "1") return;
+    input.dataset.moneyBound = "1";
+
+    input.addEventListener("input", () => {
+      const raw = parseMoney(input.value);
+      const formatted = raw ? formatGroupedNumber(raw) : "";
+      // حفظ موقعیت تقریبی کرسر
+      const oldLen = input.value.length;
+      const pos = input.selectionStart ?? oldLen;
+      input.value = formatted;
+      const newLen = input.value.length;
+      const newPos = Math.max(0, pos + (newLen - oldLen));
+      try {
+        input.setSelectionRange(newPos, newPos);
+      } catch {
+        // ignore
+      }
+    });
+
+    input.addEventListener("blur", () => {
+      const raw = parseMoney(input.value);
+      input.value = raw ? formatGroupedNumber(raw) : "";
+    });
+  });
+}
+
+export function setMoneyInputValue(id, value) {
+  const el = $(id);
+  if (!el) return;
+  const n = parseMoney(value);
+  el.value = n ? formatGroupedNumber(n) : "";
 }
