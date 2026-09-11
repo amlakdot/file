@@ -220,12 +220,14 @@ export async function saveDatabase(newFiles, commitMessage) {
 
     const content = JSON.stringify(database, null, 2);
     const bytes = new TextEncoder().encode(content);
+    // تبدیل امن به base64 بدون spread روی آرایه بزرگ (باگ ذخیره)
     let binary = "";
-    const chunkSize = 0x8000;
+    const chunkSize = 0x2000;
     for (let i = 0; i < bytes.length; i += chunkSize) {
-      binary += String.fromCharCode(
-        ...bytes.subarray(i, Math.min(i + chunkSize, bytes.length))
-      );
+      const end = Math.min(i + chunkSize, bytes.length);
+      for (let j = i; j < end; j++) {
+        binary += String.fromCharCode(bytes[j]);
+      }
     }
     const base64 = btoa(binary);
 
