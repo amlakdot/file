@@ -97,3 +97,59 @@ export function validatePhoneNumber(phone) {
   const iranianPhoneRegex = /^(?:0098|\+98|0)?9\d{9}$/;
   return iranianPhoneRegex.test(cleaned);
 }
+
+/**
+ * کپی متن در کلیپ‌بورد
+ */
+export async function copyToClipboard(text) {
+  const value = String(text || "");
+  if (!value) return false;
+
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(value);
+      return true;
+    }
+  } catch {
+    // fallback below
+  }
+
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = value;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.top = "-9999px";
+    ta.style.left = "-9999px";
+    document.body.appendChild(ta);
+    ta.select();
+    ta.setSelectionRange(0, ta.value.length);
+    const ok = document.execCommand("copy");
+    document.body.removeChild(ta);
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * اشتراک‌گذاری فایل (Web Share API یا کپی متن)
+ */
+export async function shareFileText(title, text) {
+  const payload = {
+    title: title || "املاک DOT",
+    text: text || ""
+  };
+
+  try {
+    if (navigator.share && navigator.canShare?.(payload)) {
+      await navigator.share(payload);
+      return "shared";
+    }
+  } catch (err) {
+    if (err && err.name === "AbortError") return "cancelled";
+  }
+
+  const ok = await copyToClipboard(text);
+  return ok ? "copied" : "failed";
+}
