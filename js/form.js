@@ -8,12 +8,37 @@ import {
   generateFileId,
   validatePhoneNumber,
   showToast,
-  shareFileText
+  shareFileText,
+  parseMoney,
+  formatGroupedNumber,
+  formatMoney,
+  setupMoneyInputs,
+  setMoneyInputValue
 } from "./helpers.js";
 import { commitFiles } from "./github.js";
-import { getFileData, getFileName, getFilePhone, getFileLocation } from "./files.js";
+import {
+  getFileData,
+  getFileName,
+  getFilePhone,
+  getFileLocation
+} from "./files.js";
 import { closeFileModal } from "./modal.js";
-import { TYPE_LABELS, PROPERTY_TYPE_LABELS, getStatusLabel } from "./labels.js";
+import {
+  TYPE_LABELS,
+  PROPERTY_TYPE_LABELS,
+  getStatusLabel
+} from "./labels.js";
+
+const MONEY_FIELD_IDS = [
+  "salePrice",
+  "currentDeposit",
+  "currentRent",
+  "suggestedDeposit",
+  "suggestedRent",
+  "capital",
+  "tenantDeposit",
+  "tenantRent"
+];
 
 export function setupFileForm() {
   const form = $("fileForm");
@@ -40,6 +65,7 @@ export function setupFileForm() {
     await shareCurrentFile();
   });
 
+  setupMoneyInputs(form);
   updateFormVisibility();
 }
 
@@ -67,6 +93,11 @@ export function updateFormVisibility() {
     el.classList.toggle("hidden", fileType !== "landlord");
   });
 
+  // قیمت فروش فقط برای ملک فروشی
+  document.querySelectorAll(".sale-only").forEach((el) => {
+    el.classList.toggle("hidden", fileType !== "sale");
+  });
+
   const occupancy = $("occupancy")?.value || "";
   const showOccupancyFields =
     showPropertyDetails && occupancy === "tenant";
@@ -86,7 +117,6 @@ export function updateFormVisibility() {
     familyStatus !== "family"
   );
 
-  // امکانات فقط برای ملک فروشی و مالک
   $("amenitiesSection")?.classList.toggle("hidden", !showPropertyDetails);
 }
 
@@ -96,6 +126,12 @@ function resetFormFields() {
 
   if ($("followUpDays")) $("followUpDays").value = 10;
   if ($("fileStatus")) $("fileStatus").value = "active";
+
+  MONEY_FIELD_IDS.forEach((id) => {
+    if ($(id)) $(id).value = "";
+  });
+
+  if ($("notes")) $("notes").value = "";
 
   document.querySelectorAll(".amenity").forEach((cb) => {
     cb.checked = false;
@@ -128,34 +164,32 @@ export async function saveFile() {
   const keyHolder = $("keyHolder")?.value || "";
   const condition = $("condition")?.value || "";
   const occupancy = $("occupancy")?.value || "";
-  const currentDeposit =
-    parseInt($("currentDeposit")?.value || "0", 10) || 0;
-  const currentRent = parseInt($("currentRent")?.value || "0", 10) || 0;
-  const suggestedDeposit =
-    parseInt($("suggestedDeposit")?.value || "0", 10) || 0;
-  const suggestedRent =
-    parseInt($("suggestedRent")?.value || "0", 10) || 0;
 
-  const capital = parseInt($("capital")?.value || "0", 10) || 0;
+  const salePrice = parseMoney($("salePrice")?.value);
+  const currentDeposit = parseMoney($("currentDeposit")?.value);
+  const currentRent = parseMoney($("currentRent")?.value);
+  const suggestedDeposit = parseMoney($("suggestedDeposit")?.value);
+  const suggestedRent = parseMoney($("suggestedRent")?.value);
+
+  const capital = parseMoney($("capital")?.value);
   const buyerNotes = ($("buyerNotes")?.value || "").trim();
 
-  const tenantDeposit =
-    parseInt($("tenantDeposit")?.value || "0", 10) || 0;
-  const tenantRent = parseInt($("tenantRent")?.value || "0", 10) || 0;
+  const tenantDeposit = parseMoney($("tenantDeposit")?.value);
+  const tenantRent = parseMoney($("tenantRent")?.value);
   const familyStatus = $("familyStatus")?.value || "";
   const familySize = parseInt($("familySize")?.value || "0", 10) || 0;
   const tenantNotes = ($("tenantNotes")?.value || "").trim();
+
+  const notes = ($("notes")?.value || "").trim();
 
   const amenities = Array.from(
     document.querySelectorAll(".amenity:checked")
   ).map((c) => c.value);
 
-  // وضعیت فایل (قابل تغییر توسط کاربر)
   let status = $("fileStatus")?.value || "active";
   const allowedStatuses = ["active", "followup", "pending", "archived", "done"];
   if (!allowedStatuses.includes(status)) status = "active";
 
-  // Follow-up: days → date
   const days = parseInt($("followUpDays")?.value || "10", 10);
   let followUpDate = null;
 
@@ -166,7 +200,6 @@ export async function saveFile() {
     followUpDate = d.toISOString();
   }
 
-  // اگر وضعیت پیگیری است و تاریخ نداریم، امروز را بگذار
   if (status === "followup" && !followUpDate) {
     followUpDate = new Date().toISOString();
   }
@@ -213,6 +246,7 @@ export async function saveFile() {
     keyHolder,
     condition,
     occupancy,
+    salePrice,
     currentDeposit,
     currentRent,
     suggestedDeposit,
@@ -224,6 +258,7 @@ export async function saveFile() {
     familyStatus,
     familySize,
     tenantNotes,
+    notes,
     amenities
   };
 
@@ -289,6 +324,9 @@ export async function shareCurrentFile() {
   let status = "active";
   let propertyType = "";
   let area = "";
+  let salePrice = 0;
+  let capital = 0;
+  let notes = "";
 
   if (state.editingFileId) {
     const file = state.files.find((f) => f.id === state.editingFileId);
@@ -301,10 +339,12 @@ export async function shareCurrentFile() {
       const data = getFileData(file);
       propertyType = data.propertyType || "";
       area = data.area || "";
+      salePrice = data.salePrice || 0;
+      capital = data.capital || 0;
+      notes = data.notes || "";
     }
   }
 
-  // اولویت با مقادیر فعلی فرم
   name = ($("name")?.value || "").trim() || name;
   phone = ($("phone")?.value || "").trim() || phone;
   location = ($("location")?.value || "").trim() || location;
@@ -313,6 +353,9 @@ export async function shareCurrentFile() {
   status = $("fileStatus")?.value || status;
   propertyType = $("propertyType")?.value || propertyType;
   area = $("area")?.value || area;
+  salePrice = parseMoney($("salePrice")?.value) || salePrice;
+  capital = parseMoney($("capital")?.value) || capital;
+  notes = ($("notes")?.value || "").trim() || notes;
 
   if (!name && !phone) {
     showToast("اطلاعاتی برای اشتراک‌گذاری وجود ندارد.", "error");
@@ -332,9 +375,10 @@ export async function shareCurrentFile() {
       `نوع ملک: ${PROPERTY_TYPE_LABELS[propertyType] || propertyType}`
     );
   }
-  if (area) {
-    lines.push(`متراژ: ${area} متر`);
-  }
+  if (area) lines.push(`متراژ: ${area} متر`);
+  if (salePrice) lines.push(`قیمت: ${formatMoney(salePrice)}`);
+  if (capital) lines.push(`سرمایه: ${formatMoney(capital)}`);
+  if (notes) lines.push(`توضیحات: ${notes}`);
   lines.push(`وضعیت: ${getStatusLabel(status)}`);
 
   const text = lines.join("\n");
@@ -345,7 +389,7 @@ export async function shareCurrentFile() {
   } else if (result === "copied") {
     showToast("متن فایل در کلیپ‌بورد کپی شد.", "success");
   } else if (result === "cancelled") {
-    // کاربر لغو کرد
+    // لغو کاربر
   } else {
     showToast("اشتراک‌گذاری ناموفق بود.", "error");
   }
@@ -358,7 +402,6 @@ export function loadFileIntoForm(fileId) {
     return;
   }
 
-  // اول فرم را کامل پاک کن تا داده قبلی نماند
   resetFormFields();
 
   const data = getFileData(file);
@@ -372,7 +415,7 @@ export function loadFileIntoForm(fileId) {
     $("fileStatus").value = file.status || "active";
   }
 
-  const fields = {
+  const textFields = {
     name: data.name,
     phone: data.phone,
     propertyType: data.propertyType,
@@ -383,20 +426,14 @@ export function loadFileIntoForm(fileId) {
     keyHolder: data.keyHolder,
     condition: data.condition,
     occupancy: data.occupancy,
-    currentDeposit: data.currentDeposit,
-    currentRent: data.currentRent,
-    suggestedDeposit: data.suggestedDeposit,
-    suggestedRent: data.suggestedRent,
-    capital: data.capital,
     buyerNotes: data.buyerNotes,
-    tenantDeposit: data.tenantDeposit,
-    tenantRent: data.tenantRent,
     familyStatus: data.familyStatus,
     familySize: data.familySize,
-    tenantNotes: data.tenantNotes
+    tenantNotes: data.tenantNotes,
+    notes: data.notes
   };
 
-  Object.entries(fields).forEach(([id, value]) => {
+  Object.entries(textFields).forEach(([id, value]) => {
     const el = $(id);
     if (!el) return;
     if (value === undefined || value === null) {
@@ -406,7 +443,16 @@ export function loadFileIntoForm(fileId) {
     }
   });
 
-  // محاسبه روزهای باقی‌مانده برای پیگیری
+  // فیلدهای پولی با جداکننده
+  setMoneyInputValue("salePrice", data.salePrice);
+  setMoneyInputValue("currentDeposit", data.currentDeposit);
+  setMoneyInputValue("currentRent", data.currentRent);
+  setMoneyInputValue("suggestedDeposit", data.suggestedDeposit);
+  setMoneyInputValue("suggestedRent", data.suggestedRent);
+  setMoneyInputValue("capital", data.capital);
+  setMoneyInputValue("tenantDeposit", data.tenantDeposit);
+  setMoneyInputValue("tenantRent", data.tenantRent);
+
   if (file.followUpDate) {
     const target = new Date(file.followUpDate);
     const today = new Date();
