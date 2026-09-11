@@ -127,7 +127,7 @@
                 <button id="closeModalButton" class="close-button" type="button">×</button>
             </div>
 
-            <form id="fileForm">
+            <form id="fileForm" novalidate>
                 <input id="editingFileId" type="hidden">
 
                 <!-- TYPE -->
@@ -188,6 +188,38 @@
                             <label for="year">سال ساخت</label>
                             <input id="year" type="number" min="0" placeholder="مثلاً 1404">
                         </div>
+                        <div id="floorFields" class="field property-field floor-field hidden">
+                            <label for="unitFloor">طبقه واحد</label>
+                            <select id="unitFloor">
+                                <option value="">—</option>
+                                <option value="basement">زیرزمین</option>
+                                <option value="ground">همکف</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                                <option value="16">16</option>
+                                <option value="17">17</option>
+                                <option value="18">18</option>
+                                <option value="19">19</option>
+                                <option value="20">20+</option>
+                            </select>
+                        </div>
+                        <div id="totalFloorsField" class="field property-field floor-field hidden">
+                            <label for="totalFloors">تعداد کل طبقات ساختمان</label>
+                            <input id="totalFloors" type="number" min="1" max="100" placeholder="مثلاً 5">
+                        </div>
                         <div class="field field-full">
                             <label for="location">موقعیت</label>
                             <input id="location" type="text" placeholder="محله، خیابان، منطقه...">
@@ -203,11 +235,24 @@
                             <label for="keyHolder">کلید دست</label>
                             <select id="keyHolder">
                                 <option value="owner">مالک</option>
+                                <option value="office">املاک / دفتر</option>
                                 <option value="tenant">مستاجر</option>
-                                <option value="guard">نگهبان</option>
-                                <option value="office">دفتر</option>
+                                <option value="guard">سرایدار / نگهبان</option>
                                 <option value="other">سایر</option>
                             </select>
+                        </div>
+                        <div id="keyHolderContactFields" class="field field-full hidden">
+                            <label>مشخصات دارنده کلید (اختیاری)</label>
+                            <div class="form-grid" style="margin-top:8px">
+                                <div class="field">
+                                    <label for="keyHolderName">نام (آقا / خانم)</label>
+                                    <input id="keyHolderName" type="text" placeholder="مثلاً آقای رضایی">
+                                </div>
+                                <div class="field">
+                                    <label for="keyHolderPhone">شماره تلفن دارنده کلید</label>
+                                    <input id="keyHolderPhone" type="tel" placeholder="09...">
+                                </div>
+                            </div>
                         </div>
                         <div class="field">
                             <label for="condition">وضعیت ملک</label>
@@ -357,7 +402,7 @@
                     <button id="cancelFormButton" type="button" class="ghost-button">انصراف</button>
                     <button id="shareFileButton" type="button" class="secondary-button">اشتراک‌گذاری</button>
                     <button id="deleteFileButton" type="button" class="danger-button hidden">حذف فایل</button>
-                    <button type="submit" class="primary-button">ذخیره</button>
+                    <button id="saveFileButton" type="submit" class="primary-button">ذخیره</button>
                 </div>
             </form>
         </div>
