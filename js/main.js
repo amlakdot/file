@@ -3,18 +3,27 @@
 ========================================================= */
 
 import { state } from "./state.js";
-import { $, setLoginError } from "./helpers.js";
-import { loginWithToken, logout } from "./auth.js";
+import { $, setLoginError, parseMoney, setupMoneyInputs } from "./helpers.js";
+import { loginWithToken, logout, manualSync } from "./auth.js";
 import {
   openFileModal,
+  openDetailModal,
+  closeDetailModal,
   setupModalClose,
-  setFormHandlers
+  setFormHandlers,
+  detailCopyPhone,
+  detailCopyAddress,
+  detailWhatsApp,
+  detailShareCopy
 } from "./modal.js";
 import {
   setupFileForm,
   updateFormVisibility,
   loadFileIntoForm,
-  resetFormFields
+  resetFormFields,
+  softDeleteFile,
+  restoreFile,
+  purgeFile
 } from "./form.js";
 import { applyFilters, renderHome } from "./render.js";
 
@@ -25,13 +34,11 @@ function setupLoginForm() {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     setLoginError("");
-
     const token = $("githubToken")?.value || "";
     if (!token.trim()) {
       setLoginError("لطفاً GitHub Token را وارد کنید.");
       return;
     }
-
     try {
       await loginWithToken(token);
     } catch (err) {
@@ -43,56 +50,77 @@ function setupLoginForm() {
 function setupTopBar() {
   $("newFileButton")?.addEventListener("click", (e) => {
     e.preventDefault();
-    e.stopPropagation();
     state.editingFileId = null;
     openFileModal();
   });
 
-  // رفع باگ خروج
-  const logoutBtn = $("logoutButton");
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      try {
-        logout();
-      } catch (err) {
-        console.error("logout error:", err);
-        state.token = null;
-        state.files = [];
-        $("loginScreen")?.classList.remove("hidden");
-        $("appScreen")?.classList.add("hidden");
-      }
-    });
-  }
+  $("logoutButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      logout();
+    } catch (err) {
+      console.error(err);
+      state.token = null;
+      $("loginScreen")?.classList.remove("hidden");
+      $("appScreen")?.classList.add("hidden");
+    }
+  });
 
   $("followUpButton")?.addEventListener("click", (e) => {
     e.preventDefault();
-    e.stopPropagation();
     state.currentFilter = "followup";
     applyFilters();
   });
 
   $("emptyNewFileButton")?.addEventListener("click", (e) => {
     e.preventDefault();
-    e.stopPropagation();
     state.editingFileId = null;
     openFileModal();
   });
+
+  $("manualSyncButton")?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    await manualSync();
+  });
 }
 
-function setupSearch() {
+function setupSearchAndFilters() {
   $("searchInput")?.addEventListener("input", (e) => {
     state.search = e.target?.value || "";
     renderHome();
   });
-}
 
-function setupFilters() {
+  $("regionFilter")?.addEventListener("input", (e) => {
+    state.region = e.target?.value || "";
+    renderHome();
+  });
+
+  $("priceMinFilter")?.addEventListener("input", (e) => {
+    const v = parseMoney(e.target?.value);
+    state.priceMin = v || null;
+    renderHome();
+  });
+
+  $("priceMaxFilter")?.addEventListener("input", (e) => {
+    const v = parseMoney(e.target?.value);
+    state.priceMax = v || null;
+    renderHome();
+  });
+
+  $("sortBySelect")?.addEventListener("change", (e) => {
+    state.sortBy = e.target?.value || "updatedAt";
+    renderHome();
+  });
+
+  $("sortDirSelect")?.addEventListener("change", (e) => {
+    state.sortDir = e.target?.value || "desc";
+    renderHome();
+  });
+
   document.querySelectorAll(".filter-button").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       e.preventDefault();
-      e.stopPropagation();
       const filter = btn.getAttribute("data-filter");
       if (filter) {
         state.currentFilter = filter;
@@ -102,26 +130,67 @@ function setupFilters() {
   });
 }
 
-// کلیک روی کارت → ویرایش
-document.addEventListener("click", (e) => {
-  // اگر روی دکمه یا کنترل داخل کارت کلیک شد، ادیت باز نشود
-  if (e.target.closest("button, a, input, select, textarea, label")) {
-    return;
-  }
+function setupDetailActions() {
+  $("detailEditButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    const id = state.viewingFileId;
+    if (!id) return;
+    closeDetailModal(true);
+    state.editingFileId = id;
+    openFileModal();
+  });
 
+  $("detailArchiveButton")?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    const id = state.viewingFileId;
+    if (!id) return;
+    const ok = await softDeleteFile(id);
+    if (ok) closeDetailModal();
+  });
+
+  $("detailRestoreButton")?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    const id = state.viewingFileId;
+    if (!id) return;
+    const ok = await restoreFile(id);
+    if (ok) closeDetailModal();
+  });
+
+  $("detailPurgeButton")?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    const id = state.viewingFileId;
+    if (!id) return;
+    const ok = await purgeFile(id);
+    if (ok) closeDetailModal();
+  });
+
+  $("detailCopyPhoneButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    detailCopyPhone();
+  });
+  $("detailCopyAddressButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    detailCopyAddress();
+  });
+  $("detailWhatsAppButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    detailWhatsApp();
+  });
+  $("detailShareCopyButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    detailShareCopy();
+  });
+}
+
+// کارت → جزئیات کامل (نه مستقیم ادیت)
+document.addEventListener("click", (e) => {
+  if (e.target.closest("button, a, input, select, textarea, label")) return;
   const card = e.target?.closest(".file-card");
   if (!card) return;
-
   const fileId = card.getAttribute("data-file-id");
   if (!fileId) return;
-
-  state.editingFileId = fileId;
-  openFileModal();
+  openDetailModal(fileId);
 });
-
-// =============================================
-// INIT
-// =============================================
 
 document.addEventListener("DOMContentLoaded", () => {
   setFormHandlers({
@@ -132,10 +201,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   setupLoginForm();
   setupTopBar();
-  setupSearch();
-  setupFilters();
+  setupSearchAndFilters();
   setupFileForm();
   setupModalClose();
+  setupDetailActions();
+  setupMoneyInputs(document);
 
   document.addEventListener("change", (e) => {
     const id = e.target?.id;
