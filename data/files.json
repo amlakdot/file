@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-11T07:16:59.772Z",
+  "updatedAt": "2026-09-11T07:25:49.502Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -10,7 +10,7 @@
       "createdAt": "2026-09-11T07:13:09.988Z",
       "updatedAt": "2026-09-11T07:13:09.988Z",
       "name": "فاطمی",
-      "phone": "enc:FyEjlIjOSdgJtM3+sGPFMIdx3tnmvQ8ScijA788HNfrXJvklhmBs",
+      "phone": "enc:vdRwD/CrZer68Nd+hUmyFZ8Jb6omH7XOT7HKUpRRc47TuCveDZCU",
       "propertyType": "apartment",
       "area": 72,
       "rooms": 2,
@@ -46,7 +46,7 @@
       "createdAt": "2026-09-11T07:14:14.619Z",
       "updatedAt": "2026-09-11T07:14:14.619Z",
       "name": "کوثر زاده",
-      "phone": "enc:BESQmXfABVJny+laivdHpFPnu+PA7EJVk6ep83d5XLiWKyimqdMR",
+      "phone": "enc:lArQK1lxm1VHbaVKZ1YTg/fyJTMx369jmWUkq0MblyH8kMYpWx/l",
       "propertyType": "apartment",
       "area": 60,
       "rooms": 0,
@@ -81,7 +81,7 @@
       "createdAt": "2026-09-11T07:16:56.987Z",
       "updatedAt": "2026-09-11T07:16:56.987Z",
       "name": "نام نگفته",
-      "phone": "enc:iRUKO5MHF6gvhOu9bTaoS3GXXkK6aWzceiMzNRdb/2zB1a/xHjLw",
+      "phone": "enc:cxE1s47B9QXKo5mVsty72NefwZ1lQ+WjwY2kLHStyoJhPZgQIPcB",
       "propertyType": "villa",
       "area": 72,
       "rooms": 0,
@@ -105,6 +105,42 @@
         "storage",
         "yard",
         "cooler"
+      ]
+    },
+    {
+      "id": "file-1789111547882-404-iu3a05til",
+      "type": "landlord",
+      "status": "active",
+      "followUpDate": "2026-12-19T20:30:00.000Z",
+      "createdAt": "2026-09-11T07:25:47.882Z",
+      "updatedAt": "2026-09-11T07:25:47.882Z",
+      "name": "درویش پور",
+      "phone": "enc:OZHgobGWCAG0breo7Ic4Z7VEf866PnTUeoUPQjms/mgfGDxvgxAB",
+      "propertyType": "apartment",
+      "area": 53,
+      "rooms": 0,
+      "year": 0,
+      "location": "ترکیده 3",
+      "keyHolder": "owner",
+      "condition": "new",
+      "occupancy": "empty",
+      "currentDeposit": 0,
+      "currentRent": 0,
+      "suggestedDeposit": 300000000,
+      "suggestedRent": 3000000,
+      "capital": 0,
+      "buyerNotes": "",
+      "tenantDeposit": 0,
+      "tenantRent": 0,
+      "familyStatus": "single",
+      "familySize": 0,
+      "tenantNotes": "",
+      "amenities": [
+        "parking",
+        "elevator",
+        "storage",
+        "cooler",
+        "cabinet"
       ]
     }
   ]
