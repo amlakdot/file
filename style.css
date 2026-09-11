@@ -487,6 +487,10 @@ select {
     font-size: 12px;
 }
 
+.card-info-full {
+    grid-template-columns: 1fr 1fr;
+}
+
 .info-item {
     min-width: 0;
 }
@@ -502,6 +506,44 @@ select {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    word-break: break-word;
+}
+
+.card-info-full .info-value {
+    white-space: normal;
+}
+
+.card-amenities {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+}
+
+.card-tag {
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+    border-radius: 999px;
+    padding: 4px 8px;
+    font-size: 10px;
+}
+
+.card-notes {
+    margin-top: 12px;
+    padding: 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-small);
+}
+
+.card-notes-text {
+    margin-top: 4px;
+    color: var(--text-soft);
+    font-size: 12px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 
 .card-footer {
@@ -514,6 +556,12 @@ select {
     padding-top: 12px;
     color: var(--text-muted);
     font-size: 10px;
+}
+
+.money-input {
+    direction: ltr;
+    text-align: left;
+    font-variant-numeric: tabular-nums;
 }
 
 /* =========================
