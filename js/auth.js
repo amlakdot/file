@@ -28,7 +28,11 @@ export async function loginWithToken(token) {
 }
 
 export function logout() {
-  stopPolling();
+  try {
+    stopPolling();
+  } catch {
+    // ignore
+  }
 
   state.token = null;
   state.files = [];
@@ -36,12 +40,24 @@ export function logout() {
   state.search = "";
   state.editingFileId = null;
   state.lastSyncSha = null;
+  state.isSaving = false;
 
-  clearCryptoCache();
-  closeFileModal();
+  try {
+    clearCryptoCache();
+  } catch {
+    // ignore
+  }
+
+  try {
+    closeFileModal();
+  } catch {
+    // ignore
+  }
 
   if ($("loginForm")) $("loginForm").reset();
   if ($("searchInput")) $("searchInput").value = "";
+  if ($("followUpCount")) $("followUpCount").textContent = "0";
+  if ($("filesContainer")) $("filesContainer").innerHTML = "";
 
   showLogin();
   setLoginError("");
@@ -50,6 +66,7 @@ export function logout() {
 export function showLogin() {
   $("loginScreen")?.classList.remove("hidden");
   $("appScreen")?.classList.add("hidden");
+  document.body.style.overflow = "";
 }
 
 export function showApp() {
