@@ -3,10 +3,21 @@
 ========================================================= */
 
 import { state } from "./state.js";
-import { $, normalize, escapeHtml, formatDate } from "./helpers.js";
+import {
+  $,
+  normalize,
+  escapeHtml,
+  formatDate,
+  formatMoney
+} from "./helpers.js";
 import {
   TYPE_LABELS,
   PROPERTY_TYPE_LABELS,
+  KEY_HOLDER_LABELS,
+  CONDITION_LABELS,
+  OCCUPANCY_LABELS,
+  FAMILY_LABELS,
+  AMENITY_LABELS,
   getStatusColor,
   getStatusLabel
 } from "./labels.js";
@@ -39,9 +50,14 @@ export function getFilteredFiles() {
         data.phone,
         data.location,
         data.region,
+        data.notes,
+        data.buyerNotes,
+        data.tenantNotes,
         data.propertyName,
         data.propertyPhone,
-        data.propertyLocation
+        data.propertyLocation,
+        String(data.salePrice || ""),
+        String(data.capital || "")
       ];
       return searchable.some((v) => normalize(v).includes(query));
     });
@@ -67,6 +83,18 @@ export function renderHome() {
   container.innerHTML = filtered.map((f) => renderFileCard(f)).join("");
 }
 
+function infoItem(label, value) {
+  if (value === null || value === undefined || value === "" || value === "—") {
+    return "";
+  }
+  return `
+    <div class="info-item">
+      <div class="info-label">${escapeHtml(label)}</div>
+      <div class="info-value">${value}</div>
+    </div>
+  `;
+}
+
 export function renderFileCard(file) {
   const data = getFileData(file);
   const type = file.type || "sale";
@@ -76,7 +104,132 @@ export function renderFileCard(file) {
   const location = getFileLocation(file);
   const propertyType = data.propertyType || "";
   const area = data.area || "";
+  const rooms = data.rooms || "";
+  const year = data.year || "";
   const hasFollowUp = isFollowUp(file);
+
+  const items = [];
+
+  items.push(infoItem("تلفن", escapeHtml(phone || "—")));
+  items.push(infoItem("موقعیت", escapeHtml(location || "—")));
+
+  if (type === "sale" || type === "landlord") {
+    items.push(
+      infoItem(
+        "نوع ملک",
+        escapeHtml(PROPERTY_TYPE_LABELS[propertyType] || propertyType || "—")
+      )
+    );
+    if (area) items.push(infoItem("متراژ", escapeHtml(`${area} متر`)));
+    if (rooms) items.push(infoItem("خواب", escapeHtml(String(rooms))));
+    if (year) items.push(infoItem("سال ساخت", escapeHtml(String(year))));
+
+    if (data.keyHolder) {
+      items.push(
+        infoItem(
+          "کلید دست",
+          escapeHtml(KEY_HOLDER_LABELS[data.keyHolder] || data.keyHolder)
+        )
+      );
+    }
+    if (data.condition) {
+      items.push(
+        infoItem(
+          "وضعیت ملک",
+          escapeHtml(CONDITION_LABELS[data.condition] || data.condition)
+        )
+      );
+    }
+    if (data.occupancy) {
+      items.push(
+        infoItem(
+          "سکونت",
+          escapeHtml(OCCUPANCY_LABELS[data.occupancy] || data.occupancy)
+        )
+      );
+    }
+  }
+
+  // قیمت‌ها
+  if (type === "sale" && data.salePrice) {
+    items.push(
+      infoItem("قیمت فروش", escapeHtml(formatMoney(data.salePrice)))
+    );
+  }
+  if (type === "buyer" && data.capital) {
+    items.push(infoItem("سرمایه", escapeHtml(formatMoney(data.capital))));
+  }
+  if (type === "landlord") {
+    if (data.suggestedDeposit) {
+      items.push(
+        infoItem("ودیعه پیشنهادی", escapeHtml(formatMoney(data.suggestedDeposit)))
+      );
+    }
+    if (data.suggestedRent) {
+      items.push(
+        infoItem("اجاره پیشنهادی", escapeHtml(formatMoney(data.suggestedRent)))
+      );
+    }
+  }
+  if (type === "tenant") {
+    if (data.tenantDeposit) {
+      items.push(
+        infoItem("ودیعه", escapeHtml(formatMoney(data.tenantDeposit)))
+      );
+    }
+    if (data.tenantRent) {
+      items.push(
+        infoItem("اجاره", escapeHtml(formatMoney(data.tenantRent)))
+      );
+    }
+    if (data.familyStatus) {
+      items.push(
+        infoItem(
+          "خانوادگی",
+          escapeHtml(FAMILY_LABELS[data.familyStatus] || data.familyStatus)
+        )
+      );
+    }
+    if (data.familySize) {
+      items.push(infoItem("نفرات", escapeHtml(String(data.familySize))));
+    }
+  }
+
+  if (data.occupancy === "tenant") {
+    if (data.currentDeposit) {
+      items.push(
+        infoItem("ودیعه فعلی", escapeHtml(formatMoney(data.currentDeposit)))
+      );
+    }
+    if (data.currentRent) {
+      items.push(
+        infoItem("اجاره فعلی", escapeHtml(formatMoney(data.currentRent)))
+      );
+    }
+  }
+
+  // امکانات
+  let amenitiesHtml = "";
+  if (Array.isArray(data.amenities) && data.amenities.length) {
+    const tags = data.amenities
+      .map(
+        (a) =>
+          `<span class="card-tag">${escapeHtml(AMENITY_LABELS[a] || a)}</span>`
+      )
+      .join("");
+    amenitiesHtml = `<div class="card-amenities">${tags}</div>`;
+  }
+
+  // توضیحات
+  const notesParts = [];
+  if (data.notes) notesParts.push(data.notes);
+  if (type === "buyer" && data.buyerNotes) notesParts.push(data.buyerNotes);
+  if (type === "tenant" && data.tenantNotes) notesParts.push(data.tenantNotes);
+  const notesText = notesParts.filter(Boolean).join(" | ");
+
+  const notesHtml = notesText
+    ? `<div class="card-notes"><span class="info-label">توضیحات</span><div class="card-notes-text">${escapeHtml(notesText)}</div></div>`
+    : "";
 
   return `
     <div class="file-card" data-file-id="${escapeHtml(file.id)}" role="button" tabindex="0">
@@ -87,28 +240,11 @@ export function renderFileCard(file) {
         </div>
         ${hasFollowUp ? `<div class="followup-badge">پیگیری</div>` : ""}
       </div>
-      <div class="card-info">
-        <div class="info-item">
-          <div class="info-label">تلفن</div>
-          <div class="info-value">${escapeHtml(phone || "—")}</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">موقعیت</div>
-          <div class="info-value">${escapeHtml(location || "—")}</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">نوع ملک</div>
-          <div class="info-value">${escapeHtml(
-            PROPERTY_TYPE_LABELS[propertyType] || propertyType || "—"
-          )}</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">متراژ</div>
-          <div class="info-value">${escapeHtml(
-            area ? `${area} متر` : "—"
-          )}</div>
-        </div>
+      <div class="card-info card-info-full">
+        ${items.join("")}
       </div>
+      ${amenitiesHtml}
+      ${notesHtml}
       <div class="card-footer">
         <div>${escapeHtml(formatDate(file.updatedAt))}</div>
         <div class="status-badge" style="background:${getStatusColor(status)}">
