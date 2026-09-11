@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-11T08:11:23.344Z",
+  "updatedAt": "2026-09-11T08:12:59.177Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -10,7 +10,7 @@
       "createdAt": "2026-09-11T07:13:09.988Z",
       "updatedAt": "2026-09-11T08:11:19.179Z",
       "name": "فاطمی",
-      "phone": "enc:kP5jas2j1EAttIiUC8meERrEs+U0HtcGOAUL2ISNhq7MKac7A7/K",
+      "phone": "enc:5oLjqUvOuXtrOW+FD87eutihWUKbh4bJyqPn4JjCdiBtGAXM4tmh",
       "propertyType": "apartment",
       "area": 72,
       "rooms": 2,
@@ -52,7 +52,7 @@
       "createdAt": "2026-09-11T07:14:14.619Z",
       "updatedAt": "2026-09-11T07:14:14.619Z",
       "name": "کوثر زاده",
-      "phone": "enc:RSt2i4eG3GdJr7UtZ6qR4pt4XO1otEjmez+J3yT0LvUSlrLxJTje",
+      "phone": "enc:5ZTdYQNMN7mVVR2SlNK+K6B0U/eyfW+YrwcnWN0xwDDGFeFS+HF6",
       "propertyType": "apartment",
       "area": 60,
       "rooms": 0,
@@ -85,9 +85,9 @@
       "status": "active",
       "followUpDate": "2026-12-19T20:30:00.000Z",
       "createdAt": "2026-09-11T07:16:56.987Z",
-      "updatedAt": "2026-09-11T07:16:56.987Z",
+      "updatedAt": "2026-09-11T08:12:56.278Z",
       "name": "نام نگفته",
-      "phone": "enc:63BPRu1/d2GJBZ9R/lF/GikdVyPUay+KKIR4t3VtoU9AXDf+xwlb",
+      "phone": "enc:0SyAwErQrEF4K43MRwPy9lmKUZVJFcBUpXXCKhQtDFbyweAxyjYJ",
       "propertyType": "villa",
       "area": 72,
       "rooms": 0,
@@ -111,7 +111,13 @@
         "storage",
         "yard",
         "cooler"
-      ]
+      ],
+      "unitFloor": "",
+      "totalFloors": 0,
+      "keyHolderName": "",
+      "keyHolderPhone": "",
+      "salePrice": 2500000000,
+      "notes": ""
     },
     {
       "id": "file-1789111547882-404-iu3a05til",
@@ -121,7 +127,7 @@
       "createdAt": "2026-09-11T07:25:47.882Z",
       "updatedAt": "2026-09-11T07:25:47.882Z",
       "name": "درویش پور",
-      "phone": "enc:WNlSmtpAH2v+k7Jgm8HWZDy2rNcqNxvIVn5ZnlyueRmVyqEbOWYE",
+      "phone": "enc:eRJC6MZccr3OMYs75SDfl5fmLrtp8JyX6sQY0NGkvQw0rFMGv+D8",
       "propertyType": "apartment",
       "area": 53,
       "rooms": 0,
