@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-11T07:14:15.841Z",
+  "updatedAt": "2026-09-11T07:16:59.772Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -10,7 +10,7 @@
       "createdAt": "2026-09-11T07:13:09.988Z",
       "updatedAt": "2026-09-11T07:13:09.988Z",
       "name": "فاطمی",
-      "phone": "enc:hDyQm5KPQjHGpZ1Z24Fa10Rq3LmLrPpuI/S9ItmLoJ6DdMKpoI+z",
+      "phone": "enc:FyEjlIjOSdgJtM3+sGPFMIdx3tnmvQ8ScijA788HNfrXJvklhmBs",
       "propertyType": "apartment",
       "area": 72,
       "rooms": 2,
@@ -46,7 +46,7 @@
       "createdAt": "2026-09-11T07:14:14.619Z",
       "updatedAt": "2026-09-11T07:14:14.619Z",
       "name": "کوثر زاده",
-      "phone": "enc:ZfVy0R/OKUbgW5VqhOaeOGwVg7b+2CVY4N52TQGeQ+qmFvZL7i2S",
+      "phone": "enc:BESQmXfABVJny+laivdHpFPnu+PA7EJVk6ep83d5XLiWKyimqdMR",
       "propertyType": "apartment",
       "area": 60,
       "rooms": 0,
@@ -71,6 +71,40 @@
         "elevator",
         "storage",
         "balcony"
+      ]
+    },
+    {
+      "id": "file-1789111016987-246-7vorruxao",
+      "type": "sale",
+      "status": "active",
+      "followUpDate": "2026-12-19T20:30:00.000Z",
+      "createdAt": "2026-09-11T07:16:56.987Z",
+      "updatedAt": "2026-09-11T07:16:56.987Z",
+      "name": "نام نگفته",
+      "phone": "enc:iRUKO5MHF6gvhOu9bTaoS3GXXkK6aWzceiMzNRdb/2zB1a/xHjLw",
+      "propertyType": "villa",
+      "area": 72,
+      "rooms": 0,
+      "year": 1360,
+      "location": "سیاهبند، میرزایی",
+      "keyHolder": "tenant",
+      "condition": "not-renovated",
+      "occupancy": "tenant",
+      "currentDeposit": 12000000,
+      "currentRent": 10000000,
+      "suggestedDeposit": 0,
+      "suggestedRent": 0,
+      "capital": 0,
+      "buyerNotes": "",
+      "tenantDeposit": 0,
+      "tenantRent": 0,
+      "familyStatus": "single",
+      "familySize": 0,
+      "tenantNotes": "",
+      "amenities": [
+        "storage",
+        "yard",
+        "cooler"
       ]
     }
   ]
