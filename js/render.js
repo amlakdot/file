@@ -14,6 +14,7 @@ import {
   TYPE_LABELS,
   PROPERTY_TYPE_LABELS,
   KEY_HOLDER_LABELS,
+  FLOOR_LABELS,
   CONDITION_LABELS,
   OCCUPANCY_LABELS,
   FAMILY_LABELS,
@@ -124,13 +125,30 @@ export function renderFileCard(file) {
     if (rooms) items.push(infoItem("خواب", escapeHtml(String(rooms))));
     if (year) items.push(infoItem("سال ساخت", escapeHtml(String(year))));
 
-    if (data.keyHolder) {
+    if (data.unitFloor) {
+      const floorLabel =
+        FLOOR_LABELS[data.unitFloor] || String(data.unitFloor);
+      items.push(infoItem("طبقه واحد", escapeHtml(floorLabel)));
+    }
+    if (data.totalFloors) {
       items.push(
-        infoItem(
-          "کلید دست",
-          escapeHtml(KEY_HOLDER_LABELS[data.keyHolder] || data.keyHolder)
-        )
+        infoItem("کل طبقات", escapeHtml(String(data.totalFloors)))
       );
+    }
+
+    if (data.keyHolder) {
+      let keyText = KEY_HOLDER_LABELS[data.keyHolder] || data.keyHolder;
+      if (
+        data.keyHolder !== "owner" &&
+        data.keyHolder !== "office" &&
+        (data.keyHolderName || data.keyHolderPhone)
+      ) {
+        const parts = [];
+        if (data.keyHolderName) parts.push(data.keyHolderName);
+        if (data.keyHolderPhone) parts.push(data.keyHolderPhone);
+        keyText = `${keyText}: ${parts.join(" — ")}`;
+      }
+      items.push(infoItem("کلید دست", escapeHtml(keyText)));
     }
     if (data.condition) {
       items.push(
