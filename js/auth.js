@@ -1,12 +1,12 @@
 /* =========================================================
-   AUTH + POLLING
+   AUTH + SMART POLLING
 ========================================================= */
 
 import { CONFIG } from "./config.js";
 import { state } from "./state.js";
 import { $, setLoginError } from "./helpers.js";
 import { verifyToken, loadFiles } from "./github.js";
-import { closeFileModal } from "./modal.js";
+import { closeFileModal, closeDetailModal } from "./modal.js";
 import { clearCryptoCache } from "./crypto.js";
 
 export async function loginWithToken(token) {
@@ -38,9 +38,14 @@ export function logout() {
   state.files = [];
   state.currentFilter = "all";
   state.search = "";
+  state.region = "";
+  state.priceMin = null;
+  state.priceMax = null;
   state.editingFileId = null;
+  state.viewingFileId = null;
   state.lastSyncSha = null;
   state.isSaving = false;
+  state.formDirty = false;
 
   try {
     clearCryptoCache();
@@ -49,13 +54,17 @@ export function logout() {
   }
 
   try {
-    closeFileModal();
+    closeFileModal(true);
+    closeDetailModal(true);
   } catch {
     // ignore
   }
 
   if ($("loginForm")) $("loginForm").reset();
   if ($("searchInput")) $("searchInput").value = "";
+  if ($("regionFilter")) $("regionFilter").value = "";
+  if ($("priceMinFilter")) $("priceMinFilter").value = "";
+  if ($("priceMaxFilter")) $("priceMaxFilter").value = "";
   if ($("followUpCount")) $("followUpCount").textContent = "0";
   if ($("filesContainer")) $("filesContainer").innerHTML = "";
 
@@ -74,12 +83,39 @@ export function showApp() {
   $("appScreen")?.classList.remove("hidden");
 }
 
+/**
+ * Polling هوشمند:
+ * - فقط وقتی تب visible است
+ * - حداقل فاصله minPollGap
+ * - اگر اخیراً ذخیره محلی شده کمی صبر می‌کند
+ */
+async function smartPollTick() {
+  if (!state.token) return;
+  if (state.isSaving) return;
+  if (document.visibilityState === "hidden") return;
+
+  const now = Date.now();
+  if (now - (state.lastPollAt || 0) < (CONFIG.minPollGap || 60000)) return;
+  if (now - (state.lastLocalChangeAt || 0) < 15000) return;
+
+  await loadFiles({ silent: true });
+}
+
 export function startPolling() {
   stopPolling();
-  state.pollTimer = setInterval(async () => {
-    if (!state.token) return;
-    await loadFiles({ silent: true });
-  }, CONFIG.pollInterval);
+  state.pollTimer = setInterval(smartPollTick, CONFIG.pollInterval || 180000);
+
+  if (!startPolling._visBound) {
+    startPolling._visBound = true;
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible" && state.token) {
+        smartPollTick();
+      }
+    });
+    window.addEventListener("focus", () => {
+      if (state.token) smartPollTick();
+    });
+  }
 }
 
 export function stopPolling() {
@@ -87,4 +123,9 @@ export function stopPolling() {
     clearInterval(state.pollTimer);
     state.pollTimer = null;
   }
+}
+
+export async function manualSync() {
+  if (!state.token) return;
+  await loadFiles({ silent: false });
 }
