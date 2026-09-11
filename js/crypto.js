@@ -154,6 +154,9 @@ export async function encryptFilePhone(file) {
   if (result.tenantPhone) {
     result.tenantPhone = await encryptText(result.tenantPhone);
   }
+  if (result.keyHolderPhone) {
+    result.keyHolderPhone = await encryptText(result.keyHolderPhone);
+  }
 
   return result;
 }
@@ -177,6 +180,9 @@ export async function decryptFilePhone(file) {
   }
   if (result.tenantPhone) {
     result.tenantPhone = await decryptText(result.tenantPhone);
+  }
+  if (result.keyHolderPhone) {
+    result.keyHolderPhone = await decryptText(result.keyHolderPhone);
   }
 
   return result;
