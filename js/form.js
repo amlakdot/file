@@ -10,10 +10,10 @@ import {
   showToast,
   shareFileText,
   parseMoney,
-  formatGroupedNumber,
   formatMoney,
   setupMoneyInputs,
-  setMoneyInputValue
+  setMoneyInputValue,
+  isEncryptedPhonePlaceholder
 } from "./helpers.js";
 import { commitFiles } from "./github.js";
 import {
@@ -48,8 +48,12 @@ export function setupFileForm() {
     radio.addEventListener("change", updateFormVisibility);
   });
 
+  $("propertyType")?.addEventListener("change", updateFormVisibility);
+  $("keyHolder")?.addEventListener("change", updateFormVisibility);
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    e.stopPropagation();
     await saveFile();
   });
 
@@ -63,6 +67,12 @@ export function setupFileForm() {
     e.preventDefault();
     e.stopPropagation();
     await shareCurrentFile();
+  });
+
+  // دکمه ذخیره مستقیم هم bind شود (برای اطمینان)
+  $("saveFileButton")?.addEventListener("click", async (e) => {
+    // اگر type=submit است، رویداد submit هم می‌آید؛ جلوگیری از دوبار اجرا
+    // فقط اگر خارج از submit native بود
   });
 
   setupMoneyInputs(form);
@@ -93,10 +103,29 @@ export function updateFormVisibility() {
     el.classList.toggle("hidden", fileType !== "landlord");
   });
 
-  // قیمت فروش فقط برای ملک فروشی
   document.querySelectorAll(".sale-only").forEach((el) => {
     el.classList.toggle("hidden", fileType !== "sale");
   });
+
+  // طبقه فقط برای آپارتمان (و در حالت ملک/مالک)
+  const propertyType = $("propertyType")?.value || "";
+  const showFloor =
+    showPropertyDetails &&
+    (propertyType === "apartment" || propertyType === "office" || propertyType === "commercial");
+
+  document.querySelectorAll(".floor-field").forEach((el) => {
+    el.classList.toggle("hidden", !showFloor);
+  });
+
+  // تماس دارنده کلید وقتی مالک یا دفتر نیست
+  const keyHolder = $("keyHolder")?.value || "";
+  const needsKeyContact =
+    showPropertyDetails &&
+    keyHolder &&
+    keyHolder !== "owner" &&
+    keyHolder !== "office";
+
+  $("keyHolderContactFields")?.classList.toggle("hidden", !needsKeyContact);
 
   const occupancy = $("occupancy")?.value || "";
   const showOccupancyFields =
@@ -132,6 +161,10 @@ function resetFormFields() {
   });
 
   if ($("notes")) $("notes").value = "";
+  if ($("unitFloor")) $("unitFloor").value = "";
+  if ($("totalFloors")) $("totalFloors").value = "";
+  if ($("keyHolderName")) $("keyHolderName").value = "";
+  if ($("keyHolderPhone")) $("keyHolderPhone").value = "";
 
   document.querySelectorAll(".amenity").forEach((cb) => {
     cb.checked = false;
@@ -143,25 +176,51 @@ function resetFormFields() {
   if (saleRadio) saleRadio.checked = true;
 }
 
+function setSaveButtonLoading(loading) {
+  const btn = $("saveFileButton");
+  if (!btn) return;
+  if (loading) {
+    btn.disabled = true;
+    btn.dataset.originalText = btn.textContent;
+    btn.textContent = "در حال ذخیره...";
+  } else {
+    btn.disabled = false;
+    if (btn.dataset.originalText) {
+      btn.textContent = btn.dataset.originalText;
+    } else {
+      btn.textContent = "ذخیره";
+    }
+  }
+}
+
 export async function saveFile() {
+  // جلوگیری از double-submit
   if (state.isSaving) {
     showToast("در حال ذخیره... لطفاً صبر کنید.", "warning");
     return;
   }
+
+  // شناسه ویرایش را همان اول قفل کن (closeModal بعداً null می‌کند)
+  const editingId = state.editingFileId;
 
   const fileType =
     document.querySelector('input[name="fileType"]:checked')?.value ||
     "sale";
 
   const name = ($("name")?.value || "").trim();
-  const phone = ($("phone")?.value || "").trim();
+  let phone = ($("phone")?.value || "").trim();
   const propertyType = $("propertyType")?.value || "";
   const area = parseInt($("area")?.value || "0", 10) || 0;
   const rooms = parseInt($("rooms")?.value || "0", 10) || 0;
   const year = parseInt($("year")?.value || "0", 10) || 0;
   const location = ($("location")?.value || "").trim();
 
+  const unitFloor = ($("unitFloor")?.value || "").trim();
+  const totalFloors = parseInt($("totalFloors")?.value || "0", 10) || 0;
+
   const keyHolder = $("keyHolder")?.value || "";
+  const keyHolderName = ($("keyHolderName")?.value || "").trim();
+  let keyHolderPhone = ($("keyHolderPhone")?.value || "").trim();
   const condition = $("condition")?.value || "";
   const occupancy = $("occupancy")?.value || "";
 
@@ -206,31 +265,60 @@ export async function saveFile() {
 
   if (!name) {
     showToast("لطفاً نام را وارد کنید.", "error");
+    $("name")?.focus();
     return;
   }
   if (!phone) {
     showToast("لطفاً شماره تلفن را وارد کنید.", "error");
-    return;
-  }
-  if (!validatePhoneNumber(phone)) {
-    showToast(
-      "لطفاً شماره تلفن صحیح وارد کنید (09xxxxxxxxx).",
-      "error"
-    );
+    $("phone")?.focus();
     return;
   }
 
   let existingFile = null;
-  if (state.editingFileId) {
-    existingFile = state.files.find((f) => f.id === state.editingFileId);
+  if (editingId) {
+    existingFile = state.files.find((f) => f.id === editingId);
     if (!existingFile) {
-      showToast("فایل موردنظر برای ویرایش پیدا نشد.", "error");
+      showToast("فایل موردنظر برای ویرایش پیدا نشد. صفحه را رفرش کنید.", "error");
+      return;
+    }
+  }
+
+  // اگر تلفن رمزشده یا غیرقابل‌خواندن است، از نسخه قبلی نگه دار
+  if (!validatePhoneNumber(phone)) {
+    if (
+      editingId &&
+      existingFile &&
+      isEncryptedPhonePlaceholder(phone)
+    ) {
+      phone = getFilePhone(existingFile) || existingFile.phone || phone;
+    }
+    if (!validatePhoneNumber(phone)) {
+      // شاید هنوز plaintext معتبر در فایل قبلی باشد
+      const prev = existingFile ? getFilePhone(existingFile) : "";
+      if (prev && validatePhoneNumber(prev) && isEncryptedPhonePlaceholder(($("phone")?.value || "").trim())) {
+        phone = prev;
+      } else {
+        showToast(
+          "لطفاً شماره تلفن صحیح وارد کنید (09xxxxxxxxx).",
+          "error"
+        );
+        $("phone")?.focus();
+        return;
+      }
+    }
+  }
+
+  // تلفن دارنده کلید اختیاری است؛ اگر پر شد باید معتبر باشد
+  if (keyHolderPhone) {
+    if (!validatePhoneNumber(keyHolderPhone)) {
+      showToast("شماره تلفن دارنده کلید معتبر نیست.", "error");
+      $("keyHolderPhone")?.focus();
       return;
     }
   }
 
   const fileData = {
-    id: state.editingFileId || generateFileId(),
+    id: editingId || generateFileId(),
     type: fileType,
     status,
     followUpDate,
@@ -243,7 +331,13 @@ export async function saveFile() {
     rooms,
     year,
     location,
+    unitFloor,
+    totalFloors,
     keyHolder,
+    keyHolderName:
+      keyHolder === "owner" || keyHolder === "office" ? "" : keyHolderName,
+    keyHolderPhone:
+      keyHolder === "owner" || keyHolder === "office" ? "" : keyHolderPhone,
     condition,
     occupancy,
     salePrice,
@@ -263,26 +357,35 @@ export async function saveFile() {
   };
 
   let newFiles;
-  if (state.editingFileId) {
+  if (editingId) {
     newFiles = state.files.map((f) =>
-      f.id === state.editingFileId ? { ...f, ...fileData } : f
+      f.id === editingId ? { ...f, ...fileData } : f
     );
   } else {
     newFiles = [...state.files, fileData];
   }
 
-  const success = await commitFiles(
-    newFiles,
-    state.editingFileId
-      ? `Update file ${fileData.id}`
-      : `Create new file ${fileData.id}`
-  );
+  setSaveButtonLoading(true);
+  try {
+    const success = await commitFiles(
+      newFiles,
+      editingId ? `Update file ${fileData.id}` : `Create new file ${fileData.id}`
+    );
 
-  if (success) closeFileModal();
+    if (success) {
+      closeFileModal();
+    }
+  } catch (err) {
+    console.error(err);
+    showToast(err?.message || "ذخیره انجام نشد.", "error");
+  } finally {
+    setSaveButtonLoading(false);
+  }
 }
 
 export async function deleteCurrentFile() {
-  if (!state.editingFileId) {
+  const editingId = state.editingFileId;
+  if (!editingId) {
     showToast("فایلی برای حذف انتخاب نشده است.", "error");
     return;
   }
@@ -292,7 +395,7 @@ export async function deleteCurrentFile() {
     return;
   }
 
-  const file = state.files.find((f) => f.id === state.editingFileId);
+  const file = state.files.find((f) => f.id === editingId);
   if (!file) {
     showToast("فایل پیدا نشد.", "error");
     return;
@@ -304,11 +407,8 @@ export async function deleteCurrentFile() {
   );
   if (!confirmed) return;
 
-  const newFiles = state.files.filter((f) => f.id !== state.editingFileId);
-  const success = await commitFiles(
-    newFiles,
-    `Delete file ${state.editingFileId}`
-  );
+  const newFiles = state.files.filter((f) => f.id !== editingId);
+  const success = await commitFiles(newFiles, `Delete file ${editingId}`);
 
   if (success) {
     showToast("فایل حذف شد.", "success");
@@ -327,6 +427,8 @@ export async function shareCurrentFile() {
   let salePrice = 0;
   let capital = 0;
   let notes = "";
+  let unitFloor = "";
+  let totalFloors = "";
 
   if (state.editingFileId) {
     const file = state.files.find((f) => f.id === state.editingFileId);
@@ -342,6 +444,8 @@ export async function shareCurrentFile() {
       salePrice = data.salePrice || 0;
       capital = data.capital || 0;
       notes = data.notes || "";
+      unitFloor = data.unitFloor || "";
+      totalFloors = data.totalFloors || "";
     }
   }
 
@@ -356,6 +460,8 @@ export async function shareCurrentFile() {
   salePrice = parseMoney($("salePrice")?.value) || salePrice;
   capital = parseMoney($("capital")?.value) || capital;
   notes = ($("notes")?.value || "").trim() || notes;
+  unitFloor = ($("unitFloor")?.value || "").trim() || unitFloor;
+  totalFloors = ($("totalFloors")?.value || "").trim() || totalFloors;
 
   if (!name && !phone) {
     showToast("اطلاعاتی برای اشتراک‌گذاری وجود ندارد.", "error");
@@ -376,6 +482,8 @@ export async function shareCurrentFile() {
     );
   }
   if (area) lines.push(`متراژ: ${area} متر`);
+  if (unitFloor) lines.push(`طبقه: ${unitFloor}`);
+  if (totalFloors) lines.push(`کل طبقات: ${totalFloors}`);
   if (salePrice) lines.push(`قیمت: ${formatMoney(salePrice)}`);
   if (capital) lines.push(`سرمایه: ${formatMoney(capital)}`);
   if (notes) lines.push(`توضیحات: ${notes}`);
@@ -389,7 +497,7 @@ export async function shareCurrentFile() {
   } else if (result === "copied") {
     showToast("متن فایل در کلیپ‌بورد کپی شد.", "success");
   } else if (result === "cancelled") {
-    // لغو کاربر
+    // لغو
   } else {
     showToast("اشتراک‌گذاری ناموفق بود.", "error");
   }
@@ -423,7 +531,11 @@ export function loadFileIntoForm(fileId) {
     rooms: data.rooms,
     year: data.year,
     location: data.location,
+    unitFloor: data.unitFloor,
+    totalFloors: data.totalFloors,
     keyHolder: data.keyHolder,
+    keyHolderName: data.keyHolderName,
+    keyHolderPhone: data.keyHolderPhone,
     condition: data.condition,
     occupancy: data.occupancy,
     buyerNotes: data.buyerNotes,
@@ -443,7 +555,6 @@ export function loadFileIntoForm(fileId) {
     }
   });
 
-  // فیلدهای پولی با جداکننده
   setMoneyInputValue("salePrice", data.salePrice);
   setMoneyInputValue("currentDeposit", data.currentDeposit);
   setMoneyInputValue("currentRent", data.currentRent);
