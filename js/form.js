@@ -20,9 +20,11 @@ import {
   getFileData,
   getFileName,
   getFilePhone,
-  getFileLocation
+  getFileLocation,
+  findDuplicatePhone,
+  findDuplicatePlaque
 } from "./files.js";
-import { closeFileModal } from "./modal.js";
+import { closeFileModal, clearFormDirty } from "./modal.js";
 import {
   TYPE_LABELS,
   PROPERTY_TYPE_LABELS,
@@ -161,6 +163,7 @@ function resetFormFields() {
   });
 
   if ($("notes")) $("notes").value = "";
+  if ($("plaque")) $("plaque").value = "";
   if ($("unitFloor")) $("unitFloor").value = "";
   if ($("totalFloors")) $("totalFloors").value = "";
   if ($("keyHolderName")) $("keyHolderName").value = "";
@@ -317,6 +320,32 @@ export async function saveFile() {
     }
   }
 
+  const plaque = ($("plaque")?.value || "").trim();
+
+  // جلوگیری از تکراری بودن تلفن
+  const dupPhone = findDuplicatePhone(phone, editingId);
+  if (dupPhone) {
+    showToast(
+      `این شماره قبلاً برای «${getFileName(dupPhone)}» ثبت شده است.`,
+      "error"
+    );
+    $("phone")?.focus();
+    return;
+  }
+
+  // جلوگیری از پلاک تکراری
+  if (plaque) {
+    const dupPlaque = findDuplicatePlaque(plaque, editingId);
+    if (dupPlaque) {
+      showToast(
+        `این پلاک قبلاً برای «${getFileName(dupPlaque)}» ثبت شده است.`,
+        "error"
+      );
+      $("plaque")?.focus();
+      return;
+    }
+  }
+
   const fileData = {
     id: editingId || generateFileId(),
     type: fileType,
@@ -331,6 +360,7 @@ export async function saveFile() {
     rooms,
     year,
     location,
+    plaque,
     unitFloor,
     totalFloors,
     keyHolder,
@@ -373,7 +403,8 @@ export async function saveFile() {
     );
 
     if (success) {
-      closeFileModal();
+      clearFormDirty();
+      closeFileModal(true);
     }
   } catch (err) {
     console.error(err);
@@ -383,37 +414,77 @@ export async function saveFile() {
   }
 }
 
+export async function softDeleteFile(fileId) {
+  if (!fileId) {
+    showToast("فایلی انتخاب نشده است.", "error");
+    return false;
+  }
+  if (state.isSaving) {
+    showToast("در حال ذخیره... لطفاً صبر کنید.", "warning");
+    return false;
+  }
+  const file = state.files.find((f) => f.id === fileId);
+  if (!file) {
+    showToast("فایل پیدا نشد.", "error");
+    return false;
+  }
+  const name = getFileName(file);
+  const confirmed = window.confirm(
+    `فایل «${name}» به سطل بازیابی منتقل شود؟\nتا ۳۰ روز قابل بازگردانی است.`
+  );
+  if (!confirmed) return false;
+
+  const newFiles = state.files.map((f) =>
+    f.id === fileId
+      ? {
+          ...f,
+          deletedAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }
+      : f
+  );
+  const success = await commitFiles(newFiles, `Soft-delete file ${fileId}`);
+  if (success) {
+    showToast("به سطل بازیابی منتقل شد.", "success");
+    clearFormDirty();
+    closeFileModal(true);
+  }
+  return success;
+}
+
+export async function restoreFile(fileId) {
+  if (!fileId || state.isSaving) return false;
+  const newFiles = state.files.map((f) => {
+    if (f.id !== fileId) return f;
+    const { deletedAt, ...rest } = f;
+    return { ...rest, updatedAt: new Date().toISOString() };
+  });
+  const success = await commitFiles(newFiles, `Restore file ${fileId}`);
+  if (success) showToast("فایل بازگردانی شد.", "success");
+  return success;
+}
+
+export async function purgeFile(fileId) {
+  if (!fileId || state.isSaving) return false;
+  const file = state.files.find((f) => f.id === fileId);
+  if (!file) return false;
+  const confirmed = window.confirm(
+    `حذف دائمی «${getFileName(file)}»؟\nقابل بازگشت نیست.`
+  );
+  if (!confirmed) return false;
+  const newFiles = state.files.filter((f) => f.id !== fileId);
+  const success = await commitFiles(newFiles, `Purge file ${fileId}`);
+  if (success) showToast("برای همیشه حذف شد.", "success");
+  return success;
+}
+
 export async function deleteCurrentFile() {
   const editingId = state.editingFileId;
   if (!editingId) {
     showToast("فایلی برای حذف انتخاب نشده است.", "error");
     return;
   }
-
-  if (state.isSaving) {
-    showToast("در حال ذخیره... لطفاً صبر کنید.", "warning");
-    return;
-  }
-
-  const file = state.files.find((f) => f.id === editingId);
-  if (!file) {
-    showToast("فایل پیدا نشد.", "error");
-    return;
-  }
-
-  const name = getFileName(file);
-  const confirmed = window.confirm(
-    `آیا از حذف فایل «${name}» مطمئن هستید؟\nاین عمل قابل بازگشت نیست.`
-  );
-  if (!confirmed) return;
-
-  const newFiles = state.files.filter((f) => f.id !== editingId);
-  const success = await commitFiles(newFiles, `Delete file ${editingId}`);
-
-  if (success) {
-    showToast("فایل حذف شد.", "success");
-    closeFileModal();
-  }
+  await softDeleteFile(editingId);
 }
 
 export async function shareCurrentFile() {
@@ -531,6 +602,7 @@ export function loadFileIntoForm(fileId) {
     rooms: data.rooms,
     year: data.year,
     location: data.location,
+    plaque: data.plaque,
     unitFloor: data.unitFloor,
     totalFloors: data.totalFloors,
     keyHolder: data.keyHolder,
