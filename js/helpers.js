@@ -224,3 +224,11 @@ export function setMoneyInputValue(id, value) {
   const n = parseMoney(value);
   el.value = n ? formatGroupedNumber(n) : "";
 }
+
+export function isEncryptedPhonePlaceholder(value) {
+  const v = String(value || "").trim();
+  if (!v) return false;
+  if (v.startsWith("enc:")) return true;
+  if (v === "[رمز شده]" || v.includes("رمز شده")) return true;
+  return false;
+}
