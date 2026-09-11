@@ -1,11 +1,24 @@
 /* =========================================================
-   MODAL
+   MODAL (form + detail)
 ========================================================= */
 
 import { state } from "./state.js";
 import { $ } from "./helpers.js";
+import {
+  getFileData,
+  getFileName,
+  getFilePhone,
+  getFileLocation,
+  isInTrash
+} from "./files.js";
+import { renderFileDetailHtml } from "./render.js";
+import {
+  TYPE_LABELS,
+  PROPERTY_TYPE_LABELS,
+  getStatusLabel
+} from "./labels.js";
+import { formatMoney, copyToClipboard, openWhatsApp, showToast } from "./helpers.js";
 
-// این توابع از form بعداً ست می‌شوند تا وابستگی دایره‌ای نداشته باشیم
 let _loadFileIntoForm = null;
 let _updateFormVisibility = null;
 let _resetFormFields = null;
@@ -23,25 +36,40 @@ export function setFormHandlers({
 function setEditActionButtons(isEditing) {
   const deleteBtn = $("deleteFileButton");
   const shareBtn = $("shareFileButton");
-
   if (deleteBtn) {
     deleteBtn.classList.toggle("hidden", !isEditing);
     deleteBtn.disabled = !isEditing;
   }
-
-  // شیر برای فایل جدید و ویرایش در دسترس است
   if (shareBtn) {
     shareBtn.classList.remove("hidden");
     shareBtn.disabled = false;
   }
 }
 
+export function markFormDirty() {
+  state.formDirty = true;
+}
+
+export function clearFormDirty() {
+  state.formDirty = false;
+}
+
+export function confirmDiscardIfDirty() {
+  if (!state.formDirty) return true;
+  return window.confirm(
+    "تغییرات ذخیره‌نشده دارید. از بستن فرم مطمئن هستید؟"
+  );
+}
+
 export function openFileModal() {
   const modal = $("fileModal");
   if (!modal) return;
 
+  closeDetailModal(true);
+
   modal.classList.remove("hidden");
   document.body.style.overflow = "hidden";
+  clearFormDirty();
 
   if (state.editingFileId) {
     if ($("modalEyebrow")) $("modalEyebrow").textContent = "ویرایش فایل";
@@ -52,43 +80,137 @@ export function openFileModal() {
     if ($("modalEyebrow")) $("modalEyebrow").textContent = "فایل جدید";
     if ($("modalTitle")) $("modalTitle").textContent = "ثبت فایل";
     setEditActionButtons(false);
-
-    if (_resetFormFields) {
-      _resetFormFields();
-    } else {
+    if (_resetFormFields) _resetFormFields();
+    else {
       $("fileForm")?.reset();
       if ($("followUpDays")) $("followUpDays").value = 10;
       if ($("fileStatus")) $("fileStatus").value = "active";
-      const saleRadio = document.querySelector(
-        'input[name="fileType"][value="sale"]'
-      );
-      if (saleRadio) saleRadio.checked = true;
     }
-
     if (_updateFormVisibility) _updateFormVisibility();
+  }
+
+  // dirty tracking
+  const form = $("fileForm");
+  if (form && form.dataset.dirtyBound !== "1") {
+    form.dataset.dirtyBound = "1";
+    form.addEventListener("input", markFormDirty);
+    form.addEventListener("change", markFormDirty);
   }
 }
 
-export function closeFileModal() {
+export function closeFileModal(force = false) {
+  if (!force && !confirmDiscardIfDirty()) return false;
   $("fileModal")?.classList.add("hidden");
   state.editingFileId = null;
+  clearFormDirty();
   document.body.style.overflow = "";
   setEditActionButtons(false);
+  return true;
+}
+
+export function openDetailModal(fileId) {
+  const file = state.files.find((f) => f.id === fileId);
+  if (!file) {
+    showToast("فایل پیدا نشد.", "error");
+    return;
+  }
+
+  state.viewingFileId = fileId;
+  const modal = $("detailModal");
+  if (!modal) return;
+
+  const body = $("detailBody");
+  if (body) body.innerHTML = renderFileDetailHtml(file);
+
+  if ($("detailTitle")) $("detailTitle").textContent = getFileName(file);
+
+  const inTrash = isInTrash(file);
+  $("detailEditButton")?.classList.toggle("hidden", inTrash);
+  $("detailArchiveButton")?.classList.toggle("hidden", inTrash);
+  $("detailRestoreButton")?.classList.toggle("hidden", !inTrash);
+  $("detailPurgeButton")?.classList.toggle("hidden", !inTrash);
+
+  modal.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+}
+
+export function closeDetailModal(silent = false) {
+  $("detailModal")?.classList.add("hidden");
+  state.viewingFileId = null;
+  if (!silent && $("fileModal")?.classList.contains("hidden")) {
+    document.body.style.overflow = "";
+  }
+}
+
+export function getSharePayloadForFile(file) {
+  const data = getFileData(file);
+  const type = file.type || "sale";
+  const lines = [
+    "🏠 املاک DOT",
+    `نوع: ${TYPE_LABELS[type] || type}`,
+    `نام: ${getFileName(file)}`,
+    `تلفن: ${getFilePhone(file) || "—"}`,
+    `موقعیت: ${getFileLocation(file) || "—"}`
+  ];
+  if (data.propertyType)
+    lines.push(
+      `نوع ملک: ${PROPERTY_TYPE_LABELS[data.propertyType] || data.propertyType}`
+    );
+  if (data.area) lines.push(`متراژ: ${data.area} متر`);
+  if (data.unitFloor) lines.push(`طبقه: ${data.unitFloor}`);
+  if (data.salePrice) lines.push(`قیمت: ${formatMoney(data.salePrice)}`);
+  if (data.capital) lines.push(`سرمایه: ${formatMoney(data.capital)}`);
+  if (data.notes) lines.push(`توضیحات: ${data.notes}`);
+  lines.push(`وضعیت: ${getStatusLabel(file.status || "active")}`);
+  return lines.join("\n");
+}
+
+export async function detailCopyPhone() {
+  const file = state.files.find((f) => f.id === state.viewingFileId);
+  if (!file) return;
+  const phone = getFilePhone(file);
+  if (!phone) {
+    showToast("شماره‌ای ثبت نشده.", "error");
+    return;
+  }
+  const ok = await copyToClipboard(phone);
+  showToast(ok ? "شماره کپی شد." : "کپی نشد.", ok ? "success" : "error");
+}
+
+export async function detailCopyAddress() {
+  const file = state.files.find((f) => f.id === state.viewingFileId);
+  if (!file) return;
+  const loc = getFileLocation(file);
+  if (!loc) {
+    showToast("آدرسی ثبت نشده.", "error");
+    return;
+  }
+  const ok = await copyToClipboard(loc);
+  showToast(ok ? "آدرس کپی شد." : "کپی نشد.", ok ? "success" : "error");
+}
+
+export function detailWhatsApp() {
+  const file = state.files.find((f) => f.id === state.viewingFileId);
+  if (!file) return;
+  openWhatsApp(getSharePayloadForFile(file));
+}
+
+export async function detailShareCopy() {
+  const file = state.files.find((f) => f.id === state.viewingFileId);
+  if (!file) return;
+  const ok = await copyToClipboard(getSharePayloadForFile(file));
+  showToast(ok ? "متن فایل کپی شد." : "کپی نشد.", ok ? "success" : "error");
 }
 
 export function setupModalClose() {
   $("closeModalButton")?.addEventListener("click", (e) => {
     e.preventDefault();
-    e.stopPropagation();
     closeFileModal();
   });
-
   $("cancelFormButton")?.addEventListener("click", (e) => {
     e.preventDefault();
-    e.stopPropagation();
     closeFileModal();
   });
-
   $("fileModal")?.addEventListener("click", (e) => {
     if (
       e.target === $("fileModal") ||
@@ -98,13 +220,34 @@ export function setupModalClose() {
     }
   });
 
-  // ESC برای بستن
+  $("closeDetailButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    closeDetailModal();
+  });
+  $("detailModal")?.addEventListener("click", (e) => {
+    if (
+      e.target === $("detailModal") ||
+      e.target.classList.contains("modal-backdrop")
+    ) {
+      closeDetailModal();
+    }
+  });
+
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      const modal = $("fileModal");
-      if (modal && !modal.classList.contains("hidden")) {
-        closeFileModal();
-      }
+    if (e.key !== "Escape") return;
+    if ($("fileModal") && !$("fileModal").classList.contains("hidden")) {
+      closeFileModal();
+      return;
+    }
+    if ($("detailModal") && !$("detailModal").classList.contains("hidden")) {
+      closeDetailModal();
+    }
+  });
+
+  window.addEventListener("beforeunload", (e) => {
+    if (state.formDirty) {
+      e.preventDefault();
+      e.returnValue = "";
     }
   });
 }
