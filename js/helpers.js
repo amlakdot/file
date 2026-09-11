@@ -232,3 +232,13 @@ export function isEncryptedPhonePlaceholder(value) {
   if (v === "[رمز شده]" || v.includes("رمز شده")) return true;
   return false;
 }
+
+
+export function buildWhatsAppText(lines) {
+  return Array.isArray(lines) ? lines.filter(Boolean).join("\n") : String(lines || "");
+}
+
+export function openWhatsApp(text) {
+  const url = "https://wa.me/?text=" + encodeURIComponent(text || "");
+  window.open(url, "_blank", "noopener,noreferrer");
+}
