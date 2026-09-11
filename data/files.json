@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-11T08:19:15.076Z",
+  "updatedAt": "2026-09-11T08:19:48.458Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -10,7 +10,7 @@
       "createdAt": "2026-09-11T07:13:09.988Z",
       "updatedAt": "2026-09-11T08:19:12.396Z",
       "name": "فاطمی",
-      "phone": "enc:wRfV5AKxV4xboJIA9LS7weovL2krdsvkTDY1HTX4RU+Rpminz1Kq",
+      "phone": "enc:HzUr1NX1Zvaudumt1AR2HXz0k8IQW1Fehh04q5korz39x7mcqR+D",
       "propertyType": "apartment",
       "area": 72,
       "rooms": 2,
@@ -50,9 +50,9 @@
       "status": "active",
       "followUpDate": "2026-12-19T20:30:00.000Z",
       "createdAt": "2026-09-11T07:14:14.619Z",
-      "updatedAt": "2026-09-11T07:14:14.619Z",
+      "updatedAt": "2026-09-11T08:19:46.498Z",
       "name": "کوثر زاده",
-      "phone": "enc:AQjTRozO/7u1UMv6BCvDRoH44ySUrz7FCw5dKLqa1gwtV0mSS/YP",
+      "phone": "enc:zgX8J/WNIbXwK1xUEaZ0oy5BJKwGm3C5dDIKRYJ6mkqHCcqyMO7F",
       "propertyType": "apartment",
       "area": 60,
       "rooms": 0,
@@ -77,7 +77,13 @@
         "elevator",
         "storage",
         "balcony"
-      ]
+      ],
+      "unitFloor": "",
+      "totalFloors": 0,
+      "keyHolderName": "",
+      "keyHolderPhone": "",
+      "salePrice": 4000000000,
+      "notes": ""
     },
     {
       "id": "file-1789111016987-246-7vorruxao",
@@ -87,7 +93,7 @@
       "createdAt": "2026-09-11T07:16:56.987Z",
       "updatedAt": "2026-09-11T08:12:56.278Z",
       "name": "نام نگفته",
-      "phone": "enc:vdYTO/t0OqJu9JbiwO3bZrzrA1DE7jzrXkSjkbiASbK4OtV2zuiT",
+      "phone": "enc:WYrn2CU/lMdRZRyWSStrlqHfEf1h8D1Uu1UXoAyVMGiiF1UIzRz4",
       "propertyType": "villa",
       "area": 72,
       "rooms": 0,
@@ -127,7 +133,7 @@
       "createdAt": "2026-09-11T07:25:47.882Z",
       "updatedAt": "2026-09-11T07:25:47.882Z",
       "name": "درویش پور",
-      "phone": "enc:OuyBtHeCyqWyh7VJEIRF6o5ysvNyMaIlAz3ITSZju5G2TRyAOHFZ",
+      "phone": "enc:p1LISHtLaljLFa+A6dQHAwWBq/TK4IYaO+ec2c1wovrLKbFhtfhI",
       "propertyType": "apartment",
       "area": 53,
       "rooms": 0,
