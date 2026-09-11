@@ -7,11 +7,13 @@ import {
   $,
   generateFileId,
   validatePhoneNumber,
-  showToast
+  showToast,
+  shareFileText
 } from "./helpers.js";
 import { commitFiles } from "./github.js";
-import { getFileData } from "./files.js";
+import { getFileData, getFileName, getFilePhone, getFileLocation } from "./files.js";
 import { closeFileModal } from "./modal.js";
+import { TYPE_LABELS, PROPERTY_TYPE_LABELS, getStatusLabel } from "./labels.js";
 
 export function setupFileForm() {
   const form = $("fileForm");
@@ -24,6 +26,18 @@ export function setupFileForm() {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     await saveFile();
+  });
+
+  $("deleteFileButton")?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    await deleteCurrentFile();
+  });
+
+  $("shareFileButton")?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    await shareCurrentFile();
   });
 
   updateFormVisibility();
@@ -71,9 +85,34 @@ export function updateFormVisibility() {
     "hidden",
     familyStatus !== "family"
   );
+
+  // امکانات فقط برای ملک فروشی و مالک
+  $("amenitiesSection")?.classList.toggle("hidden", !showPropertyDetails);
+}
+
+function resetFormFields() {
+  const form = $("fileForm");
+  if (form) form.reset();
+
+  if ($("followUpDays")) $("followUpDays").value = 10;
+  if ($("fileStatus")) $("fileStatus").value = "active";
+
+  document.querySelectorAll(".amenity").forEach((cb) => {
+    cb.checked = false;
+  });
+
+  const saleRadio = document.querySelector(
+    'input[name="fileType"][value="sale"]'
+  );
+  if (saleRadio) saleRadio.checked = true;
 }
 
 export async function saveFile() {
+  if (state.isSaving) {
+    showToast("در حال ذخیره... لطفاً صبر کنید.", "warning");
+    return;
+  }
+
   const fileType =
     document.querySelector('input[name="fileType"]:checked')?.value ||
     "sale";
@@ -111,16 +150,25 @@ export async function saveFile() {
     document.querySelectorAll(".amenity:checked")
   ).map((c) => c.value);
 
+  // وضعیت فایل (قابل تغییر توسط کاربر)
+  let status = $("fileStatus")?.value || "active";
+  const allowedStatuses = ["active", "followup", "pending", "archived", "done"];
+  if (!allowedStatuses.includes(status)) status = "active";
+
   // Follow-up: days → date
   const days = parseInt($("followUpDays")?.value || "10", 10);
   let followUpDate = null;
-  let status = "active";
 
   if (Number.isFinite(days) && days > 0) {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
     d.setDate(d.getDate() + days);
     followUpDate = d.toISOString();
+  }
+
+  // اگر وضعیت پیگیری است و تاریخ نداریم، امروز را بگذار
+  if (status === "followup" && !followUpDate) {
+    followUpDate = new Date().toISOString();
   }
 
   if (!name) {
@@ -142,6 +190,10 @@ export async function saveFile() {
   let existingFile = null;
   if (state.editingFileId) {
     existingFile = state.files.find((f) => f.id === state.editingFileId);
+    if (!existingFile) {
+      showToast("فایل موردنظر برای ویرایش پیدا نشد.", "error");
+      return;
+    }
   }
 
   const fileData = {
@@ -194,9 +246,120 @@ export async function saveFile() {
   if (success) closeFileModal();
 }
 
+export async function deleteCurrentFile() {
+  if (!state.editingFileId) {
+    showToast("فایلی برای حذف انتخاب نشده است.", "error");
+    return;
+  }
+
+  if (state.isSaving) {
+    showToast("در حال ذخیره... لطفاً صبر کنید.", "warning");
+    return;
+  }
+
+  const file = state.files.find((f) => f.id === state.editingFileId);
+  if (!file) {
+    showToast("فایل پیدا نشد.", "error");
+    return;
+  }
+
+  const name = getFileName(file);
+  const confirmed = window.confirm(
+    `آیا از حذف فایل «${name}» مطمئن هستید؟\nاین عمل قابل بازگشت نیست.`
+  );
+  if (!confirmed) return;
+
+  const newFiles = state.files.filter((f) => f.id !== state.editingFileId);
+  const success = await commitFiles(
+    newFiles,
+    `Delete file ${state.editingFileId}`
+  );
+
+  if (success) {
+    showToast("فایل حذف شد.", "success");
+    closeFileModal();
+  }
+}
+
+export async function shareCurrentFile() {
+  let name = "";
+  let phone = "";
+  let location = "";
+  let type = "sale";
+  let status = "active";
+  let propertyType = "";
+  let area = "";
+
+  if (state.editingFileId) {
+    const file = state.files.find((f) => f.id === state.editingFileId);
+    if (file) {
+      name = getFileName(file);
+      phone = getFilePhone(file);
+      location = getFileLocation(file);
+      type = file.type || "sale";
+      status = file.status || "active";
+      const data = getFileData(file);
+      propertyType = data.propertyType || "";
+      area = data.area || "";
+    }
+  }
+
+  // اولویت با مقادیر فعلی فرم
+  name = ($("name")?.value || "").trim() || name;
+  phone = ($("phone")?.value || "").trim() || phone;
+  location = ($("location")?.value || "").trim() || location;
+  type =
+    document.querySelector('input[name="fileType"]:checked')?.value || type;
+  status = $("fileStatus")?.value || status;
+  propertyType = $("propertyType")?.value || propertyType;
+  area = $("area")?.value || area;
+
+  if (!name && !phone) {
+    showToast("اطلاعاتی برای اشتراک‌گذاری وجود ندارد.", "error");
+    return;
+  }
+
+  const lines = [
+    "🏠 املاک DOT",
+    `نوع: ${TYPE_LABELS[type] || type}`,
+    `نام: ${name || "—"}`,
+    `تلفن: ${phone || "—"}`,
+    `موقعیت: ${location || "—"}`
+  ];
+
+  if (propertyType) {
+    lines.push(
+      `نوع ملک: ${PROPERTY_TYPE_LABELS[propertyType] || propertyType}`
+    );
+  }
+  if (area) {
+    lines.push(`متراژ: ${area} متر`);
+  }
+  lines.push(`وضعیت: ${getStatusLabel(status)}`);
+
+  const text = lines.join("\n");
+  const result = await shareFileText("املاک DOT", text);
+
+  if (result === "shared") {
+    showToast("اشتراک‌گذاری انجام شد.", "success");
+  } else if (result === "copied") {
+    showToast("متن فایل در کلیپ‌بورد کپی شد.", "success");
+  } else if (result === "cancelled") {
+    // کاربر لغو کرد
+  } else {
+    showToast("اشتراک‌گذاری ناموفق بود.", "error");
+  }
+}
+
 export function loadFileIntoForm(fileId) {
   const file = state.files.find((f) => f.id === fileId);
-  if (!file) return;
+  if (!file) {
+    showToast("فایل برای ویرایش پیدا نشد.", "error");
+    return;
+  }
+
+  // اول فرم را کامل پاک کن تا داده قبلی نماند
+  resetFormFields();
 
   const data = getFileData(file);
 
@@ -204,6 +367,10 @@ export function loadFileIntoForm(fileId) {
     `input[name="fileType"][value="${file.type || "sale"}"]`
   );
   if (typeRadio) typeRadio.checked = true;
+
+  if ($("fileStatus")) {
+    $("fileStatus").value = file.status || "active";
+  }
 
   const fields = {
     name: data.name,
@@ -231,7 +398,10 @@ export function loadFileIntoForm(fileId) {
 
   Object.entries(fields).forEach(([id, value]) => {
     const el = $(id);
-    if (el && value !== undefined && value !== null && value !== "") {
+    if (!el) return;
+    if (value === undefined || value === null) {
+      el.value = "";
+    } else {
       el.value = value;
     }
   });
@@ -242,11 +412,10 @@ export function loadFileIntoForm(fileId) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     target.setHours(0, 0, 0, 0);
-    const diffDays = Math.max(
-      1,
-      Math.round((target - today) / (1000 * 60 * 60 * 24))
-    );
-    if ($("followUpDays")) $("followUpDays").value = diffDays;
+    const diffDays = Math.round((target - today) / (1000 * 60 * 60 * 24));
+    if ($("followUpDays")) {
+      $("followUpDays").value = Math.max(1, diffDays);
+    }
   } else if ($("followUpDays")) {
     $("followUpDays").value = 10;
   }
@@ -258,3 +427,5 @@ export function loadFileIntoForm(fileId) {
 
   updateFormVisibility();
 }
+
+export { resetFormFields };
