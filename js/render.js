@@ -20,7 +20,8 @@ import {
   FAMILY_LABELS,
   AMENITY_LABELS,
   getStatusColor,
-  getStatusLabel
+  getStatusLabel,
+  getTagLabel
 } from "./labels.js";
 import {
   getFileData,
@@ -31,7 +32,8 @@ import {
   isFollowUp,
   isDeleted,
   isInTrash,
-  getActiveFiles
+  getActiveFiles,
+  getFileTags
 } from "./files.js";
 
 function amenityLabels(list) {
@@ -118,6 +120,10 @@ export function getFilteredFiles() {
         String(data.tenantRent || ""),
         String(data.area || ""),
         String(data.rooms || ""),
+        file.divarTitle || "",
+        file.divarToken || "",
+        file.source || "",
+        ...(Array.isArray(file.tags) ? file.tags : []),
         String(data.year || "")
       ];
       return searchable.some((v) => normalize(v).includes(query));
@@ -226,6 +232,8 @@ export function renderFileCard(file) {
   const price = getFilePrice(file);
   const propertyType = data.propertyType || "";
   const area = data.area || "";
+  const tags = getFileTags(file);
+  const isDivar = file.source === "divar" || !!file.divarToken;
 
   let priceLabel = "";
   if (type === "sale" && data.salePrice) priceLabel = formatMoney(data.salePrice);
@@ -245,16 +253,29 @@ export function renderFileCard(file) {
       `طبقه ${FLOOR_LABELS[data.unitFloor] || data.unitFloor}`
     );
 
+  const tagBadges = tags
+    .map((t) => {
+      const cls =
+        t === "divar-deleted"
+          ? "tag-badge tag-deleted"
+          : t === "needs-review-from-ad" || t === "needs-review"
+            ? "tag-badge tag-review"
+            : "tag-badge";
+      return `<div class="${cls}">${escapeHtml(getTagLabel(t))}</div>`;
+    })
+    .join("");
+
   return `
     <div class="file-card card-summary" data-file-id="${escapeHtml(file.id)}" role="button" tabindex="0">
       <div class="card-top">
         <div>
-          <div class="card-type">${escapeHtml(TYPE_LABELS[type] || type)}</div>
+          <div class="card-type">${escapeHtml(TYPE_LABELS[type] || type)}${isDivar ? ' <span class="divar-source-mark">دیوار</span>' : ""}</div>
           <div class="card-title">${escapeHtml(name)}</div>
         </div>
         <div class="card-top-badges">
           ${hasFollowUp ? `<div class="followup-badge">پیگیری</div>` : ""}
           ${isInTrash(file) ? `<div class="trash-badge">حذف‌شده</div>` : ""}
+          ${tagBadges}
         </div>
       </div>
       <div class="card-info">
@@ -283,9 +304,24 @@ export function renderFileDetailHtml(file) {
   const phone = getFilePhone(file);
   const location = getFileLocation(file);
   const items = [];
+  const tags = getFileTags(file);
 
   items.push(infoItem("نوع فایل", escapeHtml(TYPE_LABELS[type] || type)));
   items.push(infoItem("وضعیت", escapeHtml(getStatusLabel(status))));
+  if (tags.length) {
+    items.push(
+      infoItem(
+        "برچسب‌ها",
+        tags.map((t) => escapeHtml(getTagLabel(t))).join(" · ")
+      )
+    );
+  }
+  if (file.source === "divar" || file.divarToken) {
+    items.push(infoItem("منبع", "دیوار"));
+    if (file.divarTitle) {
+      items.push(infoItem("عنوان آگهی", escapeHtml(file.divarTitle)));
+    }
+  }
   items.push(infoItem("نام", escapeHtml(name)));
   items.push(infoItem("تلفن", escapeHtml(phone || "—")));
   items.push(infoItem("موقعیت", escapeHtml(location || "—")));
