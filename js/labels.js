@@ -93,3 +93,14 @@ export function getStatusLabel(status) {
   };
   return labels[status] || status;
 }
+
+/** برچسب‌های فایل‌های واردشده از دیوار */
+export const TAG_LABELS = {
+  "needs-review-from-ad": "نیاز به بررسی از آگهی",
+  "needs-review": "نیاز به بررسی",
+  "divar-deleted": "این آگهی از دیوار پاک شده"
+};
+
+export function getTagLabel(tag) {
+  return TAG_LABELS[tag] || tag;
+}
