@@ -130,6 +130,12 @@ export function openDetailModal(fileId) {
   $("detailRestoreButton")?.classList.toggle("hidden", !inTrash);
   $("detailPurgeButton")?.classList.toggle("hidden", !inTrash);
 
+  const divarBtn = $("detailDivarLinkButton");
+  if (divarBtn) {
+    const hasDivar = !!(file.divarUrl || file.divarToken);
+    divarBtn.classList.toggle("hidden", !hasDivar || inTrash);
+  }
+
   modal.classList.remove("hidden");
   document.body.style.overflow = "hidden";
 }
