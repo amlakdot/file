@@ -14,19 +14,26 @@ const TAG_NEEDS_REVIEW_GENERAL = "needs-review";
 
 /**
  * استخراج توکن آگهی از لینک دیوار
- * مثال: https://divar.ir/v/.../gajafK0m  →  gajafK0m
+ * پشتیبانی از:
+ *  https://divar.ir/v/slug-name/TOKEN
+ *  https://divar.ir/v/TOKEN
+ *  TOKEN خام
  */
 export function extractDivarToken(url) {
   if (!url) return null;
   const s = String(url).trim();
-  // /v/{slug}/{token} یا فقط token در انتهای مسیر
-  const m =
-    s.match(/divar\.ir\/v\/[^/]+\/([A-Za-z0-9_-]+)/i) ||
-    s.match(/divar\.ir\/v\/([A-Za-z0-9_-]+)\/?$/i) ||
-    s.match(/\/([A-Za-z0-9_-]{5,})\/?$/);
+
+  // فرم کامل: /v/{slug}/{token}
+  let m = s.match(/divar\.ir\/v\/[^/?#]+\/([A-Za-z0-9_-]{5,})/i);
   if (m) return m[1];
-  // اگر فقط توکن خام وارد شده
+
+  // فرم کوتاه: /v/{token}
+  m = s.match(/divar\.ir\/v\/([A-Za-z0-9_-]{5,})\/?(?:[?#]|$)/i);
+  if (m) return m[1];
+
+  // فقط توکن
   if (/^[A-Za-z0-9_-]{5,20}$/.test(s)) return s;
+
   return null;
 }
 
@@ -44,16 +51,20 @@ function parsePersianNumber(value) {
 }
 
 function parseMoneyValue(value) {
-  if (value === null || value === undefined) return 0;
+  if (value === null || value === undefined || value === "") return 0;
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? Math.trunc(value) : 0;
+  }
   const s = toEnglishDigits(String(value))
     .replace(/,/g, "")
     .replace(/[^\d]/g, "");
+  if (!s) return 0;
   const n = parseInt(s, 10);
   return Number.isFinite(n) ? n : 0;
 }
 
 function normalizeRooms(value) {
-  if (value === null || value === undefined) return 0;
+  if (value === null || value === undefined || value === "") return 0;
   const s = toEnglishDigits(String(value)).trim();
   const map = {
     یک: 1,
@@ -73,40 +84,28 @@ function detectTypeFromCategory(category, title, description) {
   const cat = String(category || "").toLowerCase();
   const text = `${title || ""} ${description || ""}`.toLowerCase();
 
-  const rentHints = [
-    "rent",
-    "اجاره",
-    "رهن",
-    "ودیعه",
-    "residential-rent",
-    "apartment-rent",
-    "house-rent",
-    "villa-rent"
-  ];
-  const saleHints = [
-    "sell",
-    "sale",
-    "فروش",
-    "residential-sell",
-    "apartment-sell",
-    "house-sell",
-    "villa-sell"
-  ];
-
-  if (rentHints.some((h) => cat.includes(h) || text.includes(h))) {
+  if (
+    /rent|اجاره|رهن|ودیعه|residential-rent|apartment-rent|house-rent|villa-rent/.test(
+      cat
+    ) ||
+    /اجاره|رهن|ودیعه/.test(text)
+  ) {
     return "landlord";
   }
-  if (saleHints.some((h) => cat.includes(h) || text.includes(h))) {
+  if (
+    /sell|sale|فروش|residential-sell|apartment-sell|house-sell|villa-sell/.test(
+      cat
+    ) ||
+    /فروش/.test(text)
+  ) {
     return "sale";
   }
-  // پیش‌فرض: اگر ودیعه/اجاره در متن بود اجاره
-  if (/ودیعه|اجاره|رهن/.test(text)) return "landlord";
   return "sale";
 }
 
 function detectPropertyType(category, title) {
   const t = `${category || ""} ${title || ""}`.toLowerCase();
-  if (/villa|ویلا|خانه.?ویلا|دربستی/.test(t)) return "villa";
+  if (/villa|ویلا|خانه.?ویلا|دربستی|house-/.test(t)) return "villa";
   if (/office|اداری|دفتر/.test(t)) return "office";
   if (/commercial|تجاری|مغازه|فروشگاه/.test(t)) return "commercial";
   if (/land|زمین|قطعه/.test(t)) return "land";
@@ -114,81 +113,9 @@ function detectPropertyType(category, title) {
   return "apartment";
 }
 
-function collectKeyValues(obj, out = {}) {
-  if (!obj || typeof obj !== "object") return out;
-  if (Array.isArray(obj)) {
-    obj.forEach((item) => collectKeyValues(item, out));
-    return out;
-  }
-
-  // ساختارهای رایج دیوار
-  if (obj.title && (obj.value !== undefined || obj.available !== undefined)) {
-    const key = String(obj.title).trim();
-    out[key] = obj.value !== undefined ? obj.value : obj.available;
-  }
-  if (obj.name && obj.value !== undefined) {
-    out[String(obj.name).trim()] = obj.value;
-  }
-
-  for (const k of Object.keys(obj)) {
-    const v = obj[k];
-    if (v && typeof v === "object") collectKeyValues(v, out);
-  }
-  return out;
-}
-
-function extractFromSections(sections) {
-  const result = {
-    title: "",
-    description: "",
-    attributes: {},
-    amenities: []
-  };
-  if (!Array.isArray(sections)) return result;
-
-  for (const section of sections) {
-    const name = String(section.section_name || section.name || "").toUpperCase();
-    const widgets = section.widgets || [];
-
-    for (const w of widgets) {
-      const data = w.data || w;
-      if (!data) continue;
-
-      if (name.includes("TITLE") || data.title) {
-        if (data.title && !result.title) result.title = data.title;
-        if (data.subtitle) result.subtitle = data.subtitle;
-      }
-
-      if (name.includes("DESCRIPTION") || data.text) {
-        if (data.text && !result.description) result.description = data.text;
-      }
-
-      // ویژگی‌های گروهی
-      if (Array.isArray(data.items)) {
-        for (const item of data.items) {
-          if (item.title && item.value !== undefined) {
-            result.attributes[String(item.title).trim()] = item.value;
-          }
-          if (item.title && item.available !== undefined) {
-            const available = !!item.available;
-            const title = String(item.title).trim();
-            result.attributes[title] = available;
-            mapAmenity(title, available, result.amenities);
-          }
-        }
-      }
-
-      if (data.title && data.value !== undefined) {
-        result.attributes[String(data.title).trim()] = data.value;
-      }
-    }
-  }
-  return result;
-}
-
 function mapAmenity(title, available, list) {
   if (!available) return;
-  const t = String(title).replace(/\s/g, "");
+  const t = String(title || "").replace(/\s/g, "");
   const map = {
     پارکینگ: "parking",
     آسانسور: "elevator",
@@ -203,7 +130,7 @@ function mapAmenity(title, available, list) {
     نگهبان: "guard",
     پکیج: "package",
     کولر: "cooler",
-    "گرمایشازکف": "floor-heating",
+    گرمایشازکف: "floor-heating",
     کابینت: "cabinet",
     کمد: "closet"
   };
@@ -212,190 +139,206 @@ function mapAmenity(title, available, list) {
   }
 }
 
-function extractFromWidgets(widgets) {
+/**
+ * استخراج فیلدها از ساختار واقعی posts-v2/web
+ */
+function parseDivarResponse(raw) {
   const result = {
     title: "",
     description: "",
-    attributes: {},
-    amenities: [],
+    subtitle: "",
+    category: "",
+    city: "",
     district: "",
-    city: ""
+    area: 0,
+    year: 0,
+    rooms: 0,
+    unitFloor: "",
+    totalFloors: 0,
+    credit: 0,
+    rent: 0,
+    salePrice: 0,
+    amenities: [],
+    attributes: {}
   };
-  if (!widgets || typeof widgets !== "object") return result;
 
-  if (widgets.header) {
-    result.title = widgets.header.title || result.title;
-    result.date = widgets.header.date;
-  }
-  if (widgets.description) {
-    result.description =
-      widgets.description.text || widgets.description || result.description;
-  }
+  const webengage = raw.webengage || {};
+  const seo = raw.seo || {};
+  const webInfo = seo.web_info || {};
+  const cityObj = raw.city || {};
 
-  const listData = widgets.list_data;
-  if (Array.isArray(listData)) {
-    for (const block of listData) {
-      if (Array.isArray(block.items)) {
-        for (const item of block.items) {
-          if (item.title && item.value !== undefined) {
-            result.attributes[String(item.title).trim()] = item.value;
+  result.title =
+    webInfo.title ||
+    (raw.share && raw.share.title) ||
+    webengage.title ||
+    "";
+  result.category =
+    webengage.category ||
+    webengage.cat_3 ||
+    webengage.cat_2 ||
+    webInfo.category_slug_persian ||
+    "";
+  result.city =
+    cityObj.name ||
+    webInfo.city_persian ||
+    webengage.city ||
+    "";
+  result.district = webengage.district || "";
+
+  result.credit = parseMoneyValue(webengage.credit);
+  result.rent = parseMoneyValue(webengage.rent);
+  result.salePrice = parseMoneyValue(webengage.price);
+
+  const sections = Array.isArray(raw.sections) ? raw.sections : [];
+
+  for (const section of sections) {
+    const sectionName = String(section.section_name || "").toUpperCase();
+    const widgets = section.widgets || [];
+
+    for (const widget of widgets) {
+      const wt = String(widget.widget_type || "").toUpperCase();
+      const d = widget.data || {};
+
+      if (sectionName === "TITLE") {
+        if (wt.includes("TITLE") && d.title && !result.title) {
+          result.title = d.title;
+        }
+        if (wt === "EXPANDABLE_SECTION" && d.title) {
+          result.subtitle = d.title;
+        }
+      }
+
+      if (sectionName === "DESCRIPTION" && d.text) {
+        if (wt === "DESCRIPTION_ROW" || (!result.description && d.text !== "توضیحات")) {
+          if (d.text !== "توضیحات") {
+            result.description = d.text;
           }
-          if (item.title && item.available !== undefined) {
-            result.attributes[String(item.title).trim()] = item.available;
-            mapAmenity(item.title, item.available, result.amenities);
+        }
+      }
+
+      if (sectionName === "LIST_DATA") {
+        if (wt === "GROUP_INFO_ROW" && Array.isArray(d.items)) {
+          for (const item of d.items) {
+            const t = String(item.title || "").trim();
+            const v = item.value;
+            result.attributes[t] = v;
+            if (t.includes("متراژ")) result.area = parsePersianNumber(v);
+            else if (t.includes("ساخت") || t.includes("سال"))
+              result.year = parsePersianNumber(v);
+            else if (t.includes("اتاق") || t.includes("خواب"))
+              result.rooms = normalizeRooms(v);
+          }
+        }
+
+        if (wt === "UNEXPANDABLE_ROW" && d.title) {
+          const t = String(d.title).trim();
+          const v = d.value;
+          result.attributes[t] = v;
+          if (t.includes("طبقه") && v) {
+            const floorStr = toEnglishDigits(String(v));
+            const parts = floorStr.match(/(\d+)\s*(?:از|\/)\s*(\d+)/);
+            if (parts) {
+              result.unitFloor = parts[1];
+              result.totalFloors = parseInt(parts[2], 10) || 0;
+            } else if (/همکف/.test(floorStr)) {
+              result.unitFloor = "ground";
+            } else if (/زیرزمین/.test(floorStr)) {
+              result.unitFloor = "basement";
+            } else {
+              const n = parsePersianNumber(floorStr);
+              if (n) result.unitFloor = String(n);
+            }
+          }
+          if (t.includes("ودیعه") || t.includes("رهن")) {
+            const money = parseMoneyValue(v);
+            if (money > 0) result.credit = money;
+          }
+          if (t.includes("اجاره")) {
+            if (/رایگان/.test(String(v))) {
+              result.rent = 0;
+            } else {
+              const money = parseMoneyValue(v);
+              if (money > 0) result.rent = money;
+            }
+          }
+          if (t.includes("قیمت") && !t.includes("اجاره") && !t.includes("ودیعه")) {
+            const money = parseMoneyValue(v);
+            if (money > 0) result.salePrice = money;
+          }
+        }
+
+        if (wt === "RENT_SLIDER") {
+          if (d.credit) {
+            const c =
+              parseMoneyValue(d.credit.value) ||
+              parseMoneyValue(d.credit.transformed_value);
+            if (c > 0) result.credit = c;
+          }
+          if (d.rent) {
+            const r =
+              parseMoneyValue(d.rent.value) ||
+              parseMoneyValue(d.rent.transformed_value);
+            if (d.rent.value !== undefined || d.rent.transformed_value !== undefined) {
+              result.rent = r;
+            }
+          }
+        }
+
+        if (wt === "GROUP_FEATURE_ROW" && Array.isArray(d.items)) {
+          for (const item of d.items) {
+            const available = item.available === true;
+            mapAmenity(item.title, available, result.amenities);
+            result.attributes[String(item.title || "")] = available;
           }
         }
       }
     }
   }
 
-  collectKeyValues(widgets, result.attributes);
-  return result;
-}
-
-function pickAttr(attrs, keys) {
-  for (const k of keys) {
-    for (const [title, value] of Object.entries(attrs)) {
-      if (title.includes(k) || title === k) return value;
+  if (result.subtitle) {
+    const locMatch = result.subtitle.match(/در\s+(.+)$/);
+    if (locMatch) {
+      const loc = locMatch[1].trim();
+      if (!result.district) {
+        result.district = loc;
+      }
     }
   }
-  return null;
+
+  return result;
 }
 
 /**
  * تبدیل پاسخ خام API دیوار به آبجکت فایل املاک
  */
 export function mapDivarPostToFile(raw, token, originalUrl) {
-  const dataRoot = raw.data || {};
-  const webengage = dataRoot.webengage || {};
-  const seo = raw.seo || {};
-  const category =
-    raw.category ||
-    dataRoot.category ||
-    seo.web_info?.category_slug ||
-    webengage.category ||
-    "";
+  const parsed = parseDivarResponse(raw);
 
-  let parsed = { title: "", description: "", attributes: {}, amenities: [] };
+  const type = detectTypeFromCategory(
+    parsed.category,
+    parsed.title,
+    parsed.description
+  );
+  const propertyType = detectPropertyType(parsed.category, parsed.title);
 
-  if (Array.isArray(raw.sections)) {
-    parsed = { ...parsed, ...extractFromSections(raw.sections) };
-  }
-  if (raw.widgets) {
-    const w = extractFromWidgets(raw.widgets);
-    parsed.title = parsed.title || w.title;
-    parsed.description = parsed.description || w.description;
-    parsed.attributes = { ...w.attributes, ...parsed.attributes };
-    parsed.amenities = [...new Set([...parsed.amenities, ...w.amenities])];
-  }
-
-  // عنوان از seo یا data
-  const title =
-    parsed.title ||
-    raw.title ||
-    dataRoot.title ||
-    seo.title ||
-    seo.web_info?.title ||
-    "آگهی دیوار";
-
-  const description =
-    parsed.description ||
-    dataRoot.description ||
-    seo.description ||
-    webengage.description ||
-    "";
-
-  const district =
-    dataRoot.district ||
-    seo.web_info?.district_persian ||
-    webengage.district ||
-    raw.district ||
-    "";
-  const city =
-    dataRoot.city ||
-    seo.web_info?.city_persian ||
-    webengage.city ||
-    raw.city ||
-    "";
-
-  const attrs = parsed.attributes;
-
-  // متراژ
-  let area =
-    parsePersianNumber(webengage.size) ||
-    parsePersianNumber(webengage.meterage) ||
-    parsePersianNumber(pickAttr(attrs, ["متراژ", "متراژ بنا", "اندازه"]));
-
-  // سال ساخت
-  let year =
-    parsePersianNumber(webengage.year) ||
-    parsePersianNumber(webengage.construction_year) ||
-    parsePersianNumber(pickAttr(attrs, ["ساخت", "سال ساخت", "سال"]));
-
-  // اتاق
-  let rooms =
-    normalizeRooms(webengage.rooms) ||
-    normalizeRooms(pickAttr(attrs, ["اتاق", "خواب", "تعداد اتاق"]));
-
-  // طبقه
-  const floorRaw =
-    pickAttr(attrs, ["طبقه"]) ||
-    webengage.floor ||
-    "";
-  let unitFloor = "";
-  let totalFloors = 0;
-  if (floorRaw) {
-    const floorStr = toEnglishDigits(String(floorRaw));
-    const parts = floorStr.match(/(\d+)\s*(?:از|\/)\s*(\d+)/);
-    if (parts) {
-      unitFloor = parts[1];
-      totalFloors = parseInt(parts[2], 10) || 0;
-    } else if (/همکف/.test(floorStr)) {
-      unitFloor = "ground";
-    } else if (/زیرزمین/.test(floorStr)) {
-      unitFloor = "basement";
+  let location = "";
+  if (parsed.district && parsed.city) {
+    if (parsed.district.includes(parsed.city)) {
+      location = parsed.district;
     } else {
-      const n = parsePersianNumber(floorStr);
-      if (n) unitFloor = String(n);
+      location = `${parsed.city}، ${parsed.district}`;
     }
+  } else {
+    location = parsed.district || parsed.city || "";
   }
-
-  // امکانات از attributes متنی (مثل «پارکینگ ندارد»)
-  for (const [title, value] of Object.entries(attrs)) {
-    const t = String(title);
-    if (typeof value === "boolean") {
-      mapAmenity(t, value, parsed.amenities);
-    } else {
-      const has = !/ندارد|بدون/.test(String(value)) && !/ندارد/.test(t);
-      if (/پارکینگ|آسانسور|انباری|بالکن|تراس/.test(t)) {
-        mapAmenity(t.replace(/ندارد/g, ""), has, parsed.amenities);
-      }
-    }
-  }
-
-  // قیمت‌ها
-  const credit =
-    parseMoneyValue(webengage.credit) ||
-    parseMoneyValue(pickAttr(attrs, ["ودیعه", "رهن", "پیش‌پرداخت", "پیش پرداخت"]));
-  const rent =
-    parseMoneyValue(webengage.rent) ||
-    parseMoneyValue(pickAttr(attrs, ["اجاره", "اجارهٔ ماهانه", "اجاره ماهانه"]));
-  const salePrice =
-    parseMoneyValue(webengage.price) ||
-    parseMoneyValue(dataRoot.price) ||
-    parseMoneyValue(pickAttr(attrs, ["قیمت", "مبلغ", "قیمت کل"]));
-
-  const type = detectTypeFromCategory(category, title, description);
-  const propertyType = detectPropertyType(category, title);
-
-  const locationParts = [city, district].filter(Boolean);
-  const location = locationParts.join("، ") || district || city || "";
 
   const notesParts = [];
-  if (title) notesParts.push(`عنوان دیوار: ${title}`);
-  if (description) notesParts.push(description);
+  if (parsed.title) notesParts.push(`عنوان دیوار: ${parsed.title}`);
+  if (parsed.description) notesParts.push(parsed.description);
 
   const now = new Date().toISOString();
+  const displayTitle = parsed.title || "آگهی دیوار";
+
   const file = {
     id: generateFileId(),
     type,
@@ -403,26 +346,26 @@ export function mapDivarPostToFile(raw, token, originalUrl) {
     followUpDate: null,
     createdAt: now,
     updatedAt: now,
-    name: "", // عمداً خالی — تا زمان وارد کردن دستی
+    name: `آگهی دیوار: ${displayTitle}`,
     phone: "",
     propertyType,
-    area,
-    rooms,
-    year,
+    area: parsed.area || 0,
+    rooms: parsed.rooms || 0,
+    year: parsed.year || 0,
     location,
     plaque: "",
-    unitFloor,
-    totalFloors,
+    unitFloor: parsed.unitFloor || "",
+    totalFloors: parsed.totalFloors || 0,
     keyHolder: "",
     keyHolderName: "",
     keyHolderPhone: "",
     condition: "",
     occupancy: "",
-    salePrice: type === "sale" ? salePrice : 0,
+    salePrice: type === "sale" ? parsed.salePrice || 0 : 0,
     currentDeposit: 0,
     currentRent: 0,
-    suggestedDeposit: type === "landlord" ? credit : 0,
-    suggestedRent: type === "landlord" ? rent : 0,
+    suggestedDeposit: type === "landlord" ? parsed.credit || 0 : 0,
+    suggestedRent: type === "landlord" ? parsed.rent || 0 : 0,
     capital: 0,
     buyerNotes: "",
     tenantDeposit: 0,
@@ -432,92 +375,105 @@ export function mapDivarPostToFile(raw, token, originalUrl) {
     tenantNotes: "",
     notes: notesParts.join("\n\n"),
     amenities: [...new Set(parsed.amenities)],
-    // فیلدهای مخصوص دیوار
     source: "divar",
     divarToken: token,
     divarUrl: originalUrl || buildDivarUrl(token),
-    divarTitle: title,
+    divarTitle: displayTitle,
     tags: [TAG_NEEDS_REVIEW]
   };
 
   return file;
 }
 
-/**
- * دریافت آگهی از API دیوار
- * چند endpoint و در صورت نیاز پروکسی را امتحان می‌کند
- */
+async function fetchViaAllOrigins(apiUrl) {
+  const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`;
+  const res = await fetch(proxyUrl, { method: "GET" });
+  if (!res.ok) {
+    throw new Error(`proxy HTTP ${res.status}`);
+  }
+  const wrapper = await res.json();
+  const httpCode = wrapper && wrapper.status && wrapper.status.http_code;
+  if (httpCode === 404) {
+    const err = new Error("NOT_FOUND");
+    err.notFound = true;
+    throw err;
+  }
+  if (httpCode && httpCode >= 400) {
+    throw new Error(`upstream HTTP ${httpCode}`);
+  }
+  let data = wrapper.contents;
+  if (typeof data === "string") {
+    data = JSON.parse(data);
+  }
+  return data;
+}
+
+async function fetchDirect(apiUrl) {
+  const res = await fetch(apiUrl, {
+    method: "GET",
+    headers: { Accept: "application/json" },
+    mode: "cors"
+  });
+  if (res.status === 404) {
+    const err = new Error("NOT_FOUND");
+    err.notFound = true;
+    throw err;
+  }
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
 export async function fetchDivarPost(token) {
   const endpoints = [
     `https://api.divar.ir/v8/posts-v2/web/${token}`,
-    `https://api.divar.ir/v8/posts/${token}`,
-    `https://api.divar.ir/v8/posts/v2/web/${token}`
+    `https://api.divar.ir/v8/posts/${token}`
   ];
 
-  const headers = {
-    Accept: "application/json",
-    "User-Agent":
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
-  };
-
-  let lastError = null;
   let notFound = false;
+  let lastError = null;
 
   for (const url of endpoints) {
     try {
-      const res = await fetch(url, { method: "GET", headers, mode: "cors" });
-      if (res.status === 404) {
-        notFound = true;
-        continue;
+      const data = await fetchViaAllOrigins(url);
+      if (data && (data.sections || data.webengage || data.seo || data.share)) {
+        return { ok: true, data, deleted: false };
       }
-      if (!res.ok) {
-        lastError = new Error(`HTTP ${res.status}`);
-        continue;
-      }
-      const json = await res.json();
-      if (json && (json.sections || json.widgets || json.data || json.title)) {
-        return { ok: true, data: json, deleted: false };
-      }
-      lastError = new Error("ساختار پاسخ ناشناخته");
+      lastError = new Error("ساختار پاسخ ناشناخته از پروکسی");
     } catch (err) {
+      if (err.notFound) notFound = true;
       lastError = err;
-      // CORS یا شبکه — endpoint بعدی
     }
   }
 
-  // تلاش با پروکسی عمومی (ممکن است محدود باشد)
-  try {
-    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(
-      `https://api.divar.ir/v8/posts-v2/web/${token}`
-    )}`;
-    const res = await fetch(proxyUrl, { method: "GET" });
-    if (res.ok) {
-      const json = await res.json();
-      if (json && (json.sections || json.widgets || json.data || json.title)) {
-        return { ok: true, data: json, deleted: false };
+  for (const url of endpoints) {
+    try {
+      const data = await fetchDirect(url);
+      if (data && (data.sections || data.webengage || data.seo || data.share)) {
+        return { ok: true, data, deleted: false };
       }
+    } catch (err) {
+      if (err.notFound) notFound = true;
+      lastError = err;
     }
-    if (res.status === 404) notFound = true;
-  } catch (err) {
-    lastError = err;
   }
 
   if (notFound) {
-    return { ok: false, deleted: true, error: "آگهی در دیوار پیدا نشد (حذف شده یا منقضی)." };
+    return {
+      ok: false,
+      deleted: true,
+      error: "آگهی در دیوار پیدا نشد (حذف شده یا منقضی)."
+    };
   }
 
   return {
     ok: false,
     deleted: false,
     error:
-      lastError?.message ||
-      "دریافت آگهی از دیوار ممکن نشد. احتمالاً محدودیت CORS یا شبکه است. لینک را ذخیره کنید و اطلاعات را دستی تکمیل کنید."
+      (lastError && lastError.message) ||
+      "دریافت آگهی از دیوار ممکن نشد. لینک ذخیره می‌شود؛ مشخصات را دستی تکمیل کنید."
   };
 }
 
-/**
- * ساخت فایل حداقلی فقط با لینک (وقتی fetch شکست خورد)
- */
 export function createStubDivarFile(token, originalUrl, typeHint = "landlord") {
   const now = new Date().toISOString();
   return {
@@ -527,7 +483,7 @@ export function createStubDivarFile(token, originalUrl, typeHint = "landlord") {
     followUpDate: null,
     createdAt: now,
     updatedAt: now,
-    name: "",
+    name: "آگهی دیوار (نیاز به بررسی)",
     phone: "",
     propertyType: "apartment",
     area: 0,
@@ -564,9 +520,6 @@ export function createStubDivarFile(token, originalUrl, typeHint = "landlord") {
   };
 }
 
-/**
- * بررسی اینکه فایل هنوز نیاز به تکمیل نام/تلفن دارد
- */
 export function fileNeedsReviewFromAd(file) {
   if (!file || file.source !== "divar") return false;
   const tags = Array.isArray(file.tags) ? file.tags : [];
@@ -576,9 +529,7 @@ export function fileNeedsReviewFromAd(file) {
   const name = (getFileName(file) || "").trim();
   const phone = (getFilePhone(file) || "").trim();
   const isPlaceholderName =
-    !name ||
-    name === "بدون نام" ||
-    name.startsWith("آگهی دیوار");
+    !name || name === "بدون نام" || name.startsWith("آگهی دیوار");
   return isPlaceholderName || !phone;
 }
 
@@ -588,9 +539,6 @@ export function fileIsDivarDeleted(file) {
   return tags.includes(TAG_DIVAR_DELETED);
 }
 
-/**
- * بعد از ذخیره/ویرایش: اگر نام و تلفن پر شد، تگ نیاز به بررسی را بردار
- */
 export function refreshDivarTags(file) {
   if (!file || file.source !== "divar") return file;
   const tags = new Set(Array.isArray(file.tags) ? file.tags : []);
@@ -613,9 +561,6 @@ export function refreshDivarTags(file) {
   return file;
 }
 
-/**
- * علامت‌گذاری آگهی حذف‌شده از دیوار
- */
 export function markDivarDeleted(file) {
   if (!file) return file;
   const tags = new Set(Array.isArray(file.tags) ? file.tags : []);
@@ -626,27 +571,23 @@ export function markDivarDeleted(file) {
   return file;
 }
 
-/**
- * جلوگیری از ثبت تکراری همان آگهی دیوار
- */
 export function findDuplicateDivarToken(token, excludeId = null) {
   if (!token) return null;
   return (
     state.files.find((f) => {
       if (!f || isDeleted(f)) return false;
       if (excludeId && f.id === excludeId) return false;
-      return f.divarToken === token || f.source === "divar" && f.divarToken === token;
+      return f.divarToken === token;
     }) || null
   );
 }
 
-/**
- * فرآیند کامل: لینک → فایل → ذخیره در state + GitHub
- */
 export async function importFromDivarUrl(url, typeHint = null) {
   const token = extractDivarToken(url);
   if (!token) {
-    throw new Error("لینک دیوار معتبر نیست. نمونه: https://divar.ir/v/.../TOKEN");
+    throw new Error(
+      "لینک دیوار معتبر نیست. نمونه: https://divar.ir/v/TOKEN یا https://divar.ir/v/عنوان/TOKEN"
+    );
   }
 
   const dup = findDuplicateDivarToken(token);
@@ -663,13 +604,20 @@ export async function importFromDivarUrl(url, typeHint = null) {
     file = mapDivarPostToFile(result.data, token, url.trim());
     if (typeHint === "sale" || typeHint === "landlord") {
       file.type = typeHint;
+      if (typeHint === "sale") {
+        file.salePrice = file.salePrice || file.suggestedDeposit || 0;
+        file.suggestedDeposit = 0;
+        file.suggestedRent = 0;
+      }
     }
   } else if (result.deleted) {
     file = createStubDivarFile(token, url.trim(), typeHint || "landlord");
     markDivarDeleted(file);
-    showToast("آگهی در دیوار پیدا نشد — با تگ «حذف‌شده از دیوار» ذخیره شد.", "warning");
+    showToast(
+      "آگهی در دیوار پیدا نشد — با تگ «حذف‌شده از دیوار» ذخیره شد.",
+      "warning"
+    );
   } else {
-    // CORS یا خطای شبکه: stub ذخیره می‌کنیم تا لینک از دست نرود
     file = createStubDivarFile(token, url.trim(), typeHint || "landlord");
     showToast(
       "دریافت خودکار کامل نشد. لینک ذخیره شد؛ مشخصات را دستی تکمیل کنید.",
@@ -677,18 +625,8 @@ export async function importFromDivarUrl(url, typeHint = null) {
     );
   }
 
-  // نام موقت برای نمایش تا زمان تکمیل
-  if (!file.name) {
-    file.name = file.divarTitle
-      ? `آگهی دیوار: ${file.divarTitle}`
-      : "آگهی دیوار (نیاز به بررسی)";
-  }
-
   const newFiles = [...state.files, file];
-  const success = await commitFiles(
-    newFiles,
-    `Import Divar ad ${token}`
-  );
+  const success = await commitFiles(newFiles, `Import Divar ad ${token}`);
   if (!success) {
     throw new Error("ذخیره روی GitHub ناموفق بود.");
   }
