@@ -7,6 +7,7 @@ import { generateFileId, showToast, toEnglishDigits } from "./helpers.js";
 import { state } from "./state.js";
 import { commitFiles } from "./github.js";
 import { getFileName, getFilePhone, isDeleted } from "./files.js";
+import { CONFIG } from "./config.js";
 
 const TAG_NEEDS_REVIEW = "needs-review-from-ad";
 const TAG_DIVAR_DELETED = "divar-deleted";
@@ -1348,91 +1349,66 @@ export function mapDivarPostToFile(
   و Backend باید x-api-key را خودش اضافه کند.
 */
 
-async function fetchDivarPostFromBackend(
-  token
-) {
+/**
+ * دریافت از Cloudflare Worker (CONFIG.divarProxy)
+ * Worker باید ?url= را به api.divar.ir پروکسی کند.
+ */
+async function fetchDivarPostFromBackend(token) {
+  const proxyBase = String(CONFIG.divarProxy || "")
+    .trim()
+    .replace(/\/$/, "");
 
-  const url =
-    `/api/divar/${encodeURIComponent(token)}`;
+  if (!proxyBase) {
+    throw new Error(
+      "PROXY_NOT_CONFIGURED"
+    );
+  }
 
+  const apiUrl = `https://api.divar.ir/v8/posts-v2/web/${encodeURIComponent(token)}`;
+  const url = `${proxyBase}/?url=${encodeURIComponent(apiUrl)}`;
 
-  const res =
-    await fetch(url, {
-      method: "GET",
-      headers: {
-        Accept:
-          "application/json"
-      },
-      credentials: "same-origin"
-    });
-
+  const res = await fetch(url, {
+    method: "GET",
+    headers: {
+      Accept: "application/json"
+    },
+    mode: "cors"
+  });
 
   if (res.status === 404) {
-
-    const err =
-      new Error("NOT_FOUND");
-
+    const err = new Error("NOT_FOUND");
     err.notFound = true;
-
     throw err;
   }
 
-
   if (res.status === 401) {
-
-    throw new Error(
-      "BACKEND_UNAUTHORIZED"
-    );
+    throw new Error("BACKEND_UNAUTHORIZED");
   }
-
 
   if (res.status === 403) {
-
-    throw new Error(
-      "BACKEND_FORBIDDEN"
-    );
+    throw new Error("BACKEND_FORBIDDEN");
   }
-
 
   if (res.status === 429) {
-
-    throw new Error(
-      "RATE_LIMIT"
-    );
+    throw new Error("RATE_LIMIT");
   }
-
 
   if (!res.ok) {
-
-    throw new Error(
-      `BACKEND_HTTP_${res.status}`
-    );
+    throw new Error(`BACKEND_HTTP_${res.status}`);
   }
 
+  const data = await res.json();
 
-  const data =
-    await res.json();
-
-
-  /*
-    Backend می‌تواند یکی از این دو حالت
-    را برگرداند:
-
-    1. خود JSON دیوار
-    2. { data: JSON دیوار }
-
-    هر دو را پشتیبانی می‌کنیم.
-  */
-
+  // پاسخ مستقیم دیوار یا { data: ... }
   if (
     data &&
     data.data &&
     typeof data.data === "object" &&
-    !Array.isArray(data.data)
+    !Array.isArray(data.data) &&
+    !(data.sections || data.webengage || data.seo)
   ) {
     return data.data;
   }
-
 
   return data;
 }
@@ -1512,14 +1488,19 @@ export async function fetchDivarPost(
 
     switch (err?.message) {
 
+      case "PROXY_NOT_CONFIGURED":
+        error =
+          "آدرس پروکسی دیوار تنظیم نشده. در js/config.js مقدار divarProxy را پر کنید.";
+        break;
+
       case "BACKEND_UNAUTHORIZED":
         error =
-          "احراز هویت Backend ناموفق است.";
+          "احراز هویت پروکسی ناموفق است.";
         break;
 
       case "BACKEND_FORBIDDEN":
         error =
-          "Backend اجازه دریافت آگهی دیوار را ندارد.";
+          "پروکسی اجازه دریافت آگهی دیوار را ندارد.";
         break;
 
       case "RATE_LIMIT":
