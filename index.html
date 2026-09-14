@@ -66,6 +66,10 @@
                     همگام‌سازی
                 </button>
 
+                <button id="importDivarButton" class="header-button" type="button" title="افزودن از لینک دیوار">
+                    از دیوار
+                </button>
+
                 <button id="newFileButton" class="primary-button" type="button">
                     + فایل جدید
                 </button>
@@ -469,10 +473,65 @@
                 <button id="detailCopyAddressButton" type="button" class="ghost-button">کپی آدرس</button>
                 <button id="detailWhatsAppButton" type="button" class="secondary-button">واتساپ</button>
                 <button id="detailShareCopyButton" type="button" class="secondary-button">کپی متن</button>
+                <button id="detailDivarLinkButton" type="button" class="secondary-button hidden">مشاهده این فایل در دیوار</button>
                 <button id="detailEditButton" type="button" class="primary-button">ویرایش</button>
                 <button id="detailArchiveButton" type="button" class="danger-button">انتقال به سطل</button>
                 <button id="detailRestoreButton" type="button" class="primary-button hidden">بازگردانی</button>
                 <button id="detailPurgeButton" type="button" class="danger-button hidden">حذف دائمی</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================
+         DIVAR IMPORT MODAL
+    ========================== -->
+    <div id="divarImportModal" class="modal hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-eyebrow">وارد کردن از دیوار</div>
+                    <h2>لینک آگهی دیوار</h2>
+                </div>
+                <button id="closeDivarImportButton" class="close-button" type="button">×</button>
+            </div>
+            <div class="modal-body divar-import-body">
+                <div class="field">
+                    <label for="divarUrlInput">لینک آگهی</label>
+                    <input
+                        id="divarUrlInput"
+                        type="url"
+                        dir="ltr"
+                        placeholder="https://divar.ir/v/..."
+                        autocomplete="off"
+                    >
+                    <small class="field-help">
+                        فقط آگهی‌های خانه اجاره‌ای و فروشی پشتیبانی می‌شوند.
+                        نام و شماره طرف از دیوار دریافت نمی‌شود و باید بعداً تکمیل شود.
+                    </small>
+                </div>
+                <div class="field">
+                    <label>نوع فایل (اختیاری — در صورت تشخیص خودکار خالی بگذارید)</label>
+                    <div class="radio-row">
+                        <label class="radio-chip">
+                            <input type="radio" name="divarTypeHint" value="auto" checked>
+                            <span>تشخیص خودکار</span>
+                        </label>
+                        <label class="radio-chip">
+                            <input type="radio" name="divarTypeHint" value="landlord">
+                            <span>اجاره (مالک)</span>
+                        </label>
+                        <label class="radio-chip">
+                            <input type="radio" name="divarTypeHint" value="sale">
+                            <span>فروشی</span>
+                        </label>
+                    </div>
+                </div>
+                <div id="divarImportError" class="login-error hidden"></div>
+            </div>
+            <div class="modal-actions">
+                <button id="cancelDivarImportButton" type="button" class="ghost-button">انصراف</button>
+                <button id="confirmDivarImportButton" type="button" class="primary-button">دریافت و ذخیره</button>
             </div>
         </div>
     </div>
