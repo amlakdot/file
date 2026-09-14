@@ -1054,3 +1054,77 @@ select {
 .detail-grid-wrap .card-info-full {
     margin-bottom: 8px;
 }
+
+/* ===== Divar import & tags ===== */
+.tag-badge {
+    flex-shrink: 0;
+    background: rgba(99, 140, 255, 0.12);
+    border: 1px solid rgba(99, 140, 255, 0.35);
+    color: #7aa2ff;
+    border-radius: 999px;
+    padding: 5px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tag-badge.tag-review {
+    background: rgba(227, 169, 63, 0.14);
+    border-color: rgba(227, 169, 63, 0.4);
+    color: var(--warning);
+}
+
+.tag-badge.tag-deleted {
+    background: rgba(224, 82, 82, 0.12);
+    border-color: rgba(224, 82, 82, 0.35);
+    color: var(--danger);
+}
+
+.divar-source-mark {
+    display: inline-block;
+    margin-right: 6px;
+    padding: 1px 6px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    background: rgba(85, 184, 120, 0.15);
+    color: #55b878;
+    vertical-align: middle;
+}
+
+.divar-import-body {
+    padding: 4px 0 8px;
+}
+
+.divar-import-body .radio-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.divar-import-body .radio-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface-2, rgba(255,255,255,0.03));
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.divar-import-body .radio-chip input {
+    accent-color: var(--primary, #55b878);
+}
+
+#divarUrlInput {
+    direction: ltr;
+    text-align: left;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 13px;
+}
