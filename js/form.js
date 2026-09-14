@@ -30,6 +30,7 @@ import {
   PROPERTY_TYPE_LABELS,
   getStatusLabel
 } from "./labels.js";
+import { refreshDivarTags } from "./divar.js";
 
 const MONEY_FIELD_IDS = [
   "salePrice",
@@ -266,17 +267,6 @@ export async function saveFile() {
     followUpDate = new Date().toISOString();
   }
 
-  if (!name) {
-    showToast("لطفاً نام را وارد کنید.", "error");
-    $("name")?.focus();
-    return;
-  }
-  if (!phone) {
-    showToast("لطفاً شماره تلفن را وارد کنید.", "error");
-    $("phone")?.focus();
-    return;
-  }
-
   let existingFile = null;
   if (editingId) {
     existingFile = state.files.find((f) => f.id === editingId);
@@ -286,8 +276,25 @@ export async function saveFile() {
     }
   }
 
+  // فایل‌های واردشده از دیوار تا زمان تکمیل نام/تلفن مجازند خالی باشند
+  const isDivarSource =
+    existingFile?.source === "divar" ||
+    existingFile?.divarToken ||
+    false;
+
+  if (!name && !isDivarSource) {
+    showToast("لطفاً نام را وارد کنید.", "error");
+    $("name")?.focus();
+    return;
+  }
+  if (!phone && !isDivarSource) {
+    showToast("لطفاً شماره تلفن را وارد کنید.", "error");
+    $("phone")?.focus();
+    return;
+  }
+
   // اگر تلفن رمزشده یا غیرقابل‌خواندن است، از نسخه قبلی نگه دار
-  if (!validatePhoneNumber(phone)) {
+  if (phone && !validatePhoneNumber(phone)) {
     if (
       editingId &&
       existingFile &&
@@ -300,7 +307,7 @@ export async function saveFile() {
       const prev = existingFile ? getFilePhone(existingFile) : "";
       if (prev && validatePhoneNumber(prev) && isEncryptedPhonePlaceholder(($("phone")?.value || "").trim())) {
         phone = prev;
-      } else {
+      } else if (!isDivarSource) {
         showToast(
           "لطفاً شماره تلفن صحیح وارد کنید (09xxxxxxxxx).",
           "error"
@@ -322,15 +329,17 @@ export async function saveFile() {
 
   const plaque = ($("plaque")?.value || "").trim();
 
-  // جلوگیری از تکراری بودن تلفن
-  const dupPhone = findDuplicatePhone(phone, editingId);
-  if (dupPhone) {
-    showToast(
-      `این شماره قبلاً برای «${getFileName(dupPhone)}» ثبت شده است.`,
-      "error"
-    );
-    $("phone")?.focus();
-    return;
+  // جلوگیری از تکراری بودن تلفن (فقط وقتی شماره معتبر داریم)
+  if (phone && validatePhoneNumber(phone)) {
+    const dupPhone = findDuplicatePhone(phone, editingId);
+    if (dupPhone) {
+      showToast(
+        `این شماره قبلاً برای «${getFileName(dupPhone)}» ثبت شده است.`,
+        "error"
+      );
+      $("phone")?.focus();
+      return;
+    }
   }
 
   // جلوگیری از پلاک تکراری
@@ -346,15 +355,15 @@ export async function saveFile() {
     }
   }
 
-  const fileData = {
+  let fileData = {
     id: editingId || generateFileId(),
     type: fileType,
     status,
     followUpDate,
     createdAt: existingFile?.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    name,
-    phone,
+    name: name || (isDivarSource ? existingFile?.name || "" : name),
+    phone: phone || (isDivarSource ? existingFile?.phone || "" : phone),
     propertyType,
     area,
     rooms,
@@ -385,6 +394,18 @@ export async function saveFile() {
     notes,
     amenities
   };
+
+  // حفظ فیلدهای دیوار هنگام ویرایش
+  if (existingFile?.source === "divar" || existingFile?.divarToken) {
+    fileData.source = existingFile.source || "divar";
+    fileData.divarToken = existingFile.divarToken || "";
+    fileData.divarUrl = existingFile.divarUrl || "";
+    fileData.divarTitle = existingFile.divarTitle || "";
+    fileData.tags = Array.isArray(existingFile.tags)
+      ? [...existingFile.tags]
+      : [];
+    fileData = refreshDivarTags(fileData);
+  }
 
   let newFiles;
   if (editingId) {
