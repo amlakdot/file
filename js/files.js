@@ -20,6 +20,7 @@ export function getFileName(file) {
     data.propertyName ||
     data.buyerName ||
     data.tenantName ||
+    data.divarTitle ||
     "بدون نام"
   );
 }
@@ -168,4 +169,16 @@ export function purgeExpiredTrash() {
   const before = state.files.length;
   state.files = state.files.filter((f) => !isTrashExpired(f));
   return state.files.length !== before;
+}
+
+/** تگ‌های فایل (مثلاً نیاز به بررسی از آگهی دیوار) */
+export function getFileTags(file) {
+  if (!file) return [];
+  if (Array.isArray(file.tags)) return file.tags;
+  const data = getFileData(file);
+  return Array.isArray(data.tags) ? data.tags : [];
+}
+
+export function hasTag(file, tag) {
+  return getFileTags(file).includes(tag);
 }
