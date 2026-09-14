@@ -3,7 +3,7 @@
 ========================================================= */
 
 import { state } from "./state.js";
-import { $, setLoginError, parseMoney, setupMoneyInputs } from "./helpers.js";
+import { $, setLoginError, parseMoney, setupMoneyInputs, showToast } from "./helpers.js";
 import { loginWithToken, logout, manualSync } from "./auth.js";
 import {
   openFileModal,
@@ -26,6 +26,11 @@ import {
   purgeFile
 } from "./form.js";
 import { applyFilters, renderHome } from "./render.js";
+import {
+  importFromDivarUrl,
+  buildDivarUrl,
+  extractDivarToken
+} from "./divar.js";
 
 function setupLoginForm() {
   const form = $("loginForm");
@@ -43,6 +48,106 @@ function setupLoginForm() {
       await loginWithToken(token);
     } catch (err) {
       setLoginError(err.message || "ورود ناموفق بود.");
+    }
+  });
+}
+
+function openDivarImportModal() {
+  const modal = $("divarImportModal");
+  if (!modal) return;
+  if ($("divarUrlInput")) $("divarUrlInput").value = "";
+  if ($("divarImportError")) {
+    $("divarImportError").textContent = "";
+    $("divarImportError").classList.add("hidden");
+  }
+  const auto = document.querySelector('input[name="divarTypeHint"][value="auto"]');
+  if (auto) auto.checked = true;
+  modal.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+  $("divarUrlInput")?.focus();
+}
+
+function closeDivarImportModal() {
+  $("divarImportModal")?.classList.add("hidden");
+  if ($("fileModal")?.classList.contains("hidden") && $("detailModal")?.classList.contains("hidden")) {
+    document.body.style.overflow = "";
+  }
+}
+
+function setupDivarImport() {
+  $("importDivarButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    openDivarImportModal();
+  });
+
+  $("closeDivarImportButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    closeDivarImportModal();
+  });
+  $("cancelDivarImportButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    closeDivarImportModal();
+  });
+
+  $("divarImportModal")?.querySelector(".modal-backdrop")?.addEventListener("click", () => {
+    closeDivarImportModal();
+  });
+
+  $("confirmDivarImportButton")?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    const url = ($("divarUrlInput")?.value || "").trim();
+    const errEl = $("divarImportError");
+    const btn = $("confirmDivarImportButton");
+
+    if (errEl) {
+      errEl.textContent = "";
+      errEl.classList.add("hidden");
+    }
+
+    if (!url) {
+      if (errEl) {
+        errEl.textContent = "لطفاً لینک آگهی دیوار را وارد کنید.";
+        errEl.classList.remove("hidden");
+      }
+      return;
+    }
+
+    if (!extractDivarToken(url)) {
+      if (errEl) {
+        errEl.textContent = "لینک دیوار معتبر نیست.";
+        errEl.classList.remove("hidden");
+      }
+      return;
+    }
+
+    const hint =
+      document.querySelector('input[name="divarTypeHint"]:checked')?.value ||
+      "auto";
+    const typeHint = hint === "auto" ? null : hint;
+
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = "در حال دریافت...";
+    }
+
+    try {
+      const file = await importFromDivarUrl(url, typeHint);
+      closeDivarImportModal();
+      showToast("آگهی از دیوار ذخیره شد. نام و تلفن را تکمیل کنید.", "success");
+      renderHome();
+      // باز کردن جزئیات فایل جدید
+      if (file?.id) openDetailModal(file.id);
+    } catch (err) {
+      if (errEl) {
+        errEl.textContent = err.message || "خطا در دریافت آگهی.";
+        errEl.classList.remove("hidden");
+      }
+      showToast(err.message || "خطا در دریافت آگهی.", "error");
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = "دریافت و ذخیره";
+      }
     }
   });
 }
@@ -180,6 +285,18 @@ function setupDetailActions() {
     e.preventDefault();
     detailShareCopy();
   });
+
+  $("detailDivarLinkButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    const file = state.files.find((f) => f.id === state.viewingFileId);
+    if (!file) return;
+    const url = file.divarUrl || buildDivarUrl(file.divarToken);
+    if (!url) {
+      showToast("لینک دیوار موجود نیست.", "error");
+      return;
+    }
+    window.open(url, "_blank", "noopener,noreferrer");
+  });
 }
 
 // کارت → جزئیات کامل (نه مستقیم ادیت)
@@ -205,6 +322,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupFileForm();
   setupModalClose();
   setupDetailActions();
+  setupDivarImport();
   setupMoneyInputs(document);
 
   document.addEventListener("change", (e) => {
