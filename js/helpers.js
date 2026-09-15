@@ -137,6 +137,55 @@ export function generateFileId() {
   return `file-${timestamp}-${micro}-${randomPart}`;
 }
 
+/**
+ * کد عددی فایل برای نمایش روی کارت (مثل تگ)
+ * از روی لیست فعلی، بزرگ‌ترین کد + ۱ (شروع از ۱۰۰۱)
+ */
+export function generateFileCode(files = []) {
+  const list = Array.isArray(files) ? files : [];
+  let max = 1000;
+  for (const f of list) {
+    const n = Number(f?.code);
+    if (Number.isFinite(n) && n > max) max = Math.floor(n);
+  }
+  return max + 1;
+}
+
+/** نمایش کد فایل با ارقام فارسی */
+export function formatFileCode(code) {
+  const n = Number(code);
+  if (!Number.isFinite(n) || n <= 0) return "";
+  return Math.floor(n).toLocaleString("fa-IR");
+}
+
+/**
+ * به فایل‌های بدون کد، کد عددی بده (به ترتیب createdAt)
+ * @returns {{ files: any[], changed: boolean }}
+ */
+export function ensureFileCodes(files = []) {
+  const list = Array.isArray(files) ? files.map((f) => ({ ...f })) : [];
+  let max = 1000;
+  for (const f of list) {
+    const n = Number(f?.code);
+    if (Number.isFinite(n) && n > max) max = Math.floor(n);
+  }
+  const missing = list
+    .filter((f) => !(Number(f?.code) > 0))
+    .sort((a, b) => {
+      const ta = new Date(a.createdAt || 0).getTime();
+      const tb = new Date(b.createdAt || 0).getTime();
+      return ta - tb;
+    });
+  if (!missing.length) return { files: list, changed: false };
+  const byId = new Map(list.map((f) => [f.id, f]));
+  for (const f of missing) {
+    max += 1;
+    const target = byId.get(f.id);
+    if (target) target.code = max;
+  }
+  return { files: list, changed: true };
+}
+
 export function validatePhoneNumber(phone) {
   if (!phone) return false;
   const cleaned = toEnglishDigits(phone).replace(/[\s\-()]/g, "");
