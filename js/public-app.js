@@ -189,33 +189,57 @@ function render() {
   container.innerHTML = filtered.map(renderCard).join("");
 }
 
-async function loadPublicData() {
-  const status = document.getElementById("publicStatus");
-  if (status) status.textContent = "در حال بارگذاری...";
+function publicDataCandidates() {
+  const path = CONFIG.publicDataPath || "data/public-files.json";
+  const list = [];
 
-  const candidates = [];
-  if (CONFIG.publicDataUrl) candidates.push(CONFIG.publicDataUrl);
-  candidates.push("./data/public-files.json");
-  candidates.push(
-    `https://raw.githubusercontent.com/${CONFIG.owner}/${CONFIG.repo}/${CONFIG.branch}/${CONFIG.publicDataPath || "data/public-files.json"}`
+  if (CONFIG.publicDataUrl) list.push(CONFIG.publicDataUrl);
+
+  // مسیر نسبی روی همان GitHub Pages
+  list.push("./" + path);
+  list.push(path);
+
+  // raw گیت‌هاب (اگر ریپو عمومی باشد)
+  list.push(
+    `https://raw.githubusercontent.com/${CONFIG.owner}/${CONFIG.repo}/${CONFIG.branch}/${path}`
   );
 
+  // آدرس متداول GitHub Pages پروژه
+  list.push(
+    `https://${CONFIG.owner}.github.io/${CONFIG.repo}/${path}`
+  );
+
+  // یکتا کردن
+  return [...new Set(list)];
+}
+
+async function loadPublicData({ silent = false } = {}) {
+  const status = document.getElementById("publicStatus");
+  const btn = document.getElementById("publicRefreshButton");
+
+  if (!silent && status) status.textContent = "در حال بارگذاری از منبع...";
+  if (btn) {
+    btn.classList.add("is-loading");
+    btn.textContent = "در حال به‌روزرسانی...";
+  }
+
   let lastErr = null;
-  for (const url of candidates) {
+  for (const url of publicDataCandidates()) {
     try {
-      const res = await fetch(url + (url.includes("?") ? "&" : "?") + "t=" + Date.now(), {
-        cache: "no-store"
+      const sep = url.includes("?") ? "&" : "?";
+      const res = await fetch(`${url}${sep}t=${Date.now()}`, {
+        cache: "no-store",
+        headers: { Accept: "application/json" }
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status} @ ${url}`);
       const db = await res.json();
       allFiles = Array.isArray(db.files) ? db.files : [];
       if (status) {
-        status.textContent = db.updatedAt
-          ? `به‌روزرسانی: ${formatDate(db.updatedAt)}`
-          : "آماده";
+        const when = db.updatedAt ? formatDate(db.updatedAt) : "همین الان";
+        status.textContent = `آخرین نسخه منبع · ${when}`;
       }
       render();
-      return;
+      return true;
     } catch (err) {
       lastErr = err;
     }
@@ -223,11 +247,32 @@ async function loadPublicData() {
 
   if (status) {
     status.textContent =
-      "داده عمومی در دسترس نیست. ابتدا از پنل مشاور یک‌بار ذخیره کنید.";
+      "داده عمومی در دسترس نیست. از پنل مشاور «انتشار برای عموم» را بزنید.";
   }
   console.warn("public data load failed", lastErr);
   allFiles = [];
   render();
+  return false;
+}
+
+async function refreshPublicData() {
+  const btn = document.getElementById("publicRefreshButton");
+  try {
+    const ok = await loadPublicData();
+    if (ok && btn) {
+      btn.textContent = "به‌روز شد";
+      setTimeout(() => {
+        if (btn) btn.textContent = "به‌روزرسانی";
+      }, 1200);
+    }
+  } finally {
+    if (btn) {
+      btn.classList.remove("is-loading");
+      if (btn.textContent === "در حال به‌روزرسانی...") {
+        btn.textContent = "به‌روزرسانی";
+      }
+    }
+  }
 }
 
 function setupUi() {
@@ -252,9 +297,14 @@ function setupUi() {
     search = e.target.value || "";
     render();
   });
+
+  document.getElementById("publicRefreshButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    refreshPublicData();
+  });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   setupUi();
-  loadPublicData();
+  refreshPublicData();
 });
