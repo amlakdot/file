@@ -229,7 +229,7 @@ function infoItem(label, value) {
   `;
 }
 
-/** کارت خلاصه — جزئیات کامل در مودال جزئیات */
+/** کارت خلاصه — جزئیات مهم قبل از باز شدن */
 export function renderFileCard(file) {
   const data = getFileData(file);
   const type = file.type || "sale";
@@ -238,29 +238,59 @@ export function renderFileCard(file) {
   const phone = getFilePhone(file);
   const location = getFileLocation(file);
   const hasFollowUp = isFollowUp(file);
-  const price = getFilePrice(file);
   const propertyType = data.propertyType || "";
   const area = data.area || "";
   const tags = getFileTags(file);
   const isDivar = file.source === "divar" || !!file.divarToken;
 
-  let priceLabel = "";
-  if (type === "sale" && data.salePrice) priceLabel = formatMoney(data.salePrice);
-  else if (type === "buyer" && data.capital) priceLabel = formatMoney(data.capital);
-  else if (type === "landlord" && data.suggestedDeposit)
-    priceLabel = formatMoney(data.suggestedDeposit);
-  else if (type === "tenant" && data.tenantDeposit)
-    priceLabel = formatMoney(data.tenantDeposit);
-  else if (price) priceLabel = formatMoney(price);
+  // مبالغ — رهن و اجاره با هم
+  const priceRows = [];
+  if (type === "sale") {
+    if (data.salePrice) {
+      priceRows.push({ label: "قیمت", value: formatMoney(data.salePrice) });
+    }
+  } else if (type === "landlord") {
+    if (data.suggestedDeposit) {
+      priceRows.push({ label: "رهن / ودیعه", value: formatMoney(data.suggestedDeposit) });
+    }
+    if (data.suggestedRent) {
+      priceRows.push({ label: "اجاره", value: formatMoney(data.suggestedRent) });
+    }
+  } else if (type === "tenant") {
+    if (data.tenantDeposit) {
+      priceRows.push({ label: "رهن / ودیعه", value: formatMoney(data.tenantDeposit) });
+    }
+    if (data.tenantRent) {
+      priceRows.push({ label: "اجاره", value: formatMoney(data.tenantRent) });
+    }
+  } else if (type === "buyer") {
+    if (data.capital) {
+      priceRows.push({ label: "بودجه", value: formatMoney(data.capital) });
+    }
+  }
+
+  if (!priceRows.length) {
+    const fallback = getFilePrice(file);
+    if (fallback) priceRows.push({ label: "مبلغ", value: formatMoney(fallback) });
+  }
 
   const metaBits = [];
-  if (propertyType)
+  if (propertyType) {
     metaBits.push(PROPERTY_TYPE_LABELS[propertyType] || propertyType);
+  }
   if (area) metaBits.push(`${area} متر`);
-  if (data.unitFloor)
-    metaBits.push(
-      `طبقه ${FLOOR_LABELS[data.unitFloor] || data.unitFloor}`
-    );
+  if (data.rooms) metaBits.push(`${data.rooms} خواب`);
+  if (data.unitFloor) {
+    metaBits.push(`طبقه ${FLOOR_LABELS[data.unitFloor] || data.unitFloor}`);
+  }
+  if (data.yearBuilt) metaBits.push(`ساخت ${data.yearBuilt}`);
+
+  const amenityBits = amenityLabels(data.amenities).slice(0, 4);
+  const notesRaw = String(data.notes || data.description || "").trim();
+  let notesPreview = "";
+  if (notesRaw) {
+    notesPreview = notesRaw.length > 110 ? notesRaw.slice(0, 110).trim() + "…" : notesRaw;
+  }
 
   const tagBadges = tags
     .map((t) => {
@@ -285,11 +315,29 @@ export function renderFileCard(file) {
             ? "type-tenant"
             : "type-default";
 
+  const priceHtml = priceRows.length
+    ? `<div class="card-prices">${priceRows
+        .map(
+          (r) => `
+      <div class="card-price-row">
+        <span class="card-price-label">${escapeHtml(r.label)}</span>
+        <span class="card-price-value">${escapeHtml(r.value)}</span>
+      </div>`
+        )
+        .join("")}</div>`
+    : "";
+
+  const amenitiesHtml = amenityBits.length
+    ? `<div class="card-amenities-mini">${amenityBits
+        .map((a) => `<span class="card-tag">${escapeHtml(a)}</span>`)
+        .join("")}</div>`
+    : "";
+
   return `
     <div class="file-card card-summary md-card ${typeClass}" data-file-id="${escapeHtml(file.id)}" role="button" tabindex="0">
       <div class="card-type-stripe" aria-hidden="true"></div>
       <div class="card-top">
-        <div>
+        <div class="card-top-main">
           <div class="card-type">${escapeHtml(TYPE_LABELS[type] || type)}${isDivar ? ' <span class="divar-source-mark">دیوار</span>' : ""}</div>
           <div class="card-title">${escapeHtml(name)}</div>
         </div>
@@ -299,19 +347,25 @@ export function renderFileCard(file) {
           ${tagBadges}
         </div>
       </div>
+
       <div class="card-info">
         ${infoItem("تلفن", escapeHtml(phone || "—"))}
         ${infoItem("موقعیت", escapeHtml(location || "—"))}
-        ${priceLabel ? infoItem("مبلغ", escapeHtml(priceLabel)) : ""}
         ${metaBits.length ? infoItem("مشخصات", escapeHtml(metaBits.join(" · "))) : ""}
       </div>
+
+      ${priceHtml}
+
+      ${notesPreview ? `<div class="card-notes">${escapeHtml(notesPreview)}</div>` : ""}
+
+      ${amenitiesHtml}
+
       <div class="card-footer">
         <div>${escapeHtml(formatDate(file.updatedAt || file.deletedAt))}</div>
         <div class="status-badge" style="background:${getStatusColor(status)}">
           ${escapeHtml(getStatusLabel(status))}
         </div>
       </div>
-      <div class="card-hint">برای جزئیات کامل ضربه بزنید</div>
     </div>
   `;
 }
