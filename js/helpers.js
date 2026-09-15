@@ -122,6 +122,15 @@ export function setLoginError(message) {
 }
 
 export function generateFileId() {
+  if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+    const arr = new Uint8Array(12);
+    crypto.getRandomValues(arr);
+    let hex = "";
+    for (let i = 0; i < arr.length; i++) {
+      hex += arr[i].toString(16).padStart(2, "0");
+    }
+    return `file-${Date.now()}-${hex}`;
+  }
   const timestamp = Date.now();
   const randomPart = Math.random().toString(36).slice(2, 11);
   const micro = Math.floor(Math.random() * 1000);
