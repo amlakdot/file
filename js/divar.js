@@ -3,7 +3,12 @@
    دریافت آگهی از لینک دیوار و تبدیل به ساختار فایل املاک
    ========================================================= */
 
-import { generateFileId, showToast, toEnglishDigits } from "./helpers.js";
+import {
+  generateFileId,
+  generateFileCode,
+  showToast,
+  toEnglishDigits
+} from "./helpers.js";
 import { state } from "./state.js";
 import { commitFiles } from "./github.js";
 import { getFileName, getFilePhone, isDeleted } from "./files.js";
@@ -1209,6 +1214,8 @@ export function mapDivarPostToFile(
 
     id: generateFileId(),
 
+    code: generateFileCode(state.files),
+
     type,
 
     status: "active",
@@ -1546,6 +1553,9 @@ export function createStubDivarFile(
 
     id:
       generateFileId(),
+
+    code:
+      generateFileCode(state.files),
 
     type:
       typeHint === "sale"
