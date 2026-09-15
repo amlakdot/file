@@ -92,12 +92,21 @@ function renderCard(file) {
   const loc = data.location || data.region || data.address || "";
   const prices = getPriceRows(file);
   const meta = metaBits(data);
-  const notes =
+  let notes =
     data.notes ||
     data.description ||
     data.tenantNotes ||
     data.buyerNotes ||
     "";
+  // عبارت قدیمی redact و شماره را از نمایش عمومی بردار
+  notes = String(notes)
+    .replace(/\[شماره حذف‌شده\]/g, " ")
+    .replace(
+      /(?:\+98|0098|098|0)?[\s\-_.]*9\d{2}[\s\-_.]*\d{3}[\s\-_.]*\d{4}/g,
+      " "
+    )
+    .replace(/\s{2,}/g, " ")
+    .trim();
   const amenities = amenityLabels(data.amenities).slice(0, 5);
 
   const priceHtml = prices.length
@@ -149,7 +158,6 @@ function renderCard(file) {
       }
       <div class="card-footer">
         <div>${file.updatedAt ? escapeHtml(formatDate(file.updatedAt)) : ""}</div>
-        <div class="public-privacy-note">بدون اطلاعات تماس</div>
       </div>
     </article>
   `;
