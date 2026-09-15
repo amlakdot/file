@@ -4,7 +4,7 @@
 
 import { state } from "./state.js";
 import { $, setLoginError, parseMoney, setupMoneyInputs, showToast } from "./helpers.js";
-import { loginWithToken, logout, manualSync } from "./auth.js";
+import { loginWithToken, logout, manualSync, tryRestoreSession } from "./auth.js";
 import {
   openFileModal,
   openDetailModal,
@@ -309,7 +309,7 @@ document.addEventListener("click", (e) => {
   openDetailModal(fileId);
 });
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   setFormHandlers({
     loadFileIntoForm,
     updateFormVisibility,
@@ -336,4 +336,11 @@ document.addEventListener("DOMContentLoaded", () => {
       updateFormVisibility();
     }
   });
+
+  // ورود خودکار اگر نشست معتبر (تا ۷ روز) ذخیره شده باشد
+  try {
+    await tryRestoreSession();
+  } catch (err) {
+    console.warn("auto login skipped:", err);
+  }
 });
