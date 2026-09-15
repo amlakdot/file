@@ -6,13 +6,41 @@
     <meta name="theme-color" content="#0b0d0f">
     <title>املاک DOT</title>
     <link rel="stylesheet" href="style.css">
+    <script>
+      /* نمایش فوری لودینگ یا فرم ورود قبل از اجرای ماژول‌ها */
+      (function () {
+        try {
+          var raw = localStorage.getItem("dot_auth_session_v1");
+          var hasSession = false;
+          if (raw) {
+            var data = JSON.parse(raw);
+            hasSession = !!(data && data.token && (!data.expiresAt || Date.now() <= Number(data.expiresAt)));
+          }
+          document.documentElement.dataset.boot = hasSession ? "session" : "login";
+        } catch (e) {
+          document.documentElement.dataset.boot = "login";
+        }
+      })();
+    </script>
 </head>
 <body>
 
     <!-- =========================
+         BOOT / AUTO LOGIN
+    ========================== -->
+    <section id="bootScreen" class="boot-screen hidden">
+        <div class="boot-card">
+            <div class="boot-logo">DOT</div>
+            <div class="boot-spinner" aria-hidden="true"></div>
+            <div class="boot-title">در حال ورود . . .</div>
+            <div class="boot-subtitle">در حال بارگذاری اطلاعات</div>
+        </div>
+    </section>
+
+    <!-- =========================
          LOGIN
     ========================== -->
-    <section id="loginScreen" class="login-screen">
+    <section id="loginScreen" class="login-screen hidden">
         <div class="login-card">
             <div class="login-logo">DOT</div>
             <div class="login-title">املاک DOT</div>
@@ -29,7 +57,7 @@
                         required
                     >
                     <small class="field-help">
-                        توکن فقط در حافظه همین صفحه نگه داشته می‌شود.
+                        بعد از ورود، تا ۷ روز روی همین دستگاه نیازی به وارد کردن دوباره توکن نیست.
                         (Fine-grained یا Classic با دسترسی Contents: Read and write روی این ریپو)
                     </small>
                 </div>
