@@ -35,23 +35,28 @@ function amenityLabels(list) {
     .filter(Boolean);
 }
 
+function num(v) {
+  const n = Number(v);
+  return Number.isFinite(n) && n > 0 ? n : 0;
+}
+
 function getPriceRows(file) {
   const data = file.data || {};
   const type = file.type;
   const rows = [];
-  if (type === "sale" && data.salePrice) {
+  if (type === "sale" && num(data.salePrice)) {
     rows.push({ label: "قیمت", value: formatMoney(data.salePrice) });
   } else if (type === "landlord") {
-    if (data.suggestedDeposit)
+    if (num(data.suggestedDeposit))
       rows.push({ label: "رهن / ودیعه", value: formatMoney(data.suggestedDeposit) });
-    if (data.suggestedRent)
+    if (num(data.suggestedRent))
       rows.push({ label: "اجاره", value: formatMoney(data.suggestedRent) });
   } else if (type === "tenant") {
-    if (data.tenantDeposit)
+    if (num(data.tenantDeposit))
       rows.push({ label: "رهن / ودیعه", value: formatMoney(data.tenantDeposit) });
-    if (data.tenantRent)
+    if (num(data.tenantRent))
       rows.push({ label: "اجاره", value: formatMoney(data.tenantRent) });
-  } else if (type === "buyer" && data.capital) {
+  } else if (type === "buyer" && num(data.capital)) {
     rows.push({ label: "بودجه", value: formatMoney(data.capital) });
   }
   return rows;
@@ -61,11 +66,12 @@ function metaBits(data) {
   const bits = [];
   if (data.propertyType)
     bits.push(PROPERTY_TYPE_LABELS[data.propertyType] || data.propertyType);
-  if (data.area) bits.push(`${data.area} متر`);
-  if (data.rooms) bits.push(`${data.rooms} خواب`);
+  if (num(data.area)) bits.push(`${data.area} متر`);
+  if (num(data.rooms)) bits.push(`${data.rooms} خواب`);
   if (data.unitFloor)
     bits.push(`طبقه ${FLOOR_LABELS[data.unitFloor] || data.unitFloor}`);
-  if (data.yearBuilt) bits.push(`ساخت ${data.yearBuilt}`);
+  const year = data.yearBuilt || data.year;
+  if (num(year)) bits.push(`ساخت ${year}`);
   return bits;
 }
 
@@ -83,10 +89,15 @@ function renderCard(file) {
             ? "type-tenant"
             : "type-default";
 
-  const loc = data.location || data.region || data.address || "—";
+  const loc = data.location || data.region || data.address || "";
   const prices = getPriceRows(file);
   const meta = metaBits(data);
-  const notes = data.notes || data.description || "";
+  const notes =
+    data.notes ||
+    data.description ||
+    data.tenantNotes ||
+    data.buyerNotes ||
+    "";
   const amenities = amenityLabels(data.amenities).slice(0, 5);
 
   const priceHtml = prices.length
@@ -110,10 +121,14 @@ function renderCard(file) {
         </div>
       </div>
       <div class="card-info">
-        <div class="info-item">
+        ${
+          loc
+            ? `<div class="info-item">
           <div class="info-label">موقعیت</div>
           <div class="info-value">${escapeHtml(loc)}</div>
-        </div>
+        </div>`
+            : ""
+        }
         ${
           meta.length
             ? `<div class="info-item">
