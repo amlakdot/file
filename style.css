@@ -1134,19 +1134,28 @@ select {
 
 /* ===== Divar import & tags ===== */
 .file-code-badge {
+    display: inline-flex;
+    align-items: center;
     flex-shrink: 0;
-    background: rgba(148, 163, 184, 0.14);
-    border: 1px solid rgba(148, 163, 184, 0.4);
-    color: #cbd5e1;
+    background: rgba(85, 184, 120, 0.14);
+    border: 1px solid rgba(85, 184, 120, 0.4);
+    color: #9fe0b3;
     border-radius: 999px;
-    padding: 5px 10px;
+    padding: 3px 10px;
     font-size: 11px;
     font-weight: 800;
     font-variant-numeric: tabular-nums;
     letter-spacing: 0.02em;
     white-space: nowrap;
-    direction: ltr;
+    direction: rtl;
     unicode-bidi: isolate;
+}
+
+.card-type-with-code {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 .tag-badge {
