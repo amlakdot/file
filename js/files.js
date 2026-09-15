@@ -135,8 +135,14 @@ export function updateFollowUpStatuses() {
 
 export function updateFollowUpCount() {
   const count = getActiveFiles().filter((f) => isFollowUp(f)).length;
+  const text = count.toLocaleString("fa-IR");
   const el = $("followUpCount");
-  if (el) el.textContent = count.toLocaleString("fa-IR");
+  if (el) el.textContent = text;
+  const elMobile = $("followUpCountMobile");
+  if (elMobile) {
+    elMobile.textContent = text;
+    elMobile.classList.toggle("hidden", count === 0);
+  }
 }
 
 export function findDuplicatePhone(phone, excludeId = null) {
