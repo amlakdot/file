@@ -9,7 +9,55 @@ import { verifyToken, loadFiles } from "./github.js";
 import { closeFileModal, closeDetailModal } from "./modal.js";
 import { clearCryptoCache } from "./crypto.js";
 
-export async function loginWithToken(token) {
+/** کلید ذخیره نشست در localStorage */
+const SESSION_KEY = "dot_auth_session_v1";
+
+/** مدت اعتبار نشست (میلی‌ثانیه) — پیش‌فرض ۷ روز */
+function sessionTtlMs() {
+  const days = Number(CONFIG.sessionDays);
+  const d = Number.isFinite(days) && days > 0 ? days : 7;
+  return d * 24 * 60 * 60 * 1000;
+}
+
+function saveSession(token) {
+  try {
+    const payload = {
+      token: String(token),
+      savedAt: Date.now(),
+      expiresAt: Date.now() + sessionTtlMs()
+    };
+    localStorage.setItem(SESSION_KEY, JSON.stringify(payload));
+  } catch (err) {
+    console.warn("saveSession failed:", err);
+  }
+}
+
+function clearSession() {
+  try {
+    localStorage.removeItem(SESSION_KEY);
+  } catch {
+    // ignore
+  }
+}
+
+function readSession() {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    if (!data || !data.token) return null;
+    if (data.expiresAt && Date.now() > Number(data.expiresAt)) {
+      clearSession();
+      return null;
+    }
+    return String(data.token);
+  } catch {
+    clearSession();
+    return null;
+  }
+}
+
+export async function loginWithToken(token, { persist = true } = {}) {
   token = String(token || "").trim();
   if (!token) throw new Error("لطفاً GitHub Token را وارد کنید.");
 
@@ -18,13 +66,39 @@ export async function loginWithToken(token) {
 
   const loaded = await loadFiles();
   if (!loaded) {
+    state.token = null;
     throw new Error(
       "توکن معتبر است، اما اطلاعات فایل‌ها دریافت نشد."
     );
   }
 
+  if (persist) {
+    saveSession(token);
+  }
+
   showApp();
   startPolling();
+}
+
+/**
+ * تلاش برای ورود خودکار از نشست ذخیره‌شده (تا ۷ روز)
+ * @returns {Promise<boolean>} true اگر ورود موفق بود
+ */
+export async function tryRestoreSession() {
+  const token = readSession();
+  if (!token) return false;
+
+  try {
+    // persist=false چون همین نشست را تمدید می‌کنیم بعد از موفقیت
+    await loginWithToken(token, { persist: true });
+    return true;
+  } catch (err) {
+    console.warn("tryRestoreSession failed:", err);
+    clearSession();
+    state.token = null;
+    showLogin();
+    return false;
+  }
 }
 
 export function logout() {
@@ -33,6 +107,8 @@ export function logout() {
   } catch {
     // ignore
   }
+
+  clearSession();
 
   state.token = null;
   state.files = [];
