@@ -160,7 +160,7 @@ export function toPublicFile(file) {
     status: "active",
     title: buildPublicTitle(file, data),
     data,
-    source: file.source === "divar" ? "divar" : "manual",
+    source: file.source === "divar" ? "divar" : "panel",
     updatedAt: file.updatedAt || file.createdAt || null
   };
 }
