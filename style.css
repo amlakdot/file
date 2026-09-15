@@ -1999,3 +1999,23 @@ textarea:focus-visible {
         padding: 10px 4px;
     }
 }
+
+
+.calc-chip {
+    background: rgba(231, 200, 75, 0.12);
+    border: 1px solid rgba(231, 200, 75, 0.28);
+    color: var(--accent);
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.calc-chip:hover {
+    background: rgba(231, 200, 75, 0.2);
+}
+
+@media (max-width: 800px) {
+    .calc-chip {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+}
