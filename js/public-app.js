@@ -6,6 +6,7 @@ import { CONFIG } from "./config.js";
 import {
   formatMoney,
   formatDate,
+  formatFileCode,
   escapeHtml,
   normalize
 } from "./helpers.js";
@@ -120,12 +121,24 @@ function renderCard(file) {
         .join("")}</div>`
     : "";
 
+  const codeNum = Number(file.code);
+  const codeText =
+    Number.isFinite(codeNum) && codeNum > 0 ? formatFileCode(codeNum) : "";
+  const codeBadge = codeText
+    ? `<span class="file-code-badge" title="کد فایل">کد ${escapeHtml(
+        codeText
+      )}</span>`
+    : "";
+
   return `
     <article class="file-card card-summary md-card public-card ${typeClass}">
       <div class="card-type-stripe" aria-hidden="true"></div>
       <div class="card-top">
         <div class="card-top-main">
-          <div class="card-type">${escapeHtml(TYPE_LABELS[type] || type)}</div>
+          <div class="card-type card-type-with-code">
+            <span>${escapeHtml(TYPE_LABELS[type] || type)}</span>
+            ${codeBadge}
+          </div>
           <div class="card-title">${escapeHtml(file.title || "فایل املاک")}</div>
         </div>
       </div>
