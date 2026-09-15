@@ -157,9 +157,11 @@ export function toPublicFile(file) {
   if (status === "deleted" || status === "trash") return null;
 
   const data = extractPropertyFields(file);
+  const code = Number(file.code);
 
   return {
     id: file.id,
+    code: Number.isFinite(code) && code > 0 ? Math.floor(code) : null,
     type: file.type || "sale",
     status: "active",
     title: buildPublicTitle(file, data),
