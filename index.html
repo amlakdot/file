@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0b0d0f">
     <title>املاک DOT</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script>
       /* نمایش فوری لودینگ یا فرم ورود قبل از اجرای ماژول‌ها */
@@ -75,98 +78,127 @@
          APP
     ========================== -->
     <section id="appScreen" class="app-screen hidden">
-        <header class="topbar">
+        <header class="topbar md-app-bar">
             <div class="brand">
                 <div class="brand-mark">DOT</div>
-                <div>
+                <div class="brand-text">
                     <div class="brand-name">املاک DOT</div>
                     <div class="brand-subtitle">مدیریت فایل</div>
                 </div>
             </div>
 
-            <div class="topbar-actions">
+            <div class="topbar-actions topbar-actions-desktop">
                 <button id="followUpButton" class="header-button" type="button">
                     پیگیری
-                    <span id="followUpCount">0</span>
+                    <span id="followUpCount" class="md-badge">0</span>
                 </button>
-
-                <button id="manualSyncButton" class="header-button" type="button" title="همگام‌سازی">
-                    همگام‌سازی
-                </button>
-
                 <button id="importDivarButton" class="header-button" type="button" title="افزودن از لینک دیوار">
                     از دیوار
                 </button>
-
                 <button id="newFileButton" class="primary-button" type="button">
                     + فایل جدید
                 </button>
+                <button id="moreMenuButton" class="icon-button" type="button" title="منو" aria-label="منو">
+                    ⋮
+                </button>
+            </div>
 
-                <button id="logoutButton" class="ghost-button" type="button">
-                    خروج
+            <div class="topbar-actions topbar-actions-mobile">
+                <button id="followUpButtonMobile" class="icon-button badge-button" type="button" title="پیگیری" aria-label="پیگیری">
+                    ⏱
+                    <span id="followUpCountMobile" class="md-badge sm">0</span>
+                </button>
+                <button id="moreMenuButtonMobile" class="icon-button" type="button" title="منو" aria-label="منو">
+                    ⋮
                 </button>
             </div>
         </header>
 
+        <!-- منوی بیشتر (دسکتاپ/موبایل) -->
+        <div id="moreMenuSheet" class="md-sheet hidden" aria-hidden="true">
+            <div class="md-sheet-backdrop" id="moreMenuBackdrop"></div>
+            <div class="md-sheet-panel" role="menu">
+                <div class="md-sheet-handle"></div>
+                <button type="button" class="md-sheet-item" id="menuImportDivar" role="menuitem">از دیوار</button>
+                <button type="button" class="md-sheet-item" id="menuNewFile" role="menuitem">فایل جدید</button>
+                <button type="button" class="md-sheet-item" id="manualSyncButton" role="menuitem">همگام‌سازی</button>
+                <button type="button" class="md-sheet-item danger" id="logoutButton" role="menuitem">خروج</button>
+            </div>
+        </div>
+
         <main class="main-container">
             <div class="toolbar">
-                <div class="search-box">
+                <div class="search-box md-search">
                     <span class="search-icon">⌕</span>
                     <input
                         id="searchInput"
                         type="search"
-                        placeholder="نام، تلفن، منطقه، قیمت، طبقه، امکانات، پلاک..."
+                        placeholder="جست‌وجو: نام، تلفن، منطقه، قیمت..."
                         autocomplete="off"
                     >
                 </div>
+                <button id="toggleFiltersButton" class="filter-toggle-btn" type="button" aria-expanded="false">
+                    فیلترها
+                    <span id="activeFiltersCount" class="md-badge sm hidden">0</span>
+                </button>
             </div>
 
-            <div class="advanced-filters">
-                <div class="field">
-                    <label for="regionFilter">منطقه</label>
-                    <input id="regionFilter" type="text" placeholder="مثلاً سعادت‌آباد" autocomplete="off">
-                </div>
-                <div class="field">
-                    <label for="priceMinFilter">حداقل مبلغ</label>
-                    <input id="priceMinFilter" class="money-input" type="text" inputmode="numeric" placeholder="0">
-                </div>
-                <div class="field">
-                    <label for="priceMaxFilter">حداکثر مبلغ</label>
-                    <input id="priceMaxFilter" class="money-input" type="text" inputmode="numeric" placeholder="مثلاً 10,000,000,000">
-                </div>
-                <div class="field">
-                    <label for="sortBySelect">مرتب‌سازی</label>
-                    <select id="sortBySelect">
-                        <option value="updatedAt">آخرین بروزرسانی</option>
-                        <option value="createdAt">تاریخ ثبت</option>
-                        <option value="price">مبلغ</option>
-                        <option value="name">نام</option>
-                        <option value="area">متراژ</option>
-                    </select>
-                </div>
-                <div class="field">
-                    <label for="sortDirSelect">ترتیب</label>
-                    <select id="sortDirSelect">
-                        <option value="desc">نزولی</option>
-                        <option value="asc">صعودی</option>
-                    </select>
+            <div id="advancedFiltersPanel" class="advanced-filters-panel collapsed">
+                <div class="advanced-filters">
+                    <div class="field">
+                        <label for="regionFilter">منطقه</label>
+                        <input id="regionFilter" type="text" placeholder="مثلاً سعادت‌آباد" autocomplete="off">
+                    </div>
+                    <div class="field">
+                        <label for="priceMinFilter">حداقل مبلغ</label>
+                        <input id="priceMinFilter" class="money-input" type="text" inputmode="numeric" placeholder="0">
+                    </div>
+                    <div class="field">
+                        <label for="priceMaxFilter">حداکثر مبلغ</label>
+                        <input id="priceMaxFilter" class="money-input" type="text" inputmode="numeric" placeholder="مثلاً 10,000,000,000">
+                    </div>
+                    <div class="field">
+                        <label for="sortBySelect">مرتب‌سازی</label>
+                        <select id="sortBySelect">
+                            <option value="updatedAt">آخرین بروزرسانی</option>
+                            <option value="createdAt">تاریخ ثبت</option>
+                            <option value="price">مبلغ</option>
+                            <option value="name">نام</option>
+                            <option value="area">متراژ</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="sortDirSelect">ترتیب</label>
+                        <select id="sortDirSelect">
+                            <option value="desc">نزولی</option>
+                            <option value="asc">صعودی</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
-            <div class="filters">
+            <div class="filters md-chip-row">
                 <button class="filter-button active" data-filter="all" type="button">همه</button>
                 <button class="filter-button" data-filter="sale" type="button">فروشی</button>
                 <button class="filter-button" data-filter="landlord" type="button">مالک / موجر</button>
                 <button class="filter-button" data-filter="buyer" type="button">خریدار</button>
                 <button class="filter-button" data-filter="tenant" type="button">مستاجر</button>
-                <button class="filter-button" data-filter="followup" type="button">نیاز به پیگیری</button>
-                <button class="filter-button" data-filter="trash" type="button">سطل بازیابی</button>
+                <button class="filter-button" data-filter="followup" type="button">پیگیری</button>
+                <button class="filter-button filter-review" data-filter="needs-review" type="button">نیاز به بررسی</button>
+                <button class="filter-button" data-filter="trash" type="button">سطل</button>
             </div>
 
             <div class="sync-status">
                 <span id="syncIndicator" class="sync-dot"></span>
                 <span id="syncText">در حال اتصال...</span>
                 <span id="lastSyncText" class="last-sync"></span>
+            </div>
+
+            <div id="skeletonGrid" class="files-grid skeleton-grid hidden" aria-hidden="true">
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
             </div>
 
             <div id="filesContainer" class="files-grid"></div>
@@ -180,6 +212,11 @@
                 </button>
             </div>
         </main>
+
+        <!-- FAB موبایل -->
+        <button id="fabNewFile" class="md-fab" type="button" title="فایل جدید" aria-label="فایل جدید">
+            +
+        </button>
     </section>
 
     <!-- =========================
