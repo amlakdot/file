@@ -87,6 +87,7 @@ export function extractPropertyFields(file) {
 
   for (const [key, value] of Object.entries(merged)) {
     if (STRIP_KEYS.has(key)) continue;
+    if (key === "updatedAt" || key === "createdAt" || key === "followUpDate") continue;
     if (value === null || value === undefined || value === "") continue;
     // رمزنگاری‌شده
     if (typeof value === "string" && value.startsWith("enc:")) continue;
