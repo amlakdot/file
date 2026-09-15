@@ -87,42 +87,33 @@
                 </div>
             </div>
 
-            <div class="topbar-actions topbar-actions-desktop">
-                <button id="followUpButton" class="header-button" type="button">
-                    پیگیری
+            <div class="topbar-actions">
+                <button id="followUpButton" class="header-button followup-chip" type="button" title="پیگیری">
+                    <span class="btn-label">پیگیری</span>
                     <span id="followUpCount" class="md-badge">0</span>
                 </button>
-                <button id="importDivarButton" class="header-button" type="button" title="افزودن از لینک دیوار">
+
+                <button id="importDivarButton" class="header-button divar-chip" type="button" title="افزودن از لینک دیوار">
                     از دیوار
                 </button>
-                <button id="newFileButton" class="primary-button" type="button">
-                    + فایل جدید
-                </button>
-                <button id="moreMenuButton" class="icon-button" type="button" title="منو" aria-label="منو">
-                    ⋮
-                </button>
-            </div>
 
-            <div class="topbar-actions topbar-actions-mobile">
-                <button id="followUpButtonMobile" class="icon-button badge-button" type="button" title="پیگیری" aria-label="پیگیری">
-                    ⏱
-                    <span id="followUpCountMobile" class="md-badge sm">0</span>
+                <button id="manualSyncButton" class="icon-button" type="button" title="همگام‌سازی" aria-label="همگام‌سازی">
+                    ↻
                 </button>
-                <button id="moreMenuButtonMobile" class="icon-button" type="button" title="منو" aria-label="منو">
+
+                <button id="moreMenuButton" class="icon-button" type="button" title="منو" aria-label="منو">
                     ⋮
                 </button>
             </div>
         </header>
 
-        <!-- منوی بیشتر (دسکتاپ/موبایل) -->
+        <!-- منوی بیشتر — فقط موارد کم‌استفاده -->
         <div id="moreMenuSheet" class="md-sheet hidden" aria-hidden="true">
             <div class="md-sheet-backdrop" id="moreMenuBackdrop"></div>
             <div class="md-sheet-panel" role="menu">
                 <div class="md-sheet-handle"></div>
-                <button type="button" class="md-sheet-item" id="menuImportDivar" role="menuitem">از دیوار</button>
-                <button type="button" class="md-sheet-item" id="menuNewFile" role="menuitem">فایل جدید</button>
-                <button type="button" class="md-sheet-item" id="manualSyncButton" role="menuitem">همگام‌سازی</button>
-                <button type="button" class="md-sheet-item danger" id="logoutButton" role="menuitem">خروج</button>
+                <div class="md-sheet-title">تنظیمات</div>
+                <button type="button" class="md-sheet-item danger" id="logoutButton" role="menuitem">خروج از حساب</button>
             </div>
         </div>
 
