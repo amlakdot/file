@@ -8,6 +8,8 @@ import { $, formatDateTime, showToast } from "./helpers.js";
 import { updateFollowUpStatuses, purgeExpiredTrash } from "./files.js";
 import { renderHome } from "./render.js";
 import { decryptAllFiles, encryptAllFiles } from "./crypto.js";
+import { buildPublicDatabase } from "./public-data.js";
+import { buildPublicDatabase } from "./public-data.js";
 
 export async function githubRequest(url, options = {}) {
   const TIMEOUT = 15000;
@@ -214,6 +216,66 @@ export async function loadFiles(options = {}) {
   }
 }
 
+
+async function putRepoFile(path, contentStr, message, sha = null) {
+  const bytes = new TextEncoder().encode(contentStr);
+  let binary = "";
+  const chunkSize = 0x2000;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const end = Math.min(i + chunkSize, bytes.length);
+    for (let j = i; j < end; j++) {
+      binary += String.fromCharCode(bytes[j]);
+    }
+  }
+  const base64 = btoa(binary);
+
+  const url =
+    `${CONFIG.githubApi}/repos/` +
+    `${encodeURIComponent(CONFIG.owner)}/` +
+    `${encodeURIComponent(CONFIG.repo)}/contents/` +
+    path;
+
+  const body = {
+    message,
+    content: base64,
+    branch: CONFIG.branch
+  };
+  if (sha) body.sha = sha;
+
+  return githubRequest(url, {
+    method: "PUT",
+    headers: { "Content-Type": "application/vnd.github+json" },
+    body: JSON.stringify(body)
+  });
+}
+
+async function getFileSha(path) {
+  try {
+    const url =
+      `${CONFIG.githubApi}/repos/` +
+      `${encodeURIComponent(CONFIG.owner)}/` +
+      `${encodeURIComponent(CONFIG.repo)}/contents/` +
+      `${path}?ref=${encodeURIComponent(CONFIG.branch)}`;
+    const data = await githubRequest(url, { cache: "no-store" });
+    return data?.sha || null;
+  } catch {
+    return null;
+  }
+}
+
+async function savePublicDatabase(newFiles) {
+  const publicPath = CONFIG.publicDataPath || "data/public-files.json";
+  const publicDb = buildPublicDatabase(newFiles);
+  const content = JSON.stringify(publicDb, null, 2);
+  const sha = await getFileSha(publicPath);
+  await putRepoFile(
+    publicPath,
+    content,
+    "Update public real estate files",
+    sha
+  );
+}
+
 export async function saveDatabase(newFiles, commitMessage) {
   if (state.isSaving) {
     throw new Error("یک عملیات ذخیره در حال انجام است.");
@@ -266,6 +328,13 @@ export async function saveDatabase(newFiles, commitMessage) {
     state.files = newFiles;
     state.lastSyncSha = result?.content?.sha || latest.sha;
     state.lastLocalChangeAt = Date.now();
+
+    // نسخه عمومی بدون نام و تلفن
+    try {
+      await savePublicDatabase(newFiles);
+    } catch (pubErr) {
+      console.warn("save public files failed:", pubErr);
+    }
 
     updateFollowUpStatuses();
     renderHome();
