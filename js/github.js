@@ -360,3 +360,29 @@ export async function commitFiles(
     return false;
   }
 }
+
+/**
+ * انتشار دستی نسخه عمومی از فایل‌های فعلی پنل
+ * (برای وقتی که فایل‌ها از قبل بودند و public-files خالی است)
+ */
+export async function publishPublicFiles() {
+  if (!state.token) {
+    throw new Error("ابتدا وارد شوید.");
+  }
+  const files = Array.isArray(state.files) ? state.files : [];
+  setSyncStatus("saving", "در حال انتشار نسخه عمومی...");
+  try {
+    await savePublicDatabase(files);
+    setSyncStatus("success", "نسخه عمومی منتشر شد", new Date());
+    showToast(
+      `${files.filter((f) => f && !f.deletedAt).length} فایل برای عموم منتشر شد.`,
+      "success"
+    );
+    return true;
+  } catch (error) {
+    console.error(error);
+    setSyncStatus("error", error.message || "انتشار عمومی ناموفق");
+    showToast(error.message || "انتشار عمومی انجام نشد.", "error");
+    return false;
+  }
+}
