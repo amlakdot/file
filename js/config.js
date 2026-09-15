@@ -16,5 +16,8 @@ export const CONFIG = {
   /**
    * آدرس پروکسی CORS برای دریافت آگهی دیوار (Cloudflare Worker)
    */
-  divarProxy: "https://divar-proxy.xixtelegram.workers.dev"
+  divarProxy: "https://divar-proxy.xixtelegram.workers.dev",
+
+  /** چند روز نشست لاگین روی همین دستگاه نگه داشته شود */
+  sessionDays: 7
 };
