@@ -53,6 +53,15 @@ export function getFilteredFiles() {
   if (!inTrashView) {
     if (state.currentFilter === "followup") {
       result = result.filter((f) => isFollowUp(f));
+    } else if (state.currentFilter === "needs-review") {
+      result = result.filter((f) => {
+        const tags = getFileTags(f);
+        if (tags.includes("needs-review-from-ad") || tags.includes("needs-review")) {
+          return true;
+        }
+        const name = (getFileName(f) || "").trim();
+        return name.startsWith("آگهی دیوار") || f.source === "divar" && !getFilePhone(f);
+      });
     } else if (
       state.currentFilter !== "all" &&
       state.currentFilter !== "trash"
@@ -265,8 +274,20 @@ export function renderFileCard(file) {
     })
     .join("");
 
+  const typeClass =
+    type === "sale"
+      ? "type-sale"
+      : type === "landlord"
+        ? "type-landlord"
+        : type === "buyer"
+          ? "type-buyer"
+          : type === "tenant"
+            ? "type-tenant"
+            : "type-default";
+
   return `
-    <div class="file-card card-summary" data-file-id="${escapeHtml(file.id)}" role="button" tabindex="0">
+    <div class="file-card card-summary md-card ${typeClass}" data-file-id="${escapeHtml(file.id)}" role="button" tabindex="0">
+      <div class="card-type-stripe" aria-hidden="true"></div>
       <div class="card-top">
         <div>
           <div class="card-type">${escapeHtml(TYPE_LABELS[type] || type)}${isDivar ? ' <span class="divar-source-mark">دیوار</span>' : ""}</div>
