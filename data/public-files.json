@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-15T17:57:58.881Z",
+  "updatedAt": "2026-09-15T18:08:26.746Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -36,7 +36,7 @@
         "salePrice": 3400000000,
         "notes": "شماره مدیر ساختمان فرقانی\n[شماره حذف‌شده]\nزنگ 13"
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:19:12.396Z"
     },
     {
@@ -71,7 +71,7 @@
         "totalFloors": 0,
         "salePrice": 4000000000
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:19:46.498Z"
     },
     {
@@ -106,7 +106,7 @@
         "salePrice": 2500000000,
         "yearBuilt": 1360
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:12:56.278Z"
     },
     {
@@ -140,7 +140,7 @@
           "cabinet"
         ]
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T07:25:47.882Z"
     },
     {
@@ -176,7 +176,7 @@
         ],
         "yearBuilt": 3
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:22:52.321Z"
     },
     {
@@ -206,7 +206,7 @@
         "familySize": 0,
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:27:05.448Z"
     },
     {
@@ -236,7 +236,7 @@
         "familySize": 0,
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:28:59.718Z"
     },
     {
@@ -265,7 +265,7 @@
         "familySize": 0,
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:29:30.978Z"
     },
     {
@@ -294,7 +294,7 @@
         "familySize": 0,
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:29:59.615Z"
     },
     {
@@ -323,7 +323,7 @@
         "familySize": 0,
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:30:41.388Z"
     },
     {
@@ -353,7 +353,7 @@
         "notes": "خریدار کلنگی",
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:32:06.035Z"
     },
     {
@@ -382,7 +382,7 @@
         "familySize": 0,
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:32:53.096Z"
     },
     {
@@ -412,7 +412,7 @@
         "familySize": 0,
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:34:01.695Z"
     },
     {
@@ -441,7 +441,7 @@
         "familySize": 0,
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:34:40.261Z"
     },
     {
@@ -471,7 +471,7 @@
         "familySize": 0,
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:36:06.809Z"
     },
     {
@@ -502,7 +502,7 @@
         "familySize": 0,
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:37:14.028Z"
     },
     {
@@ -532,7 +532,7 @@
         "tenantNotes": "صنعتی سوله برای نجاری",
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:40:14.519Z"
     },
     {
@@ -562,7 +562,7 @@
         "tenantNotes": "دو نفر زوج - دربست میخواد",
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:41:25.828Z"
     },
     {
@@ -592,7 +592,7 @@
         "tenantNotes": "یک نفر مجرد",
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:42:41.385Z"
     },
     {
@@ -622,7 +622,7 @@
         "tenantNotes": "یک نفر",
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:43:39.523Z"
     },
     {
@@ -652,7 +652,7 @@
         "tenantNotes": "یک نفر خانوم مسن",
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:44:42.712Z"
     },
     {
@@ -682,7 +682,7 @@
         "tenantNotes": "مستقل میخواد",
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:47:16.694Z"
     },
     {
@@ -712,7 +712,7 @@
         "tenantNotes": "ویلایی",
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:48:11.562Z"
     },
     {
@@ -742,7 +742,7 @@
         "familySize": 0,
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:50:51.512Z"
     },
     {
@@ -771,7 +771,7 @@
         "familySize": 0,
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:51:41.629Z"
     },
     {
@@ -801,7 +801,7 @@
         "tenantNotes": "شماره دو [شماره حذف‌شده]   سه نفر مجرد",
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:53:31.837Z"
     },
     {
@@ -830,7 +830,7 @@
         "familySize": 4,
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:55:15.673Z"
     },
     {
@@ -859,7 +859,7 @@
         "familySize": 0,
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:56:51.617Z"
     },
     {
@@ -890,7 +890,7 @@
         "notes": "محدوده حاج منصور",
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:58:06.117Z"
     },
     {
@@ -920,7 +920,7 @@
         "tenantNotes": "دو نفر",
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:59:16.059Z"
     },
     {
@@ -950,7 +950,7 @@
         "tenantNotes": "پارکینگ میخواد حتما",
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T09:00:42.329Z"
     },
     {
@@ -979,7 +979,7 @@
         "familySize": 3,
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T09:03:21.682Z"
     },
     {
@@ -1009,7 +1009,7 @@
         "tenantNotes": "پارکینگ میخواد حتما",
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T09:05:07.834Z"
     },
     {
@@ -1038,7 +1038,7 @@
         "familySize": 0,
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T15:02:47.935Z"
     },
     {
@@ -1068,7 +1068,7 @@
         "familySize": 0,
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-12T15:39:10.168Z"
     },
     {
@@ -1098,7 +1098,7 @@
         "familySize": 0,
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-13T07:48:42.271Z"
     },
     {
@@ -1128,7 +1128,7 @@
         "tenantNotes": "زوج جوان، خانه کوچک مهم نیست",
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-13T08:56:47.623Z"
     },
     {
@@ -1158,37 +1158,8 @@
         "tenantNotes": "شهرک - شهرک طلاییه",
         "amenities": []
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-13T13:49:47.234Z"
-    },
-    {
-      "id": "file-1789476487610-888-49uumrvcv",
-      "type": "sale",
-      "status": "active",
-      "title": "آپارتمان",
-      "data": {
-        "propertyType": "apartment",
-        "area": 0,
-        "rooms": 0,
-        "year": 0,
-        "totalFloors": 0,
-        "keyHolder": "owner",
-        "condition": "new",
-        "occupancy": "empty",
-        "salePrice": 0,
-        "currentDeposit": 0,
-        "currentRent": 0,
-        "suggestedDeposit": 0,
-        "suggestedRent": 0,
-        "capital": 0,
-        "tenantDeposit": 0,
-        "tenantRent": 0,
-        "familyStatus": "single",
-        "familySize": 0,
-        "amenities": []
-      },
-      "source": "panel",
-      "updatedAt": "2026-09-15T12:48:07.610Z"
     },
     {
       "id": "file-1789488358447-906-2wfgrmscv",
@@ -1220,7 +1191,7 @@
         "amenities": [],
         "yearBuilt": 1360
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-15T16:09:05.820Z"
     }
   ]
