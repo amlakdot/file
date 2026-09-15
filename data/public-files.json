@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-15T12:47:42.302Z",
+  "updatedAt": "2026-09-15T12:48:10.713Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1160,6 +1160,35 @@
       },
       "source": "manual",
       "updatedAt": "2026-09-13T13:49:47.234Z"
+    },
+    {
+      "id": "file-1789476487610-888-49uumrvcv",
+      "type": "sale",
+      "status": "active",
+      "title": "آپارتمان",
+      "data": {
+        "propertyType": "apartment",
+        "area": 0,
+        "rooms": 0,
+        "year": 0,
+        "totalFloors": 0,
+        "keyHolder": "owner",
+        "condition": "new",
+        "occupancy": "empty",
+        "salePrice": 0,
+        "currentDeposit": 0,
+        "currentRent": 0,
+        "suggestedDeposit": 0,
+        "suggestedRent": 0,
+        "capital": 0,
+        "tenantDeposit": 0,
+        "tenantRent": 0,
+        "familyStatus": "single",
+        "familySize": 0,
+        "amenities": []
+      },
+      "source": "manual",
+      "updatedAt": "2026-09-15T12:48:07.610Z"
     }
   ]
 }
