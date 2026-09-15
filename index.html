@@ -97,6 +97,10 @@
                     از دیوار
                 </button>
 
+                <button id="openCalculatorButton" class="icon-button" type="button" title="ماشین حساب" aria-label="ماشین حساب">
+                    ％
+                </button>
+
                 <button id="manualSyncButton" class="icon-button" type="button" title="همگام‌سازی" aria-label="همگام‌سازی">
                     ↻
                 </button>
@@ -594,6 +598,127 @@
 
     <!-- TOAST -->
     <div id="toast" class="toast hidden"></div>
+
+    
+    <!-- =========================
+         CALCULATOR MODAL
+    ========================== -->
+    <div id="calculatorModal" class="modal hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-card calc-modal-card">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-eyebrow">ابزار</div>
+                    <h2>ماشین حساب املاک</h2>
+                </div>
+                <button id="closeCalculatorButton" class="close-button" type="button">×</button>
+            </div>
+
+            <div class="calc-app-tabs">
+                <button class="calc-app-tab active" type="button" data-tab="tab1">تبدیل رهن و اجاره</button>
+                <button class="calc-app-tab" type="button" data-tab="tab2">محاسبه کمیسیون</button>
+            </div>
+
+            <div class="calc-content">
+                <!-- تب ۱ -->
+                <div id="tab1" class="calc-section active">
+                    <div class="calc-section-title">نوع محاسبه</div>
+                    <div class="calc-modes">
+                        <button class="calc-mode active" id="rahntoRentBtn" type="button">رهن ← اجاره</button>
+                        <button class="calc-mode" id="renttoRahnBtn" type="button">اجاره ← رهن</button>
+                    </div>
+
+                    <div class="field" id="rahnGroup">
+                        <label for="rahn">مبلغ رهن</label>
+                        <div class="calc-input-wrap">
+                            <input id="rahn" type="text" inputmode="numeric" placeholder="مثلاً ۸۰,۰۰۰,۰۰۰" autocomplete="off">
+                            <span class="calc-unit">تومان</span>
+                        </div>
+                    </div>
+
+                    <div class="field" id="rentGroup" style="display:none;">
+                        <label for="rent">مبلغ اجاره ماهانه</label>
+                        <div class="calc-input-wrap">
+                            <input id="rent" type="text" inputmode="numeric" placeholder="مثلاً ۲,۴۰۰,۰۰۰" autocomplete="off">
+                            <span class="calc-unit">تومان</span>
+                        </div>
+                    </div>
+
+                    <div class="calc-rate-box">
+                        <div class="calc-rate-title">نرخ تبدیل</div>
+                        <div class="calc-rate-row">
+                            <input id="rate" type="number" value="3" min="0" step="0.1">
+                            <span class="calc-rate-text">میلیون تومان اجاره برای هر ۱۰۰ میلیون تومان رهن</span>
+                        </div>
+                    </div>
+
+                    <div class="calc-actions">
+                        <button class="primary-button" id="calcRahnBtn" type="button">محاسبه</button>
+                        <button class="secondary-button" id="clearRahnBtn" type="button">پاک کردن</button>
+                    </div>
+
+                    <div class="calc-result" id="resultTab1">
+                        <div class="calc-result-title">نتیجه محاسبه</div>
+                        <div class="calc-result-number" id="resultNumberTab1"></div>
+                        <div class="calc-result-unit" id="resultUnitTab1"></div>
+                        <div class="calc-result-detail" id="resultDetailTab1"></div>
+                    </div>
+                </div>
+
+                <!-- تب ۲ -->
+                <div id="tab2" class="calc-section">
+                    <div class="field">
+                        <label for="commType">نوع کمیسیون</label>
+                        <select id="commType">
+                            <option value="sale1">فروش: یک درصد مبلغ کل (+ مالیات)</option>
+                            <option value="sale2">فروش: پله‌ای (۰.۵٪ یک میلیارد اول + ۰.۲۵٪ مازاد + مالیات)</option>
+                            <option value="rent">رهن و اجاره (یک‌چهارم اجاره + ۰.۷۵٪ رهن + مالیات)</option>
+                        </select>
+                    </div>
+
+                    <div class="field" id="commSaleGroup">
+                        <label for="commSale">مبلغ کل معامله (فروش)</label>
+                        <div class="calc-input-wrap">
+                            <input id="commSale" type="text" inputmode="numeric" placeholder="مثلاً ۳,۰۰۰,۰۰۰,۰۰۰" autocomplete="off">
+                            <span class="calc-unit">تومان</span>
+                        </div>
+                    </div>
+
+                    <div class="field" id="commRahnGroup" style="display:none;">
+                        <label for="commRahn">مبلغ رهن</label>
+                        <div class="calc-input-wrap">
+                            <input id="commRahn" type="text" inputmode="numeric" placeholder="مثلاً ۲۰۰,۰۰۰,۰۰۰" autocomplete="off">
+                            <span class="calc-unit">تومان</span>
+                        </div>
+                    </div>
+
+                    <div class="field" id="commRentGroup" style="display:none;">
+                        <label for="commRent">مبلغ اجاره ماهانه</label>
+                        <div class="calc-input-wrap">
+                            <input id="commRent" type="text" inputmode="numeric" placeholder="مثلاً ۵,۰۰۰,۰۰۰" autocomplete="off">
+                            <span class="calc-unit">تومان</span>
+                        </div>
+                    </div>
+
+                    <div class="calc-actions">
+                        <button class="primary-button" id="calcCommBtn" type="button">محاسبه کمیسیون</button>
+                        <button class="secondary-button" id="clearCommBtn" type="button">پاک کردن</button>
+                    </div>
+
+                    <div class="calc-result" id="resultTab2">
+                        <div class="calc-result-title">کمیسیون قابل پرداخت (هر طرف معامله)</div>
+                        <div class="calc-result-number" id="resultNumberTab2"></div>
+                        <div class="calc-result-unit">تومان</div>
+                        <div class="calc-result-detail" id="resultDetailTab2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="calc-footer-note">
+                این محاسبه بر اساس نرخ توافقی و تعرفه‌های تعیین‌شده انجام می‌شود.
+            </div>
+        </div>
+    </div>
 
     <script type="module" src="js/main.js"></script>
 </body>
