@@ -1452,7 +1452,7 @@ select {
 
 /* FAB */
 .md-fab {
-    display: none;
+    display: inline-flex;
     position: fixed;
     left: 20px;
     bottom: 24px;
@@ -1546,20 +1546,17 @@ textarea:focus-visible {
         min-height: 56px;
     }
 
-    .topbar-actions-desktop {
-        display: none !important;
-    }
-
-    .topbar-actions-mobile {
-        display: flex !important;
-    }
-
     .brand-subtitle {
         display: none;
     }
 
-    .md-fab {
-        display: inline-flex;
+    .followup-chip .btn-label {
+        display: none;
+    }
+
+    .divar-chip {
+        padding: 8px 12px;
+        font-size: 13px;
     }
 
     .main-container {
@@ -1574,4 +1571,46 @@ textarea:focus-visible {
         padding: 0 12px;
         font-size: 13px;
     }
+}
+
+
+/* --- Header refinements --- */
+.topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.divar-chip {
+    background: rgba(85, 184, 120, 0.14);
+    border: 1px solid rgba(85, 184, 120, 0.35);
+    color: #7dcea0;
+    font-weight: 700;
+}
+
+.divar-chip:hover {
+    background: rgba(85, 184, 120, 0.22);
+    color: #9be0b5;
+}
+
+.followup-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#manualSyncButton.spinning {
+    animation: boot-spin 0.7s linear;
+}
+
+.md-sheet-title {
+    padding: 4px 16px 12px;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* padding so FAB doesn't cover content on desktop too */
+.main-container {
+    padding-bottom: 88px;
 }
