@@ -345,7 +345,7 @@ export function renderFileCard(file) {
         <div class="card-top-badges">
           ${
             Number(file.code) > 0
-              ? `<div class="file-code-badge" title="کد فایل">${escapeHtml(
+              ? `<div class="file-code-badge" title="کد فایل">کد ${escapeHtml(
                   formatFileCode(file.code)
                 )}</div>`
               : ""
