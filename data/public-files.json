@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-15T18:16:44.006Z",
+  "updatedAt": "2026-09-15T18:21:05.778Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -34,7 +34,7 @@
         ],
         "totalFloors": 0,
         "salePrice": 3400000000,
-        "notes": "شماره مدیر ساختمان فرقانی زنگ 13"
+        "notes": "شماره مدیر ساختمان فرقانی\n[شماره حذف‌شده]\nزنگ 13"
       },
       "source": "panel",
       "updatedAt": "2026-09-11T08:19:12.396Z"
@@ -167,7 +167,7 @@
         "tenantRent": 0,
         "familyStatus": "single",
         "familySize": 0,
-        "notes": "تک برگ - شماره روبیکا",
+        "notes": "تک برگ  - [شماره حذف‌شده] شماره روبیکا",
         "amenities": [
           "elevator",
           "storage",
@@ -405,7 +405,7 @@
         "suggestedDeposit": 0,
         "suggestedRent": 0,
         "capital": 2000000000,
-        "buyerNotes": "شماره دوم",
+        "buyerNotes": "شماره دوم\n[شماره حذف‌شده]",
         "tenantDeposit": 0,
         "tenantRent": 0,
         "familyStatus": "single",
@@ -798,7 +798,7 @@
         "tenantRent": 15000000,
         "familyStatus": "single",
         "familySize": 0,
-        "tenantNotes": "شماره دو سه نفر مجرد",
+        "tenantNotes": "شماره دو [شماره حذف‌شده]   سه نفر مجرد",
         "amenities": []
       },
       "source": "panel",
@@ -1091,7 +1091,7 @@
         "suggestedDeposit": 0,
         "suggestedRent": 0,
         "capital": 4000000000,
-        "buyerNotes": "کم واحد\nآسانسور دار دو طبقه به بالا متراژ مهم نیست اگر خوب باشه",
+        "buyerNotes": "کم واحد\nآسانسور دار دو طبقه به بالا \n\n\nمتراژ مهم نیست اگر خوب باشه",
         "tenantDeposit": 0,
         "tenantRent": 0,
         "familyStatus": "single",
@@ -1162,35 +1162,6 @@
       "updatedAt": "2026-09-13T13:49:47.234Z"
     },
     {
-      "id": "file-1789476487610-888-49uumrvcv",
-      "type": "sale",
-      "status": "active",
-      "title": "آپارتمان",
-      "data": {
-        "propertyType": "apartment",
-        "area": 0,
-        "rooms": 0,
-        "year": 0,
-        "totalFloors": 0,
-        "keyHolder": "owner",
-        "condition": "new",
-        "occupancy": "empty",
-        "salePrice": 0,
-        "currentDeposit": 0,
-        "currentRent": 0,
-        "suggestedDeposit": 0,
-        "suggestedRent": 0,
-        "capital": 0,
-        "tenantDeposit": 0,
-        "tenantRent": 0,
-        "familyStatus": "single",
-        "familySize": 0,
-        "amenities": []
-      },
-      "source": "panel",
-      "updatedAt": "2026-09-15T12:48:07.610Z"
-    },
-    {
       "id": "file-1789488358447-906-2wfgrmscv",
       "type": "sale",
       "status": "active",
@@ -1216,7 +1187,7 @@
         "tenantRent": 0,
         "familyStatus": "single",
         "familySize": 0,
-        "notes": "دو طبقه 150 بنا هر طبقه 75\nدو نبش زرین\nبیست سال قولنامه کد رهگیری",
+        "notes": "دو طبقه 150 بنا هر طبقه 75\nدو نبش زرین\nبیست سال \nقولنامه کد رهگیری",
         "amenities": [],
         "yearBuilt": 1360
       },
