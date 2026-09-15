@@ -5,6 +5,7 @@
 import { state } from "./state.js";
 import { $, setLoginError, parseMoney, setupMoneyInputs, showToast } from "./helpers.js";
 import { loginWithToken, logout, manualSync, tryRestoreSession } from "./auth.js";
+import { setupCalculator } from "./calculator.js";
 import {
   openFileModal,
   openDetailModal,
@@ -392,6 +393,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   setupModalClose();
   setupDetailActions();
   setupDivarImport();
+  setupCalculator();
   setupMoneyInputs(document);
 
   document.addEventListener("change", (e) => {
