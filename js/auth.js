@@ -80,22 +80,49 @@ export async function loginWithToken(token, { persist = true } = {}) {
   startPolling();
 }
 
+function clearBootHint() {
+  try {
+    document.documentElement.removeAttribute("data-boot");
+  } catch {
+    // ignore
+  }
+}
+
+function showBoot() {
+  clearBootHint();
+  $("bootScreen")?.classList.remove("hidden");
+  $("loginScreen")?.classList.add("hidden");
+  $("appScreen")?.classList.add("hidden");
+}
+
+function hideBoot() {
+  $("bootScreen")?.classList.add("hidden");
+}
+
 /**
  * تلاش برای ورود خودکار از نشست ذخیره‌شده (تا ۷ روز)
+ * در این حالت فرم رمز نشان داده نمی‌شود — فقط لودینگ
  * @returns {Promise<boolean>} true اگر ورود موفق بود
  */
 export async function tryRestoreSession() {
   const token = readSession();
-  if (!token) return false;
+  if (!token) {
+    hideBoot();
+    showLogin();
+    return false;
+  }
+
+  showBoot();
 
   try {
-    // persist=false چون همین نشست را تمدید می‌کنیم بعد از موفقیت
     await loginWithToken(token, { persist: true });
+    hideBoot();
     return true;
   } catch (err) {
     console.warn("tryRestoreSession failed:", err);
     clearSession();
     state.token = null;
+    hideBoot();
     showLogin();
     return false;
   }
@@ -149,12 +176,16 @@ export function logout() {
 }
 
 export function showLogin() {
+  clearBootHint();
+  hideBoot();
   $("loginScreen")?.classList.remove("hidden");
   $("appScreen")?.classList.add("hidden");
   document.body.style.overflow = "";
 }
 
 export function showApp() {
+  clearBootHint();
+  hideBoot();
   $("loginScreen")?.classList.add("hidden");
   $("appScreen")?.classList.remove("hidden");
 }
