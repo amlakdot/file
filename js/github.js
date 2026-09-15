@@ -9,7 +9,6 @@ import { updateFollowUpStatuses, purgeExpiredTrash } from "./files.js";
 import { renderHome } from "./render.js";
 import { decryptAllFiles, encryptAllFiles } from "./crypto.js";
 import { buildPublicDatabase } from "./public-data.js";
-import { buildPublicDatabase } from "./public-data.js";
 
 export async function githubRequest(url, options = {}) {
   const TIMEOUT = 15000;
