@@ -6,6 +6,7 @@ import { state } from "./state.js";
 import { $, setLoginError, parseMoney, setupMoneyInputs, showToast } from "./helpers.js";
 import { loginWithToken, logout, manualSync, tryRestoreSession } from "./auth.js";
 import { setupCalculator } from "./calculator.js";
+import { publishPublicFiles } from "./github.js";
 import {
   openFileModal,
   openDetailModal,
@@ -198,6 +199,12 @@ function setupTopBar() {
   $("fabNewFile")?.addEventListener("click", (e) => {
     e.preventDefault();
     openNewFile();
+  });
+
+  $("publishPublicButton")?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    closeMoreMenu();
+    await publishPublicFiles();
   });
 
   $("logoutButton")?.addEventListener("click", (e) => {
