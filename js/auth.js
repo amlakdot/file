@@ -78,6 +78,16 @@ export async function loginWithToken(token, { persist = true } = {}) {
 
   showApp();
   startPolling();
+
+  // یک‌بار بعد از ورود: اگر فایل هست، نسخه عمومی را هم بساز
+  try {
+    const { publishPublicFiles } = await import("./github.js");
+    if (Array.isArray(state.files) && state.files.length) {
+      publishPublicFiles().catch((e) => console.warn("auto public publish:", e));
+    }
+  } catch (e) {
+    console.warn("auto public publish skipped:", e);
+  }
 }
 
 function clearBootHint() {
