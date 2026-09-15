@@ -100,6 +100,82 @@ button {
     padding: 24px;
 }
 
+/* قبل از اجرای JS: اگر نشست باشد لودینگ، وگرنه فرم ورود */
+html[data-boot="session"] #bootScreen.hidden {
+    display: flex !important;
+}
+html[data-boot="session"] #loginScreen {
+    display: none !important;
+}
+html[data-boot="login"] #loginScreen.hidden {
+    display: flex !important;
+}
+html[data-boot="login"] #bootScreen {
+    display: none !important;
+}
+
+/* صفحه لودینگ ورود خودکار */
+.boot-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+.boot-screen.hidden {
+    display: none;
+}
+
+.boot-card {
+    width: 100%;
+    max-width: 360px;
+    text-align: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 40px 28px;
+    box-shadow: var(--shadow);
+}
+
+.boot-logo {
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent);
+    color: #111;
+    border-radius: 14px;
+    font-size: 20px;
+    font-weight: 900;
+}
+
+.boot-spinner {
+    width: 36px;
+    height: 36px;
+    margin: 0 auto 18px;
+    border: 3px solid rgba(255, 255, 255, 0.12);
+    border-top-color: var(--accent, #55b878);
+    border-radius: 50%;
+    animation: boot-spin 0.8s linear infinite;
+}
+
+@keyframes boot-spin {
+    to { transform: rotate(360deg); }
+}
+
+.boot-title {
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.boot-subtitle {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
 .login-card {
     width: 100%;
     max-width: 410px;
