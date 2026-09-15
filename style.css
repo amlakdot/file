@@ -38,8 +38,9 @@ body {
 body {
     background: var(--bg);
     color: var(--text);
-    font-family: Tahoma, Arial, sans-serif;
+    font-family: "Vazirmatn", Tahoma, Arial, sans-serif;
     font-size: 14px;
+    -webkit-font-smoothing: antialiased;
 }
 
 button,
@@ -1203,4 +1204,374 @@ select {
     text-align: left;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 13px;
+}
+
+/* =========================================================
+   MATERIAL DESIGN LAYER
+========================================================= */
+:root {
+    --md-primary: #e7c84b;
+    --md-on-primary: #1a1a1a;
+    --md-surface: #111417;
+    --md-surface-container: #171b1f;
+    --md-outline: #292f35;
+    --md-elevation-1: 0 1px 3px rgba(0,0,0,.35), 0 1px 2px rgba(0,0,0,.24);
+    --md-elevation-2: 0 3px 6px rgba(0,0,0,.34), 0 2px 4px rgba(0,0,0,.24);
+    --md-elevation-3: 0 10px 20px rgba(0,0,0,.3), 0 3px 6px rgba(0,0,0,.22);
+    --type-sale: #55b878;
+    --type-landlord: #5b9fd4;
+    --type-buyer: #c084fc;
+    --type-tenant: #f0a05a;
+}
+
+.md-app-bar {
+    min-height: 64px;
+    box-shadow: var(--md-elevation-1);
+}
+
+.brand-text {
+    min-width: 0;
+}
+
+.icon-button {
+    width: 42px;
+    height: 42px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text);
+    font-size: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: background 0.15s ease;
+}
+
+.icon-button:hover {
+    background: rgba(255,255,255,0.08);
+}
+
+.badge-button .md-badge {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+}
+
+.md-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: var(--danger);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.md-badge.sm {
+    min-width: 16px;
+    height: 16px;
+    font-size: 10px;
+    padding: 0 4px;
+}
+
+.topbar-actions-mobile {
+    display: none;
+    align-items: center;
+    gap: 4px;
+}
+
+.toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.toolbar .search-box {
+    flex: 1;
+    min-width: 0;
+}
+
+.filter-toggle-btn {
+    flex-shrink: 0;
+    height: 46px;
+    padding: 0 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-soft);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-toggle-btn.open,
+.filter-toggle-btn.has-active {
+    border-color: var(--accent);
+    color: var(--text);
+}
+
+.advanced-filters-panel {
+    overflow: hidden;
+    transition: max-height 0.25s ease, opacity 0.2s ease, margin 0.2s ease;
+    max-height: 280px;
+    opacity: 1;
+    margin-bottom: 12px;
+}
+
+.advanced-filters-panel.collapsed {
+    max-height: 0;
+    opacity: 0;
+    margin-bottom: 0;
+    pointer-events: none;
+}
+
+.md-chip-row {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 4px;
+    margin-bottom: 12px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+}
+
+.md-chip-row .filter-button {
+    flex-shrink: 0;
+    box-shadow: none;
+}
+
+.filter-button.filter-review.active {
+    background: var(--warning);
+    border-color: var(--warning);
+    color: #111;
+}
+
+/* Card type stripe (Material emphasis) */
+.file-card.md-card {
+    position: relative;
+    overflow: hidden;
+    padding-right: 18px;
+    box-shadow: var(--md-elevation-1);
+    border: 1px solid var(--border);
+}
+
+.file-card.md-card:hover {
+    box-shadow: var(--md-elevation-2);
+}
+
+.card-type-stripe {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--text-muted);
+}
+
+.file-card.type-sale .card-type-stripe { background: var(--type-sale); }
+.file-card.type-landlord .card-type-stripe { background: var(--type-landlord); }
+.file-card.type-buyer .card-type-stripe { background: var(--type-buyer); }
+.file-card.type-tenant .card-type-stripe { background: var(--type-tenant); }
+
+.file-card.type-sale .card-type { color: var(--type-sale); }
+.file-card.type-landlord .card-type { color: var(--type-landlord); }
+.file-card.type-buyer .card-type { color: var(--type-buyer); }
+.file-card.type-tenant .card-type { color: var(--type-tenant); }
+
+/* Bottom sheet / menu */
+.md-sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.md-sheet.hidden {
+    display: none !important;
+}
+
+.md-sheet-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+}
+
+.md-sheet-panel {
+    position: relative;
+    width: min(480px, 100%);
+    background: var(--surface-2);
+    border-radius: 20px 20px 0 0;
+    padding: 10px 12px 24px;
+    box-shadow: var(--md-elevation-3);
+    animation: sheet-up 0.22s ease;
+}
+
+@keyframes sheet-up {
+    from { transform: translateY(24px); opacity: 0.6; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.md-sheet-handle {
+    width: 40px;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--border-light);
+    margin: 6px auto 14px;
+}
+
+.md-sheet-item {
+    width: 100%;
+    text-align: right;
+    border: 0;
+    background: transparent;
+    color: var(--text);
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.md-sheet-item:hover {
+    background: rgba(255,255,255,0.06);
+}
+
+.md-sheet-item.danger {
+    color: var(--danger);
+}
+
+/* FAB */
+.md-fab {
+    display: none;
+    position: fixed;
+    left: 20px;
+    bottom: 24px;
+    width: 56px;
+    height: 56px;
+    border: 0;
+    border-radius: 16px;
+    background: var(--accent);
+    color: #111;
+    font-size: 28px;
+    font-weight: 700;
+    box-shadow: var(--md-elevation-3);
+    z-index: 30;
+    align-items: center;
+    justify-content: center;
+}
+
+.md-fab:active {
+    transform: scale(0.96);
+}
+
+/* Skeleton */
+.skeleton-grid .skeleton-card {
+    height: 140px;
+    border-radius: var(--radius);
+    background: linear-gradient(
+        90deg,
+        var(--surface) 0%,
+        var(--surface-3) 50%,
+        var(--surface) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-shine 1.2s ease-in-out infinite;
+    border: 1px solid var(--border);
+}
+
+@keyframes skeleton-shine {
+    0% { background-position: 100% 0; }
+    100% { background-position: -100% 0; }
+}
+
+/* Buttons material-ish */
+.primary-button,
+.header-button,
+.filter-button,
+.secondary-button {
+    transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+.primary-button {
+    box-shadow: var(--md-elevation-1);
+}
+
+.primary-button:active,
+.header-button:active,
+.filter-button:active {
+    transform: scale(0.98);
+}
+
+/* Focus visible for a11y */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* Desktop sheet can look like menu near top-right */
+@media (min-width: 801px) {
+    .md-sheet {
+        align-items: flex-start;
+        justify-content: flex-end;
+        padding: 72px 24px 0 0;
+    }
+    .md-sheet-panel {
+        border-radius: 16px;
+        width: 260px;
+        animation: none;
+    }
+    .md-sheet-handle {
+        display: none;
+    }
+}
+
+@media (max-width: 800px) {
+    .topbar {
+        flex-direction: row;
+        align-items: center;
+        padding: 10px 14px;
+        min-height: 56px;
+    }
+
+    .topbar-actions-desktop {
+        display: none !important;
+    }
+
+    .topbar-actions-mobile {
+        display: flex !important;
+    }
+
+    .brand-subtitle {
+        display: none;
+    }
+
+    .md-fab {
+        display: inline-flex;
+    }
+
+    .main-container {
+        padding: 14px 14px 88px;
+    }
+
+    .toolbar {
+        flex-wrap: nowrap;
+    }
+
+    .filter-toggle-btn {
+        padding: 0 12px;
+        font-size: 13px;
+    }
 }
