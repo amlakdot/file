@@ -152,16 +152,73 @@ function setupDivarImport() {
   });
 }
 
+function openMoreMenu() {
+  const sheet = $("moreMenuSheet");
+  if (!sheet) return;
+  sheet.classList.remove("hidden");
+  sheet.setAttribute("aria-hidden", "false");
+}
+
+function closeMoreMenu() {
+  const sheet = $("moreMenuSheet");
+  if (!sheet) return;
+  sheet.classList.add("hidden");
+  sheet.setAttribute("aria-hidden", "true");
+}
+
+function openNewFile() {
+  state.editingFileId = null;
+  openFileModal();
+}
+
+function goFollowUp() {
+  state.currentFilter = "followup";
+  applyFilters();
+}
+
+function updateActiveFiltersBadge() {
+  let n = 0;
+  if ((state.region || "").trim()) n += 1;
+  if (state.priceMin != null && state.priceMin !== "") n += 1;
+  if (state.priceMax != null && state.priceMax !== "") n += 1;
+  if (state.sortBy && state.sortBy !== "updatedAt") n += 1;
+  if (state.sortDir && state.sortDir !== "desc") n += 1;
+  const badge = $("activeFiltersCount");
+  if (badge) {
+    badge.textContent = String(n);
+    badge.classList.toggle("hidden", n === 0);
+  }
+  const btn = $("toggleFiltersButton");
+  if (btn) btn.classList.toggle("has-active", n > 0);
+}
+
 function setupTopBar() {
   $("newFileButton")?.addEventListener("click", (e) => {
     e.preventDefault();
-    state.editingFileId = null;
-    openFileModal();
+    openNewFile();
+  });
+
+  $("fabNewFile")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    openNewFile();
+  });
+
+  $("menuNewFile")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    closeMoreMenu();
+    openNewFile();
+  });
+
+  $("menuImportDivar")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    closeMoreMenu();
+    $("importDivarButton")?.click();
   });
 
   $("logoutButton")?.addEventListener("click", (e) => {
     e.preventDefault();
     e.stopPropagation();
+    closeMoreMenu();
     try {
       logout();
     } catch (err) {
@@ -174,20 +231,33 @@ function setupTopBar() {
 
   $("followUpButton")?.addEventListener("click", (e) => {
     e.preventDefault();
-    state.currentFilter = "followup";
-    applyFilters();
+    goFollowUp();
+  });
+  $("followUpButtonMobile")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    goFollowUp();
   });
 
   $("emptyNewFileButton")?.addEventListener("click", (e) => {
     e.preventDefault();
-    state.editingFileId = null;
-    openFileModal();
+    openNewFile();
   });
 
   $("manualSyncButton")?.addEventListener("click", async (e) => {
     e.preventDefault();
+    closeMoreMenu();
     await manualSync();
   });
+
+  $("moreMenuButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    openMoreMenu();
+  });
+  $("moreMenuButtonMobile")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    openMoreMenu();
+  });
+  $("moreMenuBackdrop")?.addEventListener("click", () => closeMoreMenu());
 }
 
 function setupSearchAndFilters() {
@@ -198,28 +268,33 @@ function setupSearchAndFilters() {
 
   $("regionFilter")?.addEventListener("input", (e) => {
     state.region = e.target?.value || "";
+    updateActiveFiltersBadge();
     renderHome();
   });
 
   $("priceMinFilter")?.addEventListener("input", (e) => {
     const v = parseMoney(e.target?.value);
     state.priceMin = v || null;
+    updateActiveFiltersBadge();
     renderHome();
   });
 
   $("priceMaxFilter")?.addEventListener("input", (e) => {
     const v = parseMoney(e.target?.value);
     state.priceMax = v || null;
+    updateActiveFiltersBadge();
     renderHome();
   });
 
   $("sortBySelect")?.addEventListener("change", (e) => {
     state.sortBy = e.target?.value || "updatedAt";
+    updateActiveFiltersBadge();
     renderHome();
   });
 
   $("sortDirSelect")?.addEventListener("change", (e) => {
     state.sortDir = e.target?.value || "desc";
+    updateActiveFiltersBadge();
     renderHome();
   });
 
@@ -233,6 +308,19 @@ function setupSearchAndFilters() {
       }
     });
   });
+
+  $("toggleFiltersButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    const panel = $("advancedFiltersPanel");
+    const btn = $("toggleFiltersButton");
+    if (!panel) return;
+    panel.classList.toggle("collapsed");
+    const isCollapsed = panel.classList.contains("collapsed");
+    btn?.setAttribute("aria-expanded", isCollapsed ? "false" : "true");
+    btn?.classList.toggle("open", !isCollapsed);
+  });
+
+  updateActiveFiltersBadge();
 }
 
 function setupDetailActions() {
