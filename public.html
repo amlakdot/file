@@ -70,6 +70,21 @@
         gap: 10px;
         color: var(--text-muted);
         font-size: 12px;
+        flex-wrap: wrap;
+      }
+      .public-meta-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .public-refresh-btn {
+        padding: 8px 12px;
+        font-size: 12px;
+        white-space: nowrap;
+      }
+      .public-refresh-btn.is-loading {
+        opacity: 0.7;
+        pointer-events: none;
       }
       .public-privacy-note {
         font-size: 10px;
@@ -129,7 +144,12 @@
             <div id="publicFilters" class="filters md-chip-row"></div>
             <div class="public-meta-row">
                 <span id="publicCount">—</span>
-                <span id="publicStatus">…</span>
+                <div class="public-meta-actions">
+                    <span id="publicStatus">…</span>
+                    <button id="publicRefreshButton" class="header-button public-refresh-btn" type="button" title="دریافت آخرین فایل‌ها از منبع">
+                        به‌روزرسانی
+                    </button>
+                </div>
             </div>
         </div>
 
