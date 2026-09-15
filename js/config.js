@@ -7,6 +7,13 @@ export const CONFIG = {
   repo: "file",
   branch: "main",
   dataPath: "data/files.json",
+  /** نسخه عمومی بدون نام و تلفن */
+  publicDataPath: "data/public-files.json",
+  /**
+   * آدرس مستقیم داده عمومی (اختیاری)
+   * اگر خالی باشد از مسیر نسبی و raw گیت‌هاب امتحان می‌شود
+   */
+  publicDataUrl: "",
   githubApi: "https://api.github.com",
   /** فاصله پایه polling وقتی تب فعال است */
   pollInterval: 3 * 60 * 1000,
