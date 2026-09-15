@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-15T14:49:31.435Z",
+  "updatedAt": "2026-09-15T16:06:01.430Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1189,6 +1189,38 @@
       },
       "source": "manual",
       "updatedAt": "2026-09-15T12:48:07.610Z"
+    },
+    {
+      "id": "file-1789488358447-906-2wfgrmscv",
+      "type": "sale",
+      "status": "active",
+      "title": "آپارتمان · 100 متر · زرین",
+      "data": {
+        "propertyType": "apartment",
+        "area": 100,
+        "rooms": 0,
+        "year": 0,
+        "location": "زرین",
+        "plaque": "۱۰۲",
+        "totalFloors": 2,
+        "keyHolder": "owner",
+        "condition": "not-renovated",
+        "occupancy": "owner",
+        "salePrice": 6500000000,
+        "currentDeposit": 0,
+        "currentRent": 0,
+        "suggestedDeposit": 0,
+        "suggestedRent": 0,
+        "capital": 0,
+        "tenantDeposit": 0,
+        "tenantRent": 0,
+        "familyStatus": "single",
+        "familySize": 0,
+        "notes": "دو طبقه 150 بنا هر طبقه 75\nدو نبش زرین\nبیست سال \nقولنامه مد رهگیری",
+        "amenities": []
+      },
+      "source": "manual",
+      "updatedAt": "2026-09-15T16:05:58.447Z"
     }
   ]
 }
