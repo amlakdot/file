@@ -1,1577 +1,609 @@
-:root {
-    --bg: #0b0d0f;
-    --surface: #111417;
-    --surface-2: #171b1f;
-    --surface-3: #1d2227;
-
-    --border: #292f35;
-    --border-light: #343b42;
-
-    --text: #f2f2f2;
-    --text-soft: #aeb5bb;
-    --text-muted: #727a82;
-
-    --accent: #e7c84b;
-    --accent-dark: #b79c2d;
-
-    --danger: #e05252;
-    --success: #55b878;
-    --warning: #e3a93f;
-
-    --radius: 12px;
-    --radius-small: 8px;
-
-    --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
-}
-
-* {
-    box-sizing: border-box;
-}
-
-html,
-body {
-    margin: 0;
-    padding: 0;
-    min-height: 100%;
-}
-
-body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: "Vazirmatn", Tahoma, Arial, sans-serif;
-    font-size: 14px;
-    -webkit-font-smoothing: antialiased;
-}
-
-button,
-input,
-select,
-textarea {
-    font: inherit;
-}
-
-button {
-    cursor: pointer;
-}
-
-.hidden {
-    display: none !important;
-}
-
-/* =========================
-   SYNC DOT
-========================= */
-.sync-dot.success,
-.sync-dot.online {
-    background: var(--success);
-}
-
-.sync-dot.loading {
-    background: var(--warning);
-    animation: pulse 1s ease-in-out infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.35; }
-}
-
-/* =========================
-   STATUS BADGE
-========================= */
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 4px 10px;
-    border-radius: 999px;
-    color: #111;
-    font-size: 10px;
-    font-weight: 700;
-    white-space: nowrap;
-}
-
-/* =========================
-   LOGIN
-========================= */
-.login-screen {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-}
-
-/* قبل از اجرای JS: اگر نشست باشد لودینگ، وگرنه فرم ورود */
-html[data-boot="session"] #bootScreen.hidden {
-    display: flex !important;
-}
-html[data-boot="session"] #loginScreen {
-    display: none !important;
-}
-html[data-boot="login"] #loginScreen.hidden {
-    display: flex !important;
-}
-html[data-boot="login"] #bootScreen {
-    display: none !important;
-}
-
-/* صفحه لودینگ ورود خودکار */
-.boot-screen {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-}
-.boot-screen.hidden {
-    display: none;
-}
-
-.boot-card {
-    width: 100%;
-    max-width: 360px;
-    text-align: center;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 40px 28px;
-    box-shadow: var(--shadow);
-}
-
-.boot-logo {
-    width: 58px;
-    height: 58px;
-    margin: 0 auto 22px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--accent);
-    color: #111;
-    border-radius: 14px;
-    font-size: 20px;
-    font-weight: 900;
-}
-
-.boot-spinner {
-    width: 36px;
-    height: 36px;
-    margin: 0 auto 18px;
-    border: 3px solid rgba(255, 255, 255, 0.12);
-    border-top-color: var(--accent, #55b878);
-    border-radius: 50%;
-    animation: boot-spin 0.8s linear infinite;
-}
-
-@keyframes boot-spin {
-    to { transform: rotate(360deg); }
-}
-
-.boot-title {
-    font-size: 18px;
-    font-weight: 800;
-    margin-bottom: 8px;
-}
-
-.boot-subtitle {
-    color: var(--text-muted);
-    font-size: 13px;
-}
-
-.login-card {
-    width: 100%;
-    max-width: 410px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 34px;
-    box-shadow: var(--shadow);
-}
-
-.login-logo {
-    width: 58px;
-    height: 58px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--accent);
-    color: #111;
-    border-radius: 14px;
-    font-size: 20px;
-    font-weight: 900;
-    margin-bottom: 20px;
-}
-
-.login-title {
-    font-size: 25px;
-    font-weight: 800;
-}
-
-.login-subtitle {
-    color: var(--text-muted);
-    margin-top: 7px;
-    margin-bottom: 28px;
-}
-
-/* =========================
-   FIELDS
-========================= */
-.field {
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-}
-
-.field-full {
-    grid-column: 1 / -1;
-}
-
-.field label {
-    color: var(--text-soft);
-    font-size: 13px;
-}
-
-.field-help {
-    color: var(--text-muted);
-    font-size: 11px;
-    line-height: 1.7;
-}
-
-input,
-select,
-textarea {
-    width: 100%;
-    color: var(--text);
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-small);
-    outline: none;
-    padding: 11px 12px;
-    transition: border-color 0.15s ease, background 0.15s ease;
-}
-
-input::placeholder,
-textarea::placeholder {
-    color: var(--text-muted);
-}
-
-input:focus,
-select:focus,
-textarea:focus {
-    border-color: var(--accent-dark);
-    background: var(--surface-3);
-}
-
-textarea {
-    resize: vertical;
-    min-height: 100px;
-}
-
-select {
-    appearance: auto;
-}
-
-/* =========================
-   BUTTONS
-========================= */
-.primary-button,
-.secondary-button,
-.ghost-button,
-.danger-button,
-.header-button {
-    border: 0;
-    border-radius: var(--radius-small);
-    padding: 10px 15px;
-    font-weight: 700;
-    transition: transform 0.12s ease, opacity 0.12s ease, background 0.12s ease;
-}
-
-.primary-button:hover,
-.secondary-button:hover,
-.ghost-button:hover,
-.danger-button:hover,
-.header-button:hover {
-    transform: translateY(-1px);
-}
-
-.primary-button {
-    background: var(--accent);
-    color: #111;
-}
-
-.primary-button:hover {
-    background: #f0d35c;
-}
-
-.secondary-button {
-    background: var(--surface-3);
-    color: var(--text);
-    border: 1px solid var(--border-light);
-}
-
-.ghost-button {
-    background: transparent;
-    color: var(--text-soft);
-    border: 1px solid var(--border);
-}
-
-.ghost-button:hover {
-    color: var(--text);
-    background: var(--surface-2);
-}
-
-.danger-button {
-    background: rgba(224, 82, 82, 0.12);
-    color: #f27777;
-    border: 1px solid rgba(224, 82, 82, 0.3);
-}
-
-.header-button {
-    background: var(--surface-2);
-    color: var(--text-soft);
-    border: 1px solid var(--border);
-}
-
-.header-button span {
-    display: inline-flex;
-    min-width: 21px;
-    height: 21px;
-    align-items: center;
-    justify-content: center;
-    margin-right: 5px;
-    border-radius: 50%;
-    background: var(--warning);
-    color: #111;
-    font-size: 11px;
-}
-
-.login-button {
-    width: 100%;
-    margin-top: 10px;
-    padding: 13px;
-}
-
-/* =========================
-   APP
-========================= */
-.app-screen {
-    min-height: 100vh;
-}
-
-.topbar {
-    position: sticky;
-    top: 0;
-    z-index: 20;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    padding: 15px 24px;
-    background: rgba(11, 13, 15, 0.94);
-    border-bottom: 1px solid var(--border);
-    backdrop-filter: blur(14px);
-}
-
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.brand-mark {
-    width: 42px;
-    height: 42px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--accent);
-    color: #111;
-    border-radius: 10px;
-    font-weight: 900;
-}
-
-.brand-name {
-    font-size: 15px;
-    font-weight: 800;
-}
-
-.brand-subtitle {
-    color: var(--text-muted);
-    font-size: 11px;
-    margin-top: 3px;
-}
-
-.topbar-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-/* =========================
-   MAIN
-========================= */
-.main-container {
-    max-width: 1450px;
-    margin: 0 auto;
-    padding: 24px;
-}
-
-.toolbar {
-    margin-bottom: 13px;
-}
-
-.search-box {
-    position: relative;
-}
-
-.search-icon {
-    position: absolute;
-    right: 13px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-muted);
-    font-size: 21px;
-    pointer-events: none;
-}
-
-.search-box input {
-    padding-right: 42px;
-    height: 46px;
-}
-
-/* =========================
-   FILTERS
-========================= */
-.filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 7px;
-    margin-bottom: 13px;
-}
-
-.filter-button {
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text-muted);
-    border-radius: 999px;
-    padding: 8px 14px;
-    cursor: pointer;
-}
-
-.filter-button:hover {
-    color: var(--text);
-}
-
-.filter-button.active {
-    background: var(--accent);
-    color: #111;
-    border-color: var(--accent);
-    font-weight: 700;
-}
-
-/* =========================
-   SYNC
-========================= */
-.sync-status {
-    min-height: 25px;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    margin-bottom: 14px;
-    color: var(--text-muted);
-    font-size: 11px;
-}
-
-.sync-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--warning);
-}
-
-.sync-dot.online {
-    background: var(--success);
-}
-
-.sync-dot.error {
-    background: var(--danger);
-}
-
-.last-sync {
-    color: var(--text-muted);
-}
-
-/* =========================
-   FILE GRID
-========================= */
-.files-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 12px;
-}
-
-.file-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px;
-    cursor: pointer;
-    transition: border-color 0.15s ease, transform 0.15s ease, background 0.15s ease;
-}
-
-.file-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--border-light);
-    background: var(--surface-2);
-}
-
-.card-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 14px;
-}
-
-.card-type {
-    color: var(--accent);
-    font-size: 11px;
-    font-weight: 800;
-}
-
-.card-title {
-    margin-top: 5px;
-    font-size: 17px;
-    font-weight: 800;
-    word-break: break-word;
-}
-
-.followup-badge {
-    flex-shrink: 0;
-    background: rgba(227, 169, 63, 0.12);
-    border: 1px solid rgba(227, 169, 63, 0.3);
-    color: var(--warning);
-    border-radius: 999px;
-    padding: 5px 8px;
-    font-size: 10px;
-    font-weight: 700;
-}
-
-.card-info {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    color: var(--text-soft);
-    font-size: 12px;
-}
-
-.card-info-full {
-    grid-template-columns: 1fr 1fr;
-}
-
-.info-item {
-    min-width: 0;
-}
-
-.info-label {
-    display: block;
-    color: var(--text-muted);
-    font-size: 10px;
-    margin-bottom: 3px;
-}
-
-.info-value {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    word-break: break-word;
-}
-
-.card-info-full .info-value {
-    white-space: normal;
-}
-
-.card-amenities {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 12px;
-}
-
-.card-tag {
-    background: var(--surface-3);
-    border: 1px solid var(--border);
-    color: var(--text-soft);
-    border-radius: 999px;
-    padding: 4px 8px;
-    font-size: 10px;
-}
-
-.card-notes {
-    margin-top: 12px;
-    padding: 10px;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-small);
-}
-
-.card-notes-text {
-    margin-top: 4px;
-    color: var(--text-soft);
-    font-size: 12px;
-    line-height: 1.6;
-    white-space: pre-wrap;
-    word-break: break-word;
-}
-
-.card-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    border-top: 1px solid var(--border);
-    margin-top: 14px;
-    padding-top: 12px;
-    color: var(--text-muted);
-    font-size: 10px;
-}
-
-.money-input {
-    direction: ltr;
-    text-align: left;
-    font-variant-numeric: tabular-nums;
-}
-
-/* =========================
-   EMPTY
-========================= */
-.empty-state {
-    min-height: 400px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: var(--text-muted);
-}
-
-.empty-icon {
-    width: 64px;
-    height: 64px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    font-size: 26px;
-    margin-bottom: 15px;
-}
-
-.empty-state h2 {
-    margin: 0 0 7px;
-    color: var(--text);
-    font-size: 18px;
-}
-
-.empty-state p {
-    margin: 0 0 18px;
-}
-
-/* =========================
-   MODAL
-========================= */
-.modal {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-
-.modal-backdrop {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.72);
-    backdrop-filter: blur(5px);
-}
-
-.modal-card {
-    position: relative;
-    width: 100%;
-    max-width: 650px;
-    max-height: calc(100vh - 40px);
-    overflow-y: auto;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    box-shadow: var(--shadow);
-    padding: 22px;
-}
-
-.large-modal {
-    max-width: 850px;
-}
-
-.small-modal {
-    max-width: 440px;
-}
-
-.modal-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 20px;
-    margin-bottom: 24px;
-}
-
-.modal-header h2 {
-    margin: 5px 0 0;
-    font-size: 21px;
-}
-
-.modal-eyebrow {
-    color: var(--accent);
-    font-size: 11px;
-    font-weight: 800;
-}
-
-.close-button {
-    width: 35px;
-    height: 35px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--surface-2);
-    color: var(--text-soft);
-    font-size: 24px;
-}
-
-.close-button:hover {
-    color: var(--text);
-}
-
-/* =========================
-   FORM
-========================= */
-.form-section {
-    padding-bottom: 22px;
-    margin-bottom: 22px;
-    border-bottom: 1px solid var(--border);
-}
-
-.form-section:last-of-type {
-    border-bottom: 0;
-}
-
-.section-title {
-    font-size: 13px;
-    color: var(--text);
-    font-weight: 800;
-    margin-bottom: 13px;
-}
-
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 13px;
-}
-
-.type-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-}
-
-.type-option {
-    cursor: pointer;
-}
-
-.type-option input {
-    display: none;
-}
-
-.type-option span {
-    display: block;
-    padding: 12px;
-    text-align: center;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-small);
-    color: var(--text-muted);
-}
-
-.type-option input:checked + span {
-    border-color: var(--accent);
-    background: rgba(231, 200, 75, 0.08);
-    color: var(--accent);
-    font-weight: 700;
-}
-
-/* =========================
-   AMENITIES
-========================= */
-.amenities-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 8px;
-}
-
-.amenities-grid label {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    padding: 9px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-small);
-    background: var(--surface-2);
-    color: var(--text-soft);
-    font-size: 12px;
-    cursor: pointer;
-}
-
-.amenities-grid input {
-    width: auto;
-}
-
-/* =========================
-   MODAL ACTIONS
-========================= */
-.modal-actions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 8px;
-    flex-wrap: wrap;
-    padding-top: 4px;
-}
-
-.modal-actions .primary-button {
-    margin-right: auto;
-}
-
-.modal-actions .danger-button:disabled,
-.modal-actions .secondary-button:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* =========================
-   DETAIL
-========================= */
-.detail-content {
-    display: grid;
-    gap: 10px;
-    margin-bottom: 24px;
-}
-
-.detail-group {
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-small);
-    padding: 12px;
-}
-
-.detail-group-title {
-    color: var(--accent);
-    font-size: 11px;
-    font-weight: 800;
-    margin-bottom: 10px;
-}
-
-.detail-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-}
-
-.detail-item-label {
-    color: var(--text-muted);
-    font-size: 10px;
-    margin-bottom: 3px;
-}
-
-.detail-item-value {
-    color: var(--text);
-    font-size: 12px;
-    word-break: break-word;
-}
-
-.amenity-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-}
-
-.amenity-tag {
-    background: var(--surface-3);
-    border: 1px solid var(--border);
-    color: var(--text-soft);
-    border-radius: 999px;
-    padding: 5px 8px;
-    font-size: 10px;
-}
-
-/* =========================
-   RENEW
-========================= */
-.renew-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-}
-
-.renew-button {
-    padding: 13px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-small);
-    background: var(--surface-2);
-    color: var(--text);
-    font-weight: 700;
-}
-
-.renew-button:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-}
-
-/* =========================
-   TOAST
-========================= */
-.toast {
-    position: fixed;
-    left: 50%;
-    bottom: 24px;
-    z-index: 300;
-    transform: translateX(-50%);
-    background: var(--surface-3);
-    border: 1px solid var(--border-light);
-    color: var(--text);
-    border-radius: 999px;
-    padding: 10px 16px;
-    box-shadow: var(--shadow);
-    font-size: 12px;
-}
-
-.toast.success {
-    border-color: rgba(85, 184, 120, 0.4);
-}
-
-.toast.error {
-    border-color: rgba(224, 82, 82, 0.4);
-}
-
-.toast.warning {
-    border-color: rgba(227, 169, 63, 0.4);
-}
-
-/* =========================
-   LOGIN ERROR
-========================= */
-.login-error {
-    margin-top: 12px;
-    padding: 10px;
-    border-radius: var(--radius-small);
-    background: rgba(224, 82, 82, 0.1);
-    border: 1px solid rgba(224, 82, 82, 0.25);
-    color: #f27777;
-    font-size: 12px;
-    line-height: 1.7;
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
-@media (max-width: 800px) {
-    .topbar {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .topbar-actions {
-        width: 100%;
-        flex-wrap: wrap;
-    }
-
-    .topbar-actions > button {
-        flex: 1;
-    }
-
-    .type-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .amenities-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 600px) {
-    .main-container {
-        padding: 15px;
-    }
-
-    .login-card {
-        padding: 25px;
-    }
-
-    .form-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .field-full {
-        grid-column: auto;
-    }
-
-    .detail-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .files-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .modal {
-        padding: 10px;
-    }
-
-    .modal-card {
-        max-height: calc(100vh - 20px);
-        padding: 17px;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        scroll-behavior: auto !important;
-        transition: none !important;
-        animation: none !important;
-    }
-}
-
-
-/* =========================
-   ADVANCED FILTERS + SUMMARY CARDS
-========================= */
-.advanced-filters {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 10px;
-    margin-bottom: 12px;
-}
-
-.advanced-filters .field label {
-    font-size: 11px;
-    color: var(--text-muted);
-}
-
-.advanced-filters input,
-.advanced-filters select {
-    width: 100%;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-small);
-    color: var(--text);
-    padding: 8px 10px;
-}
-
-.card-summary .card-info {
-    grid-template-columns: 1fr 1fr;
-}
-
-.card-hint {
-    margin-top: 10px;
-    font-size: 10px;
-    color: var(--text-muted);
-    text-align: center;
-}
-
-.card-top-badges {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    align-items: flex-end;
-}
-
-.trash-badge {
-    flex-shrink: 0;
-    background: rgba(224, 82, 82, 0.12);
-    border: 1px solid rgba(224, 82, 82, 0.3);
-    color: var(--danger);
-    border-radius: 999px;
-    padding: 5px 8px;
-    font-size: 10px;
-    font-weight: 700;
-}
-
-.detail-body {
-    max-height: min(60vh, 520px);
-    overflow: auto;
-    margin-bottom: 12px;
-}
-
-.detail-actions {
-    border-top: 1px solid var(--border);
-    padding-top: 12px;
-}
-
-.detail-meta {
-    margin-top: 12px;
-    font-size: 11px;
-    color: var(--text-muted);
-}
-
-.detail-grid-wrap .card-info-full {
-    margin-bottom: 8px;
-}
-
-/* ===== Divar import & tags ===== */
-.tag-badge {
-    flex-shrink: 0;
-    background: rgba(99, 140, 255, 0.12);
-    border: 1px solid rgba(99, 140, 255, 0.35);
-    color: #7aa2ff;
-    border-radius: 999px;
-    padding: 5px 8px;
-    font-size: 10px;
-    font-weight: 700;
-    white-space: nowrap;
-    max-width: 160px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.tag-badge.tag-review {
-    background: rgba(227, 169, 63, 0.14);
-    border-color: rgba(227, 169, 63, 0.4);
-    color: var(--warning);
-}
-
-.tag-badge.tag-deleted {
-    background: rgba(224, 82, 82, 0.12);
-    border-color: rgba(224, 82, 82, 0.35);
-    color: var(--danger);
-}
-
-.divar-source-mark {
-    display: inline-block;
-    margin-right: 6px;
-    padding: 1px 6px;
-    border-radius: 6px;
-    font-size: 10px;
-    font-weight: 700;
-    background: rgba(85, 184, 120, 0.15);
-    color: #55b878;
-    vertical-align: middle;
-}
-
-.divar-import-body {
-    padding: 4px 0 8px;
-}
-
-.divar-import-body .radio-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 6px;
-}
-
-.divar-import-body .radio-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 12px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: var(--surface-2, rgba(255,255,255,0.03));
-    cursor: pointer;
-    font-size: 13px;
-}
-
-.divar-import-body .radio-chip input {
-    accent-color: var(--primary, #55b878);
-}
-
-#divarUrlInput {
-    direction: ltr;
-    text-align: left;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    font-size: 13px;
-}
-
-/* =========================================================
-   MATERIAL DESIGN LAYER
-========================================================= */
-:root {
-    --md-primary: #e7c84b;
-    --md-on-primary: #1a1a1a;
-    --md-surface: #111417;
-    --md-surface-container: #171b1f;
-    --md-outline: #292f35;
-    --md-elevation-1: 0 1px 3px rgba(0,0,0,.35), 0 1px 2px rgba(0,0,0,.24);
-    --md-elevation-2: 0 3px 6px rgba(0,0,0,.34), 0 2px 4px rgba(0,0,0,.24);
-    --md-elevation-3: 0 10px 20px rgba(0,0,0,.3), 0 3px 6px rgba(0,0,0,.22);
-    --type-sale: #55b878;
-    --type-landlord: #5b9fd4;
-    --type-buyer: #c084fc;
-    --type-tenant: #f0a05a;
-}
-
-.md-app-bar {
-    min-height: 64px;
-    box-shadow: var(--md-elevation-1);
-}
-
-.brand-text {
-    min-width: 0;
-}
-
-.icon-button {
-    width: 42px;
-    height: 42px;
-    border: 0;
-    border-radius: 50%;
-    background: transparent;
-    color: var(--text);
-    font-size: 20px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    transition: background 0.15s ease;
-}
-
-.icon-button:hover {
-    background: rgba(255,255,255,0.08);
-}
-
-.badge-button .md-badge {
-    position: absolute;
-    top: 4px;
-    left: 4px;
-}
-
-.md-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 20px;
-    height: 20px;
-    padding: 0 6px;
-    border-radius: 999px;
-    background: var(--danger);
-    color: #fff;
-    font-size: 11px;
-    font-weight: 700;
-    line-height: 1;
-}
-
-.md-badge.sm {
-    min-width: 16px;
-    height: 16px;
-    font-size: 10px;
-    padding: 0 4px;
-}
-
-.topbar-actions-mobile {
-    display: none;
-    align-items: center;
-    gap: 4px;
-}
-
-.toolbar {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 12px;
-}
-
-.toolbar .search-box {
-    flex: 1;
-    min-width: 0;
-}
-
-.filter-toggle-btn {
-    flex-shrink: 0;
-    height: 46px;
-    padding: 0 14px;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text-soft);
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.filter-toggle-btn.open,
-.filter-toggle-btn.has-active {
-    border-color: var(--accent);
-    color: var(--text);
-}
-
-.advanced-filters-panel {
-    overflow: hidden;
-    transition: max-height 0.25s ease, opacity 0.2s ease, margin 0.2s ease;
-    max-height: 280px;
-    opacity: 1;
-    margin-bottom: 12px;
-}
-
-.advanced-filters-panel.collapsed {
-    max-height: 0;
-    opacity: 0;
-    margin-bottom: 0;
-    pointer-events: none;
-}
-
-.md-chip-row {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    padding-bottom: 4px;
-    margin-bottom: 12px;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-}
-
-.md-chip-row .filter-button {
-    flex-shrink: 0;
-    box-shadow: none;
-}
-
-.filter-button.filter-review.active {
-    background: var(--warning);
-    border-color: var(--warning);
-    color: #111;
-}
-
-/* Card type stripe (Material emphasis) */
-.file-card.md-card {
-    position: relative;
-    overflow: hidden;
-    padding-right: 18px;
-    box-shadow: var(--md-elevation-1);
-    border: 1px solid var(--border);
-}
-
-.file-card.md-card:hover {
-    box-shadow: var(--md-elevation-2);
-}
-
-.card-type-stripe {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 4px;
-    height: 100%;
-    background: var(--text-muted);
-}
-
-.file-card.type-sale .card-type-stripe { background: var(--type-sale); }
-.file-card.type-landlord .card-type-stripe { background: var(--type-landlord); }
-.file-card.type-buyer .card-type-stripe { background: var(--type-buyer); }
-.file-card.type-tenant .card-type-stripe { background: var(--type-tenant); }
-
-.file-card.type-sale .card-type { color: var(--type-sale); }
-.file-card.type-landlord .card-type { color: var(--type-landlord); }
-.file-card.type-buyer .card-type { color: var(--type-buyer); }
-.file-card.type-tenant .card-type { color: var(--type-tenant); }
-
-/* Bottom sheet / menu */
-.md-sheet {
-    position: fixed;
-    inset: 0;
-    z-index: 80;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-}
-
-.md-sheet.hidden {
-    display: none !important;
-}
-
-.md-sheet-backdrop {
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.45);
-}
-
-.md-sheet-panel {
-    position: relative;
-    width: min(480px, 100%);
-    background: var(--surface-2);
-    border-radius: 20px 20px 0 0;
-    padding: 10px 12px 24px;
-    box-shadow: var(--md-elevation-3);
-    animation: sheet-up 0.22s ease;
-}
-
-@keyframes sheet-up {
-    from { transform: translateY(24px); opacity: 0.6; }
-    to { transform: translateY(0); opacity: 1; }
-}
-
-.md-sheet-handle {
-    width: 40px;
-    height: 4px;
-    border-radius: 999px;
-    background: var(--border-light);
-    margin: 6px auto 14px;
-}
-
-.md-sheet-item {
-    width: 100%;
-    text-align: right;
-    border: 0;
-    background: transparent;
-    color: var(--text);
-    padding: 14px 16px;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 15px;
-}
-
-.md-sheet-item:hover {
-    background: rgba(255,255,255,0.06);
-}
-
-.md-sheet-item.danger {
-    color: var(--danger);
-}
-
-/* FAB */
-.md-fab {
-    display: none;
-    position: fixed;
-    left: 20px;
-    bottom: 24px;
-    width: 56px;
-    height: 56px;
-    border: 0;
-    border-radius: 16px;
-    background: var(--accent);
-    color: #111;
-    font-size: 28px;
-    font-weight: 700;
-    box-shadow: var(--md-elevation-3);
-    z-index: 30;
-    align-items: center;
-    justify-content: center;
-}
-
-.md-fab:active {
-    transform: scale(0.96);
-}
-
-/* Skeleton */
-.skeleton-grid .skeleton-card {
-    height: 140px;
-    border-radius: var(--radius);
-    background: linear-gradient(
-        90deg,
-        var(--surface) 0%,
-        var(--surface-3) 50%,
-        var(--surface) 100%
-    );
-    background-size: 200% 100%;
-    animation: skeleton-shine 1.2s ease-in-out infinite;
-    border: 1px solid var(--border);
-}
-
-@keyframes skeleton-shine {
-    0% { background-position: 100% 0; }
-    100% { background-position: -100% 0; }
-}
-
-/* Buttons material-ish */
-.primary-button,
-.header-button,
-.filter-button,
-.secondary-button {
-    transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
-}
-
-.primary-button {
-    box-shadow: var(--md-elevation-1);
-}
-
-.primary-button:active,
-.header-button:active,
-.filter-button:active {
-    transform: scale(0.98);
-}
-
-/* Focus visible for a11y */
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-}
-
-/* Desktop sheet can look like menu near top-right */
-@media (min-width: 801px) {
-    .md-sheet {
-        align-items: flex-start;
-        justify-content: flex-end;
-        padding: 72px 24px 0 0;
-    }
-    .md-sheet-panel {
-        border-radius: 16px;
-        width: 260px;
-        animation: none;
-    }
-    .md-sheet-handle {
-        display: none;
-    }
-}
-
-@media (max-width: 800px) {
-    .topbar {
-        flex-direction: row;
-        align-items: center;
-        padding: 10px 14px;
-        min-height: 56px;
-    }
-
-    .topbar-actions-desktop {
-        display: none !important;
-    }
-
-    .topbar-actions-mobile {
-        display: flex !important;
-    }
-
-    .brand-subtitle {
-        display: none;
-    }
-
-    .md-fab {
-        display: inline-flex;
-    }
-
-    .main-container {
-        padding: 14px 14px 88px;
-    }
-
-    .toolbar {
-        flex-wrap: nowrap;
-    }
-
-    .filter-toggle-btn {
-        padding: 0 12px;
-        font-size: 13px;
-    }
-}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b0d0f">
+    <title>املاک DOT</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script>
+      /* نمایش فوری لودینگ یا فرم ورود قبل از اجرای ماژول‌ها */
+      (function () {
+        try {
+          var raw = localStorage.getItem("dot_auth_session_v1");
+          var hasSession = false;
+          if (raw) {
+            var data = JSON.parse(raw);
+            hasSession = !!(data && data.token && (!data.expiresAt || Date.now() <= Number(data.expiresAt)));
+          }
+          document.documentElement.dataset.boot = hasSession ? "session" : "login";
+        } catch (e) {
+          document.documentElement.dataset.boot = "login";
+        }
+      })();
+    </script>
+</head>
+<body>
+
+    <!-- =========================
+         BOOT / AUTO LOGIN
+    ========================== -->
+    <section id="bootScreen" class="boot-screen hidden">
+        <div class="boot-card">
+            <div class="boot-logo">DOT</div>
+            <div class="boot-spinner" aria-hidden="true"></div>
+            <div class="boot-title">در حال ورود . . .</div>
+            <div class="boot-subtitle">در حال بارگذاری اطلاعات</div>
+        </div>
+    </section>
+
+    <!-- =========================
+         LOGIN
+    ========================== -->
+    <section id="loginScreen" class="login-screen hidden">
+        <div class="login-card">
+            <div class="login-logo">DOT</div>
+            <div class="login-title">املاک DOT</div>
+            <div class="login-subtitle">سامانه مدیریت فایل</div>
+
+            <form id="loginForm">
+                <div class="field">
+                    <label for="githubToken">GitHub Token</label>
+                    <input
+                        id="githubToken"
+                        type="password"
+                        autocomplete="off"
+                        placeholder="ghp_... یا github_pat_..."
+                        required
+                    >
+                    <small class="field-help">
+                        بعد از ورود، تا ۷ روز روی همین دستگاه نیازی به وارد کردن دوباره توکن نیست.
+                        (Fine-grained یا Classic با دسترسی Contents: Read and write روی این ریپو)
+                    </small>
+                </div>
+
+                <button type="submit" class="primary-button login-button">
+                    ورود
+                </button>
+
+                <div id="loginError" class="login-error hidden"></div>
+            </form>
+        </div>
+    </section>
+
+    <!-- =========================
+         APP
+    ========================== -->
+    <section id="appScreen" class="app-screen hidden">
+        <header class="topbar md-app-bar">
+            <div class="brand">
+                <div class="brand-mark">DOT</div>
+                <div class="brand-text">
+                    <div class="brand-name">املاک DOT</div>
+                    <div class="brand-subtitle">مدیریت فایل</div>
+                </div>
+            </div>
+
+            <div class="topbar-actions topbar-actions-desktop">
+                <button id="followUpButton" class="header-button" type="button">
+                    پیگیری
+                    <span id="followUpCount" class="md-badge">0</span>
+                </button>
+                <button id="importDivarButton" class="header-button" type="button" title="افزودن از لینک دیوار">
+                    از دیوار
+                </button>
+                <button id="newFileButton" class="primary-button" type="button">
+                    + فایل جدید
+                </button>
+                <button id="moreMenuButton" class="icon-button" type="button" title="منو" aria-label="منو">
+                    ⋮
+                </button>
+            </div>
+
+            <div class="topbar-actions topbar-actions-mobile">
+                <button id="followUpButtonMobile" class="icon-button badge-button" type="button" title="پیگیری" aria-label="پیگیری">
+                    ⏱
+                    <span id="followUpCountMobile" class="md-badge sm">0</span>
+                </button>
+                <button id="moreMenuButtonMobile" class="icon-button" type="button" title="منو" aria-label="منو">
+                    ⋮
+                </button>
+            </div>
+        </header>
+
+        <!-- منوی بیشتر (دسکتاپ/موبایل) -->
+        <div id="moreMenuSheet" class="md-sheet hidden" aria-hidden="true">
+            <div class="md-sheet-backdrop" id="moreMenuBackdrop"></div>
+            <div class="md-sheet-panel" role="menu">
+                <div class="md-sheet-handle"></div>
+                <button type="button" class="md-sheet-item" id="menuImportDivar" role="menuitem">از دیوار</button>
+                <button type="button" class="md-sheet-item" id="menuNewFile" role="menuitem">فایل جدید</button>
+                <button type="button" class="md-sheet-item" id="manualSyncButton" role="menuitem">همگام‌سازی</button>
+                <button type="button" class="md-sheet-item danger" id="logoutButton" role="menuitem">خروج</button>
+            </div>
+        </div>
+
+        <main class="main-container">
+            <div class="toolbar">
+                <div class="search-box md-search">
+                    <span class="search-icon">⌕</span>
+                    <input
+                        id="searchInput"
+                        type="search"
+                        placeholder="جست‌وجو: نام، تلفن، منطقه، قیمت..."
+                        autocomplete="off"
+                    >
+                </div>
+                <button id="toggleFiltersButton" class="filter-toggle-btn" type="button" aria-expanded="false">
+                    فیلترها
+                    <span id="activeFiltersCount" class="md-badge sm hidden">0</span>
+                </button>
+            </div>
+
+            <div id="advancedFiltersPanel" class="advanced-filters-panel collapsed">
+                <div class="advanced-filters">
+                    <div class="field">
+                        <label for="regionFilter">منطقه</label>
+                        <input id="regionFilter" type="text" placeholder="مثلاً سعادت‌آباد" autocomplete="off">
+                    </div>
+                    <div class="field">
+                        <label for="priceMinFilter">حداقل مبلغ</label>
+                        <input id="priceMinFilter" class="money-input" type="text" inputmode="numeric" placeholder="0">
+                    </div>
+                    <div class="field">
+                        <label for="priceMaxFilter">حداکثر مبلغ</label>
+                        <input id="priceMaxFilter" class="money-input" type="text" inputmode="numeric" placeholder="مثلاً 10,000,000,000">
+                    </div>
+                    <div class="field">
+                        <label for="sortBySelect">مرتب‌سازی</label>
+                        <select id="sortBySelect">
+                            <option value="updatedAt">آخرین بروزرسانی</option>
+                            <option value="createdAt">تاریخ ثبت</option>
+                            <option value="price">مبلغ</option>
+                            <option value="name">نام</option>
+                            <option value="area">متراژ</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="sortDirSelect">ترتیب</label>
+                        <select id="sortDirSelect">
+                            <option value="desc">نزولی</option>
+                            <option value="asc">صعودی</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filters md-chip-row">
+                <button class="filter-button active" data-filter="all" type="button">همه</button>
+                <button class="filter-button" data-filter="sale" type="button">فروشی</button>
+                <button class="filter-button" data-filter="landlord" type="button">مالک / موجر</button>
+                <button class="filter-button" data-filter="buyer" type="button">خریدار</button>
+                <button class="filter-button" data-filter="tenant" type="button">مستاجر</button>
+                <button class="filter-button" data-filter="followup" type="button">پیگیری</button>
+                <button class="filter-button filter-review" data-filter="needs-review" type="button">نیاز به بررسی</button>
+                <button class="filter-button" data-filter="trash" type="button">سطل</button>
+            </div>
+
+            <div class="sync-status">
+                <span id="syncIndicator" class="sync-dot"></span>
+                <span id="syncText">در حال اتصال...</span>
+                <span id="lastSyncText" class="last-sync"></span>
+            </div>
+
+            <div id="skeletonGrid" class="files-grid skeleton-grid hidden" aria-hidden="true">
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+            </div>
+
+            <div id="filesContainer" class="files-grid"></div>
+
+            <div id="emptyState" class="empty-state hidden">
+                <div class="empty-icon">⌂</div>
+                <h2 id="emptyTitle">فایلی پیدا نشد</h2>
+                <p id="emptyDesc">هنوز فایلی با این مشخصات ثبت نشده است.</p>
+                <button id="emptyNewFileButton" class="primary-button" type="button">
+                    ثبت فایل جدید
+                </button>
+            </div>
+        </main>
+
+        <!-- FAB موبایل -->
+        <button id="fabNewFile" class="md-fab" type="button" title="فایل جدید" aria-label="فایل جدید">
+            +
+        </button>
+    </section>
+
+    <!-- =========================
+         FILE MODAL
+    ========================== -->
+    <div id="fileModal" class="modal hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-card large-modal">
+            <div class="modal-header">
+                <div>
+                    <div id="modalEyebrow" class="modal-eyebrow">فایل جدید</div>
+                    <h2 id="modalTitle">ثبت فایل</h2>
+                </div>
+                <button id="closeModalButton" class="close-button" type="button">×</button>
+            </div>
+
+            <form id="fileForm" novalidate>
+                <input id="editingFileId" type="hidden">
+
+                <!-- TYPE -->
+                <div class="form-section">
+                    <div class="section-title">نوع فایل</div>
+                    <div class="type-grid">
+                        <label class="type-option">
+                            <input type="radio" name="fileType" value="sale" checked>
+                            <span>ملک فروشی</span>
+                        </label>
+                        <label class="type-option">
+                            <input type="radio" name="fileType" value="landlord">
+                            <span>مالک / موجر</span>
+                        </label>
+                        <label class="type-option">
+                            <input type="radio" name="fileType" value="buyer">
+                            <span>خریدار</span>
+                        </label>
+                        <label class="type-option">
+                            <input type="radio" name="fileType" value="tenant">
+                            <span>مستاجر</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- COMMON -->
+                <div class="form-section">
+                    <div class="section-title">اطلاعات اصلی</div>
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="name">نام</label>
+                            <input id="name" type="text" placeholder="نام مالک / مشتری">
+                        </div>
+                        <div class="field">
+                            <label for="phone">شماره تماس</label>
+                            <input id="phone" type="tel" placeholder="09...">
+                        </div>
+                        <div class="field property-field">
+                            <label for="propertyType">نوع ملک</label>
+                            <select id="propertyType">
+                                <option value="apartment">آپارتمان</option>
+                                <option value="villa">ویلا</option>
+                                <option value="office">دفتر / اداری</option>
+                                <option value="commercial">تجاری</option>
+                                <option value="land">زمین</option>
+                                <option value="garden">باغ</option>
+                            </select>
+                        </div>
+                        <div class="field property-field">
+                            <label for="area">متراژ</label>
+                            <input id="area" type="number" min="0" placeholder="مثلاً 120">
+                        </div>
+                        <div class="field property-field">
+                            <label for="rooms">تعداد خواب</label>
+                            <input id="rooms" type="number" min="0" placeholder="مثلاً 2">
+                        </div>
+                        <div class="field property-field">
+                            <label for="year">سال ساخت</label>
+                            <input id="year" type="number" min="0" placeholder="مثلاً 1404">
+                        </div>
+                        <div id="floorFields" class="field property-field floor-field hidden">
+                            <label for="unitFloor">طبقه واحد</label>
+                            <select id="unitFloor">
+                                <option value="">—</option>
+                                <option value="basement">زیرزمین</option>
+                                <option value="ground">همکف</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                                <option value="16">16</option>
+                                <option value="17">17</option>
+                                <option value="18">18</option>
+                                <option value="19">19</option>
+                                <option value="20">20+</option>
+                            </select>
+                        </div>
+                        <div id="totalFloorsField" class="field property-field floor-field hidden">
+                            <label for="totalFloors">تعداد کل طبقات ساختمان</label>
+                            <input id="totalFloors" type="number" min="1" max="100" placeholder="مثلاً 5">
+                        </div>
+                        <div class="field field-full">
+                            <label for="location">موقعیت</label>
+                            <input id="location" type="text" placeholder="محله، خیابان، منطقه...">
+                        </div>
+                        <div class="field property-field">
+                            <label for="plaque">پلاک (اختیاری)</label>
+                            <input id="plaque" type="text" placeholder="پلاک ثبتی / پلاک ساختمان">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PROPERTY DETAILS -->
+                <div id="propertyDetailsSection" class="form-section">
+                    <div class="section-title">وضعیت ملک</div>
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="keyHolder">کلید دست</label>
+                            <select id="keyHolder">
+                                <option value="owner">مالک</option>
+                                <option value="office">املاک / دفتر</option>
+                                <option value="tenant">مستاجر</option>
+                                <option value="guard">سرایدار / نگهبان</option>
+                                <option value="other">سایر</option>
+                            </select>
+                        </div>
+                        <div id="keyHolderContactFields" class="field field-full hidden">
+                            <label>مشخصات دارنده کلید (اختیاری)</label>
+                            <div class="form-grid" style="margin-top:8px">
+                                <div class="field">
+                                    <label for="keyHolderName">نام (آقا / خانم)</label>
+                                    <input id="keyHolderName" type="text" placeholder="مثلاً آقای رضایی">
+                                </div>
+                                <div class="field">
+                                    <label for="keyHolderPhone">شماره تلفن دارنده کلید</label>
+                                    <input id="keyHolderPhone" type="tel" placeholder="09...">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label for="condition">وضعیت ملک</label>
+                            <select id="condition">
+                                <option value="new">نوساز</option>
+                                <option value="unused">کلید نخورده</option>
+                                <option value="renovated">بازسازی‌شده</option>
+                                <option value="not-renovated">بازسازی‌نشده</option>
+                                <option value="renovating">در حال بازسازی</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="occupancy">وضعیت سکونت</label>
+                            <select id="occupancy">
+                                <option value="empty">خالی</option>
+                                <option value="tenant">مستاجر</option>
+                                <option value="owner">مالک ساکن</option>
+                                <option value="evacuating">در حال تخلیه</option>
+                            </select>
+                        </div>
+                        <div id="salePriceField" class="field sale-only">
+                            <label for="salePrice">قیمت فروش</label>
+                            <input id="salePrice" class="money-input" type="text" inputmode="numeric" placeholder="مثلاً 10,000,000">
+                        </div>
+                        <div id="currentDepositField" class="field hidden">
+                            <label for="currentDeposit">ودیعه فعلی</label>
+                            <input id="currentDeposit" class="money-input" type="text" inputmode="numeric" placeholder="مثلاً 500,000,000">
+                        </div>
+                        <div id="currentRentField" class="field hidden">
+                            <label for="currentRent">اجاره فعلی</label>
+                            <input id="currentRent" class="money-input" type="text" inputmode="numeric" placeholder="مثلاً 15,000,000">
+                        </div>
+                        <div id="suggestedDepositField" class="field landlord-only">
+                            <label for="suggestedDeposit">ودیعه پیشنهادی</label>
+                            <input id="suggestedDeposit" class="money-input" type="text" inputmode="numeric" placeholder="مثلاً 500,000,000">
+                        </div>
+                        <div id="suggestedRentField" class="field landlord-only">
+                            <label for="suggestedRent">اجاره پیشنهادی</label>
+                            <input id="suggestedRent" class="money-input" type="text" inputmode="numeric" placeholder="مثلاً 15,000,000">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BUYER -->
+                <div id="buyerSection" class="form-section hidden">
+                    <div class="section-title">مشخصات خرید</div>
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="capital">سرمایه خریدار</label>
+                            <input id="capital" class="money-input" type="text" inputmode="numeric" placeholder="مثلاً 5,000,000,000">
+                        </div>
+                        <div class="field field-full">
+                            <label for="buyerNotes">توضیحات</label>
+                            <textarea id="buyerNotes" rows="4" placeholder="نیازها، شرایط، توضیحات..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TENANT -->
+                <div id="tenantSection" class="form-section hidden">
+                    <div class="section-title">مشخصات مستاجر</div>
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="tenantDeposit">ودیعه</label>
+                            <input id="tenantDeposit" class="money-input" type="text" inputmode="numeric" placeholder="مثلاً 500,000,000">
+                        </div>
+                        <div class="field">
+                            <label for="tenantRent">اجاره</label>
+                            <input id="tenantRent" class="money-input" type="text" inputmode="numeric" placeholder="مثلاً 15,000,000">
+                        </div>
+                        <div class="field">
+                            <label for="familyStatus">وضعیت خانوادگی</label>
+                            <select id="familyStatus">
+                                <option value="single">مجرد</option>
+                                <option value="married">متأهل</option>
+                                <option value="family">خانوادگی</option>
+                            </select>
+                        </div>
+                        <div id="familySizeField" class="field">
+                            <label for="familySize">تعداد نفرات</label>
+                            <input id="familySize" type="number" min="1" placeholder="مثلاً 3">
+                        </div>
+                        <div class="field field-full">
+                            <label for="tenantNotes">توضیحات</label>
+                            <textarea id="tenantNotes" rows="4" placeholder="شرایط، شغل، نیازها و..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AMENITIES -->
+                <div id="amenitiesSection" class="form-section">
+                    <div class="section-title">امکانات</div>
+                    <div class="amenities-grid">
+                        <label><input type="checkbox" value="parking" class="amenity"> پارکینگ</label>
+                        <label><input type="checkbox" value="elevator" class="amenity"> آسانسور</label>
+                        <label><input type="checkbox" value="storage" class="amenity"> انباری</label>
+                        <label><input type="checkbox" value="balcony" class="amenity"> بالکن</label>
+                        <label><input type="checkbox" value="terrace" class="amenity"> تراس</label>
+                        <label><input type="checkbox" value="yard" class="amenity"> حیاط</label>
+                        <label><input type="checkbox" value="pool" class="amenity"> استخر</label>
+                        <label><input type="checkbox" value="jacuzzi" class="amenity"> جکوزی</label>
+                        <label><input type="checkbox" value="roof" class="amenity"> روف</label>
+                        <label><input type="checkbox" value="lobby" class="amenity"> لابی</label>
+                        <label><input type="checkbox" value="guard" class="amenity"> نگهبان</label>
+                        <label><input type="checkbox" value="package" class="amenity"> پکیج</label>
+                        <label><input type="checkbox" value="cooler" class="amenity"> کولر</label>
+                        <label><input type="checkbox" value="floor-heating" class="amenity"> گرمایش از کف</label>
+                        <label><input type="checkbox" value="cabinet" class="amenity"> کابینت</label>
+                        <label><input type="checkbox" value="closet" class="amenity"> کمد</label>
+                    </div>
+                </div>
+
+                <!-- NOTES (all types) -->
+                <div class="form-section">
+                    <div class="section-title">توضیحات</div>
+                    <div class="form-grid">
+                        <div class="field field-full">
+                            <label for="notes">توضیحات کلی</label>
+                            <textarea id="notes" rows="4" placeholder="هر توضیح دستی که لازم است اینجا بنویسید..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STATUS -->
+                <div class="form-section">
+                    <div class="section-title">وضعیت فایل</div>
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="fileStatus">وضعیت</label>
+                            <select id="fileStatus">
+                                <option value="active">فعال</option>
+                                <option value="followup">نیاز به پیگیری</option>
+                                <option value="pending">در انتظار</option>
+                                <option value="archived">بایگانی</option>
+                                <option value="done">انجام شده</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="followUpDays">پیگیری بعد از چند روز؟</label>
+                            <input id="followUpDays" type="number" min="1" value="10">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="modal-actions">
+                    <button id="cancelFormButton" type="button" class="ghost-button">انصراف</button>
+                    <button id="shareFileButton" type="button" class="secondary-button">اشتراک‌گذاری</button>
+                    <button id="deleteFileButton" type="button" class="danger-button hidden">حذف فایل</button>
+                    <button id="saveFileButton" type="submit" class="primary-button">ذخیره</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- =========================
+         DETAIL MODAL
+    ========================== -->
+    <div id="detailModal" class="modal hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-card large-modal">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-eyebrow">جزئیات فایل</div>
+                    <h2 id="detailTitle">فایل</h2>
+                </div>
+                <button id="closeDetailButton" class="close-button" type="button">×</button>
+            </div>
+            <div id="detailBody" class="detail-body"></div>
+            <div class="modal-actions detail-actions">
+                <button id="detailCopyPhoneButton" type="button" class="ghost-button">کپی تلفن</button>
+                <button id="detailCopyAddressButton" type="button" class="ghost-button">کپی آدرس</button>
+                <button id="detailWhatsAppButton" type="button" class="secondary-button">واتساپ</button>
+                <button id="detailShareCopyButton" type="button" class="secondary-button">کپی متن</button>
+                <button id="detailDivarLinkButton" type="button" class="secondary-button hidden">مشاهده این فایل در دیوار</button>
+                <button id="detailEditButton" type="button" class="primary-button">ویرایش</button>
+                <button id="detailArchiveButton" type="button" class="danger-button">انتقال به سطل</button>
+                <button id="detailRestoreButton" type="button" class="primary-button hidden">بازگردانی</button>
+                <button id="detailPurgeButton" type="button" class="danger-button hidden">حذف دائمی</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================
+         DIVAR IMPORT MODAL
+    ========================== -->
+    <div id="divarImportModal" class="modal hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-eyebrow">وارد کردن از دیوار</div>
+                    <h2>لینک آگهی دیوار</h2>
+                </div>
+                <button id="closeDivarImportButton" class="close-button" type="button">×</button>
+            </div>
+            <div class="modal-body divar-import-body">
+                <div class="field">
+                    <label for="divarUrlInput">لینک آگهی</label>
+                    <input
+                        id="divarUrlInput"
+                        type="url"
+                        dir="ltr"
+                        placeholder="https://divar.ir/v/..."
+                        autocomplete="off"
+                    >
+                    <small class="field-help">
+                        فقط آگهی‌های خانه اجاره‌ای و فروشی پشتیبانی می‌شوند.
+                        نام و شماره طرف از دیوار دریافت نمی‌شود و باید بعداً تکمیل شود.
+                    </small>
+                </div>
+                <div class="field">
+                    <label>نوع فایل (اختیاری — در صورت تشخیص خودکار خالی بگذارید)</label>
+                    <div class="radio-row">
+                        <label class="radio-chip">
+                            <input type="radio" name="divarTypeHint" value="auto" checked>
+                            <span>تشخیص خودکار</span>
+                        </label>
+                        <label class="radio-chip">
+                            <input type="radio" name="divarTypeHint" value="landlord">
+                            <span>اجاره (مالک)</span>
+                        </label>
+                        <label class="radio-chip">
+                            <input type="radio" name="divarTypeHint" value="sale">
+                            <span>فروشی</span>
+                        </label>
+                    </div>
+                </div>
+                <div id="divarImportError" class="login-error hidden"></div>
+            </div>
+            <div class="modal-actions">
+                <button id="cancelDivarImportButton" type="button" class="ghost-button">انصراف</button>
+                <button id="confirmDivarImportButton" type="button" class="primary-button">دریافت و ذخیره</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="toast hidden"></div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
