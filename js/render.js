@@ -8,7 +8,8 @@ import {
   normalize,
   escapeHtml,
   formatDate,
-  formatMoney
+  formatMoney,
+  formatFileCode
 } from "./helpers.js";
 import {
   TYPE_LABELS,
@@ -342,6 +343,13 @@ export function renderFileCard(file) {
           <div class="card-title">${escapeHtml(name)}</div>
         </div>
         <div class="card-top-badges">
+          ${
+            Number(file.code) > 0
+              ? `<div class="file-code-badge" title="کد فایل">${escapeHtml(
+                  formatFileCode(file.code)
+                )}</div>`
+              : ""
+          }
           ${hasFollowUp ? `<div class="followup-badge">پیگیری</div>` : ""}
           ${isInTrash(file) ? `<div class="trash-badge">حذف‌شده</div>` : ""}
           ${tagBadges}
