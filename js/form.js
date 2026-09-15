@@ -6,6 +6,7 @@ import { state } from "./state.js";
 import {
   $,
   generateFileId,
+  generateFileCode,
   validatePhoneNumber,
   showToast,
   shareFileText,
@@ -355,8 +356,15 @@ export async function saveFile() {
     }
   }
 
+  // کد عددی فایل — روی ویرایش حفظ، برای فایل جدید خودکار
+  const fileCode =
+    existingFile && Number(existingFile.code) > 0
+      ? Math.floor(Number(existingFile.code))
+      : generateFileCode(state.files);
+
   let fileData = {
     id: editingId || generateFileId(),
+    code: fileCode,
     type: fileType,
     status,
     followUpDate,
