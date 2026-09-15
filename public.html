@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b0d0f">
+    <meta name="description" content="فایل‌های املاک DOT — مشاهده عمومی بدون اطلاعات تماس">
+    <title>فایل‌های املاک | DOT</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+      .public-page {
+        min-height: 100vh;
+        padding-bottom: 40px;
+      }
+      .public-hero {
+        padding: 28px 20px 18px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(11, 13, 15, 0.96);
+      }
+      .public-hero-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+      .public-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+      .public-brand .brand-mark {
+        width: 42px;
+        height: 42px;
+      }
+      .public-title {
+        font-size: 22px;
+        font-weight: 800;
+        margin: 0 0 6px;
+      }
+      .public-subtitle {
+        color: var(--text-muted);
+        font-size: 13px;
+        line-height: 1.7;
+        margin: 0;
+      }
+      .public-privacy-banner {
+        margin-top: 14px;
+        padding: 10px 14px;
+        border-radius: 12px;
+        background: rgba(85, 184, 120, 0.1);
+        border: 1px solid rgba(85, 184, 120, 0.25);
+        color: #8fd4a8;
+        font-size: 12px;
+        line-height: 1.7;
+      }
+      .public-toolbar {
+        max-width: 1100px;
+        margin: 18px auto 0;
+        padding: 0 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .public-meta-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        color: var(--text-muted);
+        font-size: 12px;
+      }
+      .public-privacy-note {
+        font-size: 10px;
+        color: var(--text-muted);
+      }
+      .public-card {
+        cursor: default;
+      }
+      .public-card:hover {
+        transform: none;
+      }
+      #publicFiles {
+        max-width: 1100px;
+        margin: 16px auto;
+        padding: 0 16px 24px;
+      }
+      #publicEmpty {
+        max-width: 480px;
+        margin: 40px auto;
+        text-align: center;
+        color: var(--text-muted);
+      }
+      .public-agent-link {
+        display: inline-block;
+        margin-top: 10px;
+        font-size: 12px;
+        color: var(--text-soft);
+      }
+    </style>
+</head>
+<body>
+    <div class="public-page">
+        <header class="public-hero">
+            <div class="public-hero-inner">
+                <div class="public-brand">
+                    <div class="brand-mark">DOT</div>
+                    <div>
+                        <div class="brand-name">املاک DOT</div>
+                        <div class="brand-subtitle">نمایش عمومی فایل‌ها</div>
+                    </div>
+                </div>
+                <h1 class="public-title">فایل‌های ملکی</h1>
+                <p class="public-subtitle">
+                    فقط مشخصات ملک نمایش داده می‌شود. نام مالک، شماره تماس و هر شماره داخل توضیحات پنهان است.
+                </p>
+                <div class="public-privacy-banner">
+                    این صفحه برای عموم است — برای ثبت و مدیریت فایل وارد پنل مشاور شوید.
+                </div>
+            </div>
+        </header>
+
+        <div class="public-toolbar">
+            <div class="search-box md-search">
+                <span class="search-icon">⌕</span>
+                <input id="publicSearch" type="search" placeholder="جست‌وجو: منطقه، متراژ، نوع ملک..." autocomplete="off">
+            </div>
+            <div id="publicFilters" class="filters md-chip-row"></div>
+            <div class="public-meta-row">
+                <span id="publicCount">—</span>
+                <span id="publicStatus">…</span>
+            </div>
+        </div>
+
+        <div id="publicFiles" class="files-grid"></div>
+
+        <div id="publicEmpty" class="hidden">
+            <div class="empty-icon">⌂</div>
+            <h2>فایلی برای نمایش نیست</h2>
+            <p>هنوز فایل عمومی منتشر نشده یا با این فیلتر نتیجه‌ای نیست.</p>
+            <a class="public-agent-link" href="index.html">ورود مشاوران</a>
+        </div>
+    </div>
+
+    <script type="module" src="js/public-app.js"></script>
+</body>
+</html>
