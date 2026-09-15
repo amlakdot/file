@@ -193,26 +193,10 @@ function updateActiveFiltersBadge() {
 }
 
 function setupTopBar() {
-  $("newFileButton")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    openNewFile();
-  });
-
+  // فایل جدید فقط از FAB و empty state
   $("fabNewFile")?.addEventListener("click", (e) => {
     e.preventDefault();
     openNewFile();
-  });
-
-  $("menuNewFile")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    closeMoreMenu();
-    openNewFile();
-  });
-
-  $("menuImportDivar")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    closeMoreMenu();
-    $("importDivarButton")?.click();
   });
 
   $("logoutButton")?.addEventListener("click", (e) => {
@@ -233,10 +217,6 @@ function setupTopBar() {
     e.preventDefault();
     goFollowUp();
   });
-  $("followUpButtonMobile")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    goFollowUp();
-  });
 
   $("emptyNewFileButton")?.addEventListener("click", (e) => {
     e.preventDefault();
@@ -245,15 +225,16 @@ function setupTopBar() {
 
   $("manualSyncButton")?.addEventListener("click", async (e) => {
     e.preventDefault();
-    closeMoreMenu();
-    await manualSync();
+    const btn = e.currentTarget;
+    btn?.classList.add("spinning");
+    try {
+      await manualSync();
+    } finally {
+      setTimeout(() => btn?.classList.remove("spinning"), 600);
+    }
   });
 
   $("moreMenuButton")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    openMoreMenu();
-  });
-  $("moreMenuButtonMobile")?.addEventListener("click", (e) => {
     e.preventDefault();
     openMoreMenu();
   });
