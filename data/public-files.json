@@ -1,10 +1,9 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-15T19:50:26.051Z",
+  "updatedAt": "2026-09-16T05:06:20.748Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
-      "code": 1001,
       "type": "sale",
       "status": "active",
       "title": "آپارتمان · 72 متر · 2 خواب · شهرک طلاییه",
@@ -35,15 +34,14 @@
         ],
         "totalFloors": 0,
         "salePrice": 3400000000,
-        "notes": "شماره مدیر ساختمان فرقانی زنگ 13",
+        "notes": "شماره مدیر ساختمان فرقانی\n[شماره حذف‌شده]\nزنگ 13",
         "code": 1001
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:19:12.396Z"
     },
     {
       "id": "file-1789110854619-959-ghh7r1g82",
-      "code": 1002,
       "type": "sale",
       "status": "active",
       "title": "آپارتمان · 60 متر · خ مریم",
@@ -75,12 +73,11 @@
         "salePrice": 4000000000,
         "code": 1002
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:19:46.498Z"
     },
     {
       "id": "file-1789111016987-246-7vorruxao",
-      "code": 1003,
       "type": "sale",
       "status": "active",
       "title": "ویلا / خانه · 72 متر · سیاهبند",
@@ -112,12 +109,11 @@
         "code": 1003,
         "yearBuilt": 1360
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:12:56.278Z"
     },
     {
       "id": "file-1789111547882-404-iu3a05til",
-      "code": 1004,
       "type": "landlord",
       "status": "active",
       "title": "آپارتمان · 53 متر · ترکیده 3",
@@ -148,12 +144,11 @@
         ],
         "code": 1004
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T07:25:47.882Z"
     },
     {
       "id": "file-1789114972321-480-3iuki51h5",
-      "code": 1005,
       "type": "sale",
       "status": "active",
       "title": "آپارتمان · 90 متر · 2 خواب",
@@ -176,7 +171,7 @@
         "tenantRent": 0,
         "familyStatus": "single",
         "familySize": 0,
-        "notes": "تک برگ - شماره روبیکا",
+        "notes": "تک برگ  - [شماره حذف‌شده] شماره روبیکا",
         "amenities": [
           "elevator",
           "storage",
@@ -186,12 +181,11 @@
         "code": 1005,
         "yearBuilt": 3
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:22:52.321Z"
     },
     {
       "id": "file-1789115225448-80-yj91czt31",
-      "code": 1006,
       "type": "buyer",
       "status": "active",
       "title": "آپارتمان · بومهن میخواد و پردیس فاز هشت اگر بشه",
@@ -218,12 +212,11 @@
         "amenities": [],
         "code": 1006
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:27:05.448Z"
     },
     {
       "id": "file-1789115339718-25-g6b1uazba",
-      "code": 1007,
       "type": "buyer",
       "status": "active",
       "title": "آپارتمان",
@@ -250,12 +243,11 @@
         "amenities": [],
         "code": 1007
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:28:59.718Z"
     },
     {
       "id": "file-1789115370978-29-6ykhdedrh",
-      "code": 1008,
       "type": "buyer",
       "status": "active",
       "title": "آپارتمان",
@@ -281,12 +273,11 @@
         "amenities": [],
         "code": 1008
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:29:30.978Z"
     },
     {
       "id": "file-1789115399615-622-93z93xto5",
-      "code": 1009,
       "type": "buyer",
       "status": "active",
       "title": "آپارتمان",
@@ -312,12 +303,11 @@
         "amenities": [],
         "code": 1009
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:29:59.615Z"
     },
     {
       "id": "file-1789115441388-806-wkn0fhdq5",
-      "code": 1010,
       "type": "buyer",
       "status": "active",
       "title": "آپارتمان",
@@ -343,12 +333,11 @@
         "amenities": [],
         "code": 1010
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:30:41.388Z"
     },
     {
       "id": "file-1789115526035-284-nh666qcs2",
-      "code": 1011,
       "type": "buyer",
       "status": "active",
       "title": "آپارتمان",
@@ -375,12 +364,11 @@
         "amenities": [],
         "code": 1011
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:32:06.035Z"
     },
     {
       "id": "file-1789115573096-933-r5woxjeop",
-      "code": 1012,
       "type": "buyer",
       "status": "active",
       "title": "آپارتمان",
@@ -406,12 +394,11 @@
         "amenities": [],
         "code": 1012
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:32:53.096Z"
     },
     {
       "id": "file-1789115641695-963-owfw9ip0z",
-      "code": 1013,
       "type": "buyer",
       "status": "active",
       "title": "آپارتمان",
@@ -430,7 +417,7 @@
         "suggestedDeposit": 0,
         "suggestedRent": 0,
         "capital": 2000000000,
-        "buyerNotes": "شماره دوم",
+        "buyerNotes": "شماره دوم\n[شماره حذف‌شده]",
         "tenantDeposit": 0,
         "tenantRent": 0,
         "familyStatus": "single",
@@ -438,12 +425,11 @@
         "amenities": [],
         "code": 1013
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:34:01.695Z"
     },
     {
       "id": "file-1789115680261-817-lbkh99ia4",
-      "code": 1014,
       "type": "buyer",
       "status": "active",
       "title": "آپارتمان",
@@ -469,12 +455,11 @@
         "amenities": [],
         "code": 1014
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:34:40.261Z"
     },
     {
       "id": "file-1789115766809-972-orxd1i2mc",
-      "code": 1015,
       "type": "buyer",
       "status": "active",
       "title": "آپارتمان",
@@ -501,12 +486,11 @@
         "amenities": [],
         "code": 1015
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:36:06.809Z"
     },
     {
       "id": "file-1789115834028-599-q2m3feeob",
-      "code": 1016,
       "type": "buyer",
       "status": "active",
       "title": "آپارتمان · سمت حاج منصور",
@@ -534,12 +518,11 @@
         "amenities": [],
         "code": 1016
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:37:14.028Z"
     },
     {
       "id": "file-1789116014519-227-ir7fxcbeo",
-      "code": 1017,
       "type": "tenant",
       "status": "active",
       "title": "آپارتمان",
@@ -566,12 +549,11 @@
         "amenities": [],
         "code": 1017
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:40:14.519Z"
     },
     {
       "id": "file-1789116085828-765-f6q1nxetk",
-      "code": 1018,
       "type": "tenant",
       "status": "active",
       "title": "آپارتمان",
@@ -598,12 +580,11 @@
         "amenities": [],
         "code": 1018
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:41:25.828Z"
     },
     {
       "id": "file-1789116161385-118-qe8ozv37i",
-      "code": 1019,
       "type": "tenant",
       "status": "active",
       "title": "آپارتمان",
@@ -630,12 +611,11 @@
         "amenities": [],
         "code": 1019
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:42:41.385Z"
     },
     {
       "id": "file-1789116219523-718-d4uruxsqc",
-      "code": 1020,
       "type": "tenant",
       "status": "active",
       "title": "آپارتمان",
@@ -662,12 +642,11 @@
         "amenities": [],
         "code": 1020
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:43:39.523Z"
     },
     {
       "id": "file-1789116282712-362-h269i1xe8",
-      "code": 1021,
       "type": "tenant",
       "status": "active",
       "title": "آپارتمان",
@@ -694,12 +673,11 @@
         "amenities": [],
         "code": 1021
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:44:42.712Z"
     },
     {
       "id": "file-1789116436694-195-6hekswgda",
-      "code": 1022,
       "type": "tenant",
       "status": "active",
       "title": "آپارتمان",
@@ -726,12 +704,11 @@
         "amenities": [],
         "code": 1022
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:47:16.694Z"
     },
     {
       "id": "file-1789116491562-759-4gryc67kq",
-      "code": 1023,
       "type": "tenant",
       "status": "active",
       "title": "آپارتمان",
@@ -758,12 +735,11 @@
         "amenities": [],
         "code": 1023
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:48:11.562Z"
     },
     {
       "id": "file-1789116651512-353-rnbnsjqkx",
-      "code": 1024,
       "type": "tenant",
       "status": "active",
       "title": "آپارتمان · به سمت شهر و حاج منصور",
@@ -790,12 +766,11 @@
         "amenities": [],
         "code": 1024
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:50:51.512Z"
     },
     {
       "id": "file-1789116701629-433-3397gt71l",
-      "code": 1025,
       "type": "tenant",
       "status": "active",
       "title": "آپارتمان",
@@ -821,12 +796,11 @@
         "amenities": [],
         "code": 1025
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:51:41.629Z"
     },
     {
       "id": "file-1789116811837-606-ofyiz8ohf",
-      "code": 1026,
       "type": "tenant",
       "status": "active",
       "title": "آپارتمان",
@@ -849,16 +823,15 @@
         "tenantRent": 15000000,
         "familyStatus": "single",
         "familySize": 0,
-        "tenantNotes": "شماره دو سه نفر مجرد",
+        "tenantNotes": "شماره دو [شماره حذف‌شده]   سه نفر مجرد",
         "amenities": [],
         "code": 1026
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:53:31.837Z"
     },
     {
       "id": "file-1789116915673-536-a052ag4ap",
-      "code": 1027,
       "type": "tenant",
       "status": "active",
       "title": "آپارتمان",
@@ -884,12 +857,11 @@
         "amenities": [],
         "code": 1027
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:55:15.673Z"
     },
     {
       "id": "file-1789117011617-576-y4tudhehk",
-      "code": 1028,
       "type": "tenant",
       "status": "active",
       "title": "آپارتمان",
@@ -915,12 +887,11 @@
         "amenities": [],
         "code": 1028
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:56:51.617Z"
     },
     {
       "id": "file-1789117086117-216-yo5bhfoqu",
-      "code": 1029,
       "type": "tenant",
       "status": "active",
       "title": "آپارتمان",
@@ -948,12 +919,11 @@
         "amenities": [],
         "code": 1029
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:58:06.117Z"
     },
     {
       "id": "file-1789117156059-83-nraths4b9",
-      "code": 1030,
       "type": "tenant",
       "status": "active",
       "title": "آپارتمان",
@@ -980,12 +950,11 @@
         "amenities": [],
         "code": 1030
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T08:59:16.059Z"
     },
     {
       "id": "file-1789117242329-186-s2wk8875e",
-      "code": 1031,
       "type": "tenant",
       "status": "active",
       "title": "آپارتمان",
@@ -1012,12 +981,11 @@
         "amenities": [],
         "code": 1031
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T09:00:42.329Z"
     },
     {
       "id": "file-1789117401682-110-84mxltgqd",
-      "code": 1032,
       "type": "tenant",
       "status": "active",
       "title": "آپارتمان",
@@ -1043,12 +1011,11 @@
         "amenities": [],
         "code": 1032
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T09:03:21.682Z"
     },
     {
       "id": "file-1789117507834-586-mvznxao08",
-      "code": 1033,
       "type": "tenant",
       "status": "active",
       "title": "آپارتمان",
@@ -1075,12 +1042,11 @@
         "amenities": [],
         "code": 1033
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T09:05:07.834Z"
     },
     {
       "id": "file-1789138967935-874-7hze1s9pd",
-      "code": 1034,
       "type": "tenant",
       "status": "active",
       "title": "آپارتمان",
@@ -1106,12 +1072,11 @@
         "amenities": [],
         "code": 1034
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-11T15:02:47.935Z"
     },
     {
       "id": "file-1789227071546-143-khla4ddl5",
-      "code": 1035,
       "type": "buyer",
       "status": "active",
       "title": "آپارتمان",
@@ -1138,12 +1103,11 @@
         "amenities": [],
         "code": 1035
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-12T15:39:10.168Z"
     },
     {
       "id": "file-1789285598126-453-37gfjbwvy",
-      "code": 1036,
       "type": "buyer",
       "status": "active",
       "title": "آپارتمان",
@@ -1162,7 +1126,7 @@
         "suggestedDeposit": 0,
         "suggestedRent": 0,
         "capital": 4000000000,
-        "buyerNotes": "کم واحد\nآسانسور دار دو طبقه به بالا متراژ مهم نیست اگر خوب باشه",
+        "buyerNotes": "کم واحد\nآسانسور دار دو طبقه به بالا \n\n\nمتراژ مهم نیست اگر خوب باشه",
         "tenantDeposit": 0,
         "tenantRent": 0,
         "familyStatus": "single",
@@ -1170,12 +1134,11 @@
         "amenities": [],
         "code": 1036
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-13T07:48:42.271Z"
     },
     {
       "id": "file-1789289807623-328-ecgm4e8xj",
-      "code": 1037,
       "type": "tenant",
       "status": "active",
       "title": "آپارتمان",
@@ -1202,12 +1165,11 @@
         "amenities": [],
         "code": 1037
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-13T08:56:47.623Z"
     },
     {
       "id": "file-1789307387234-515-ggc2fmz7z",
-      "code": 1038,
       "type": "tenant",
       "status": "active",
       "title": "آپارتمان",
@@ -1234,12 +1196,11 @@
         "amenities": [],
         "code": 1038
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-13T13:49:47.234Z"
     },
     {
       "id": "file-1789476487610-888-49uumrvcv",
-      "code": 1042,
       "type": "sale",
       "status": "active",
       "title": "آپارتمان",
@@ -1265,12 +1226,11 @@
         "amenities": [],
         "code": 1042
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-15T12:48:07.610Z"
     },
     {
       "id": "file-1789488358447-906-2wfgrmscv",
-      "code": 1043,
       "type": "sale",
       "status": "active",
       "title": "آپارتمان · 100 متر · زرین",
@@ -1295,12 +1255,12 @@
         "tenantRent": 0,
         "familyStatus": "single",
         "familySize": 0,
-        "notes": "دو طبقه 150 بنا هر طبقه 75\nدو نبش زرین\nبیست سال قولنامه کد رهگیری",
+        "notes": "دو طبقه 150 بنا هر طبقه 75\nدو نبش زرین\nبیست سال \nقولنامه کد رهگیری",
         "amenities": [],
         "code": 1043,
         "yearBuilt": 1360
       },
-      "source": "panel",
+      "source": "manual",
       "updatedAt": "2026-09-15T16:09:05.820Z"
     }
   ]
