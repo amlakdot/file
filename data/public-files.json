@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-17T13:37:12.432Z",
+  "updatedAt": "2026-09-17T13:38:18.242Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1405,6 +1405,38 @@
       },
       "source": "panel",
       "updatedAt": "2026-09-16T17:16:36.895Z"
+    },
+    {
+      "id": "file-1789652295614-84bf1673ead7cb26c08fe0c4",
+      "code": 1047,
+      "type": "tenant",
+      "status": "active",
+      "title": "آپارتمان",
+      "data": {
+        "code": 1047,
+        "propertyType": "apartment",
+        "area": 0,
+        "rooms": 0,
+        "year": 0,
+        "totalFloors": 0,
+        "keyHolder": "owner",
+        "condition": "new",
+        "occupancy": "empty",
+        "salePrice": 0,
+        "currentDeposit": 0,
+        "currentRent": 0,
+        "suggestedDeposit": 0,
+        "suggestedRent": 0,
+        "capital": 0,
+        "tenantDeposit": 250000000,
+        "tenantRent": 10000000,
+        "familyStatus": "single",
+        "familySize": 0,
+        "tenantNotes": "پارکینگ دارد",
+        "amenities": []
+      },
+      "source": "panel",
+      "updatedAt": "2026-09-17T13:38:15.614Z"
     }
   ]
 }
