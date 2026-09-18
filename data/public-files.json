@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-18T16:34:38.400Z",
+  "updatedAt": "2026-09-18T16:34:54.064Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1500,6 +1500,57 @@
       },
       "source": "panel",
       "updatedAt": "2026-09-18T14:09:05.591Z"
+    },
+    {
+      "id": "file-1789749290507-a82593723747a0043d891c01",
+      "code": 1056,
+      "type": "landlord",
+      "status": "active",
+      "title": "آپارتمان · 70 متر · 2 خواب · بومهن",
+      "data": {
+        "code": 1056,
+        "propertyType": "apartment",
+        "area": 70,
+        "rooms": 2,
+        "year": 1392,
+        "location": "بومهن، خ فرهنگ",
+        "unitFloor": "2",
+        "totalFloors": 0,
+        "salePrice": 0,
+        "currentDeposit": 0,
+        "currentRent": 0,
+        "suggestedDeposit": 150000000,
+        "suggestedRent": 7000000,
+        "capital": 0,
+        "tenantDeposit": 0,
+        "tenantRent": 0,
+        "familySize": 0,
+        "notes": "عنوان دیوار: اجاره واحد 70متری خوش نقشه 70متر 2خواب با آسانسور و انباری بدون پارکینگ جای پارک دم درب ساختمان زیاد آپارتمانی ساکت و تمیز",
+        "amenities": [
+          "elevator",
+          "storage"
+        ],
+        "divarDescription": "70متر 2خواب با آسانسور و انباری بدون پارکینگ جای پارک دم درب ساختمان زیاد آپارتمانی ساکت و تمیز",
+        "divarImages": [
+          "https://mapimage.divarcdn.com/v8/mapimage?encrypted_data=MTIzNDU2Nzg5MTIzXIMHjPCJzKzuQj6ZJ0mUNfpLAKl7Sc3HBYtulrDEMHdYDA=="
+        ],
+        "divarAttributes": {
+          "متراژ": "۷۰",
+          "ساخت": "۱۳۹۲",
+          "اتاق": "۲",
+          "تصویر‌ها برای همین ملک است؟": "بله",
+          "ودیعه": "‏۱۵۰,۰۰۰,۰۰۰ تومان",
+          "اجارهٔ ماهانه": "‏۷,۰۰۰,۰۰۰ تومان",
+          "ودیعه و اجاره": "غیر قابل تبدیل",
+          "طبقه": "۲",
+          "آسانسور": true,
+          "پارکینگ ندارد": false,
+          "انباری": true
+        },
+        "yearBuilt": 1392
+      },
+      "source": "divar",
+      "updatedAt": "2026-09-18T16:34:50.507Z"
     }
   ]
 }
