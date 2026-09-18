@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-18T16:58:56.898Z",
+  "updatedAt": "2026-09-18T16:59:16.528Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1551,6 +1551,69 @@
       },
       "source": "divar",
       "updatedAt": "2026-09-18T16:42:21.897Z"
+    },
+    {
+      "id": "file-1789750754839-532a2b0e702539d059420e04",
+      "code": 1059,
+      "type": "landlord",
+      "status": "active",
+      "title": "آپارتمان · 60 متر · 1 خواب · بومهن",
+      "data": {
+        "code": 1059,
+        "propertyType": "apartment",
+        "area": 60,
+        "rooms": 1,
+        "year": 1396,
+        "location": "بومهن، خ بیات",
+        "unitFloor": "4",
+        "totalFloors": 4,
+        "salePrice": 0,
+        "currentDeposit": 0,
+        "currentRent": 0,
+        "suggestedDeposit": 300000000,
+        "suggestedRent": 9000000,
+        "capital": 0,
+        "tenantDeposit": 0,
+        "tenantRent": 0,
+        "familySize": 0,
+        "notes": "عنوان دیوار: اجاره آپارتمان60متری ،انتهای بیات یک واحد آپارتمان جهت رهن و اجاره تمیز و مرتب کف سرامیک ؛ چهار طبقه دو واحدی؛ طبقه آخر بدون مشرف با آسانسور؛ جای پارک جلو ساختمان زیر دوربین هست؛ یکی از واحد ها هم پارکینگ اگه خواستید اجاره میده؛ دارای گاز رومیزی، هود و پکیج، املاکی محترم لطفا تماس نگیرید ، آگهی شخصی میباشد.",
+        "amenities": [
+          "elevator",
+          "storage"
+        ],
+        "divarDescription": "یک واحد آپارتمان جهت رهن و اجاره \nتمیز و مرتب کف سرامیک ؛ چهار طبقه دو واحدی؛ طبقه آخر بدون مشرف با آسانسور؛ جای پارک جلو ساختمان زیر دوربین هست؛ یکی از واحد ها هم پارکینگ اگه خواستید اجاره میده؛ دارای گاز رومیزی، هود و پکیج، املاکی  محترم لطفا تماس نگیرید ، آگهی شخصی میباشد.",
+        "divarImages": [
+          "https://s100.divarcdn.com/static/videos/thumbnails/thumbnail/6fc491a5-ef89-4fff-b3ba-08d0bc3b6efd.jpg",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/3QyEabsFAjdyYHOy5xLGBw/4231b6c1-ebf8-4443-a8d6-4b30245b1ece.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/mrt_yz3mG1fL__l8VWO4JA/34ec59d6-4f55-4fd6-964e-a36f901de8fa.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/YciqST-OoiHiotwwAiCeEg/ca24d858-89eb-4a64-a193-6d654f7de326.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/iL2E1w3Qv2gdIL3eXzW6Hg/41a1dc94-05fd-4775-a13b-9147d90324db.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/RMoy9FGjARl7dRS8UkX3Yw/e16a5714-b426-44e9-a735-6375b11b539e.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/frn1Epibro_JJROV3Zfarg/d49b93f0-948e-4a9d-ac23-c37ef4685e74.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/DevFK_WEvIyddotYbbbs3A/dd132e4d-2110-49c4-8b18-bff85b27a6af.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/SKhLzeUaCwRHqrybAnN1cw/48ba8d6f-5505-4bf4-aaff-ec8677a8d936.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/GjxceZYIOZdaMccXVePffg/1f3dcc4d-971c-4cc1-9738-7e17b5f0e237.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/Fo0xOmC5tRzTGYd7ltUqeA/5e215d7e-39f9-4dd1-a97c-81fba708b839.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/qyBmGKhSD0zQgVHl1ixwYA/11b69764-ab76-4fcb-bc5a-28281f56b796.webp",
+          "https://mapimage.divarcdn.com/v8/mapimage?encrypted_data=MTIzNDU2Nzg5MTIzXDpfKeLSy6zuQi1x7_J2NfpL1MXj_oyZwfb1DeIjSc5yzQ=="
+        ],
+        "divarAttributes": {
+          "متراژ": "۶۰",
+          "ساخت": "۱۳۹۶",
+          "اتاق": "۱",
+          "تصویر‌ها برای همین ملک است؟": "بله",
+          "ودیعه": "‏۳۰۰,۰۰۰,۰۰۰ تومان",
+          "اجارهٔ ماهانه": "‏۹,۰۰۰,۰۰۰ تومان",
+          "ودیعه و اجاره": "غیر قابل تبدیل",
+          "طبقه": "۴ از ۴",
+          "آسانسور": true,
+          "پارکینگ ندارد": false,
+          "انباری": true
+        },
+        "yearBuilt": 1396
+      },
+      "source": "divar",
+      "updatedAt": "2026-09-18T16:59:14.838Z"
     }
   ]
 }
