@@ -24,17 +24,28 @@ const TAG_NEEDS_REVIEW_GENERAL = "needs-review";
    ========================================================= */
 
 /**
+ * پاک‌سازی متن کپی‌شده از موبایل (کاراکتر نامرئی، فاصلهٔ اضافه)
+ */
+function cleanPastedUrl(url) {
+  return String(url || "")
+    .replace(/[\u200B-\u200D\uFEFF\u00A0]/g, "") // zero-width / nbsp
+    .replace(/\s+/g, "")
+    .trim();
+}
+
+/**
  * استخراج توکن آگهی از لینک دیوار
  *
  * پشتیبانی:
  * https://divar.ir/v/slug-name/TOKEN
  * https://divar.ir/v/TOKEN
+ * https://divar.ir/v/TOKEN?ref=android
  * TOKEN
  */
 export function extractDivarToken(url) {
   if (!url) return null;
 
-  let s = String(url).trim();
+  let s = cleanPastedUrl(url);
 
   // فقط token
   if (/^[A-Za-z0-9_-]{5,40}$/.test(s)) {
@@ -47,6 +58,7 @@ export function extractDivarToken(url) {
   }
 
   try {
+    // query و hash را قبل از parse حذف نکن — URL API خودش pathname می‌دهد
     const u = new URL(s);
 
     if (!u.hostname.toLowerCase().endsWith("divar.ir")) {
@@ -84,6 +96,7 @@ export function extractDivarToken(url) {
       /v/slug/TOKEN
       /v/عنوان-فارسی/TOKEN
       آخرین بخش بعد از /v/ را token در نظر می‌گیریم.
+      ?ref=android و بقیه query نادیده گرفته می‌شوند.
     */
     const token = decodeURIComponent(
       afterV[afterV.length - 1]
@@ -95,9 +108,9 @@ export function extractDivarToken(url) {
 
     return token;
   } catch {
-    // آخرین شانس: پیدا کردن الگوی token در متن
+    // آخرین شانس: پیدا کردن الگوی token در متن (با یا بدون ?ref=)
     const m = String(url).match(
-      /(?:\/v\/(?:[^/\s]+\/)?)([A-Za-z0-9_-]{5,40})(?:[/?#]|$)/
+      /(?:\/v\/(?:[^/\s?#]+\/)?)([A-Za-z0-9_-]{5,40})(?:[/?#]|$)/
     );
     return m ? m[1] : null;
   }
@@ -107,6 +120,17 @@ export function extractDivarToken(url) {
 export function buildDivarUrl(token) {
   if (!token) return "";
   return `https://divar.ir/v/${encodeURIComponent(token)}`;
+}
+
+/**
+ * لینک دیوار را به فرم تمیز استاندارد تبدیل می‌کند:
+ * https://divar.ir/v/TOKEN
+ * (بدون ?ref=android و پارامترهای اضافه)
+ */
+export function normalizeDivarUrl(url) {
+  const token = extractDivarToken(url);
+  if (!token) return "";
+  return buildDivarUrl(token);
 }
 
 
@@ -1397,8 +1421,193 @@ export function mapDivarPostToFile(
 */
 
 /**
+ * ساختار HTML دیوار (sections آبجکت + widgetType/dto)
+ * را به ساختار API (sections آرایه + widget_type/data) تبدیل می‌کند.
+ */
+function normalizeDivarPostShape(raw) {
+  if (!raw || typeof raw !== "object") return raw;
+
+  const out = { ...raw };
+
+  // seo camelCase → snake برای parser فعلی
+  if (out.seo && typeof out.seo === "object") {
+    const seo = { ...out.seo };
+    if (seo.webInfo && !seo.web_info) {
+      const wi = seo.webInfo;
+      seo.web_info = {
+        title: wi.title,
+        city_persian: wi.city_persian,
+        district_persian: wi.district_persian,
+        category_slug_persian: wi.category_slug_persian
+      };
+    }
+    out.seo = seo;
+  }
+
+  // city object
+  if (out.city && typeof out.city === "object" && out.city.name) {
+    out.city_name = out.city_name || out.city.name;
+  }
+
+  const sections = out.sections;
+  if (Array.isArray(sections)) {
+    return out;
+  }
+
+  if (sections && typeof sections === "object") {
+    const list = [];
+    for (const [sectionName, widgets] of Object.entries(sections)) {
+      const widgetList = Array.isArray(widgets) ? widgets : [];
+      list.push({
+        section_name: sectionName,
+        widgets: widgetList.map((w) => {
+          if (!w || typeof w !== "object") return w;
+          // فرم HTML نرمال‌شده
+          if (w.dto && typeof w.dto === "object") {
+            return {
+              widget_type:
+                w.dto.widget_type ||
+                w.widgetType ||
+                w.widget_type ||
+                "",
+              data:
+                w.dto.data && typeof w.dto.data === "object"
+                  ? w.dto.data
+                  : w.dto
+            };
+          }
+          // فرم API
+          return {
+            widget_type: w.widget_type || w.widgetType || "",
+            data: w.data || {}
+          };
+        })
+      });
+    }
+    out.sections = list;
+  }
+
+  return out;
+}
+
+/**
+ * استخراج آبجکت آگهی از HTML صفحهٔ دیوار
+ * (window.__PRELOADED_STATE__.currentPost.post)
+ */
+function extractPostFromDivarHtml(html) {
+  if (!html || typeof html !== "string") return null;
+
+  const marker = "window.__PRELOADED_STATE__";
+  const idx = html.indexOf(marker);
+  if (idx === -1) return null;
+
+  const eq = html.indexOf("=", idx + marker.length);
+  if (eq === -1) return null;
+
+  let i = eq + 1;
+  while (i < html.length && /\s/.test(html[i])) i += 1;
+  if (html[i] !== "{") return null;
+
+  let depth = 0;
+  let end = -1;
+  for (let j = i; j < html.length; j += 1) {
+    const ch = html[j];
+    if (ch === "{") depth += 1;
+    else if (ch === "}") {
+      depth -= 1;
+      if (depth === 0) {
+        end = j;
+        break;
+      }
+    }
+  }
+  if (end < 0) return null;
+
+  let state;
+  try {
+    state = JSON.parse(html.slice(i, end + 1));
+  } catch {
+    return null;
+  }
+
+  const post = state?.currentPost?.post;
+  if (post && typeof post === "object") {
+    if (post.sections || post.webengage || post.share || post.seo) {
+      return normalizeDivarPostShape(post);
+    }
+  }
+
+  function findPost(obj, depthLeft = 6) {
+    if (!obj || typeof obj !== "object" || depthLeft < 0) return null;
+    const hasSections =
+      (Array.isArray(obj.sections) && obj.sections.length) ||
+      (obj.sections &&
+        typeof obj.sections === "object" &&
+        Object.keys(obj.sections).length);
+    if (hasSections && (obj.share || obj.webengage || obj.seo)) {
+      return normalizeDivarPostShape(obj);
+    }
+    if (Array.isArray(obj)) {
+      for (const item of obj) {
+        const found = findPost(item, depthLeft - 1);
+        if (found) return found;
+      }
+      return null;
+    }
+    for (const value of Object.values(obj)) {
+      const found = findPost(value, depthLeft - 1);
+      if (found) return found;
+    }
+    return null;
+  }
+
+  return findPost(state);
+}
+
+function isValidDivarPost(data) {
+  return !!(
+    data &&
+    typeof data === "object" &&
+    (data.sections || data.webengage || data.seo || data.share)
+  );
+}
+
+function unwrapDivarPayload(data) {
+  if (!data || typeof data !== "object") return null;
+
+  if (data.error && !data.sections && !data.webengage) {
+    return null;
+  }
+
+  if (
+    data.data &&
+    typeof data.data === "object" &&
+    !Array.isArray(data.data) &&
+    !(data.sections || data.webengage || data.seo)
+  ) {
+    return isValidDivarPost(data.data) ? data.data : null;
+  }
+
+  return isValidDivarPost(data) ? data : null;
+}
+
+async function proxyFetchText(proxyBase, targetUrl, accept) {
+  const url = `${proxyBase}/?url=${encodeURIComponent(targetUrl)}`;
+  const res = await fetch(url, {
+    method: "GET",
+    headers: {
+      Accept: accept || "*/*"
+    },
+    mode: "cors",
+    cache: "no-store"
+  });
+  return res;
+}
+
+/**
  * دریافت از Cloudflare Worker (CONFIG.divarProxy)
- * Worker باید ?url= را به api.divar.ir پروکسی کند.
+ * 1) API JSON دیوار
+ * 2) fallback: HTML صفحه آگهی و __PRELOADED_STATE__
  */
 async function fetchDivarPostFromBackend(token) {
   const proxyBase = String(CONFIG.divarProxy || "")
@@ -1406,52 +1615,37 @@ async function fetchDivarPostFromBackend(token) {
     .replace(/\/$/, "");
 
   if (!proxyBase) {
-    throw new Error(
-      "PROXY_NOT_CONFIGURED"
-    );
+    throw new Error("PROXY_NOT_CONFIGURED");
   }
 
-  // مسیرهای رایج API دیوار — اولی معمولاً پاسخ کامل می‌دهد
   const apiCandidates = [
     `https://api.divar.ir/v8/posts-v2/web/${encodeURIComponent(token)}`,
     `https://api.divar.ir/v8/posts-v2/${encodeURIComponent(token)}`
   ];
 
   let lastErr = null;
+  let sawNotFound = false;
 
   for (const apiUrl of apiCandidates) {
-    const url = `${proxyBase}/?url=${encodeURIComponent(apiUrl)}`;
-
     try {
-      const res = await fetch(url, {
-        method: "GET",
-        headers: {
-          Accept: "application/json"
-        },
-        mode: "cors",
-        cache: "no-store"
-      });
+      const res = await proxyFetchText(
+        proxyBase,
+        apiUrl,
+        "application/json"
+      );
 
       if (res.status === 404) {
-        const err = new Error("NOT_FOUND");
-        err.notFound = true;
-        lastErr = err;
+        sawNotFound = true;
+        lastErr = new Error("NOT_FOUND");
+        lastErr.notFound = true;
         continue;
       }
-
-      if (res.status === 401) {
-        throw new Error("BACKEND_UNAUTHORIZED");
-      }
-
+      if (res.status === 401) throw new Error("BACKEND_UNAUTHORIZED");
+      if (res.status === 429) throw new Error("RATE_LIMIT");
       if (res.status === 403) {
         lastErr = new Error("BACKEND_FORBIDDEN");
         continue;
       }
-
-      if (res.status === 429) {
-        throw new Error("RATE_LIMIT");
-      }
-
       if (!res.ok) {
         lastErr = new Error(`BACKEND_HTTP_${res.status}`);
         continue;
@@ -1466,48 +1660,48 @@ async function fetchDivarPostFromBackend(token) {
         continue;
       }
 
-      if (!data || typeof data !== "object") {
-        lastErr = new Error("EMPTY_RESPONSE");
-        continue;
-      }
-
-      // اگر پروکسی فقط error برگرداند
-      if (data.error && !data.sections && !data.webengage) {
-        lastErr = new Error(String(data.error));
-        continue;
-      }
-
-      // پاسخ مستقیم دیوار یا { data: ... }
-      if (
-        data.data &&
-        typeof data.data === "object" &&
-        !Array.isArray(data.data) &&
-        !(data.sections || data.webengage || data.seo)
-      ) {
-        return data.data;
-      }
-
-      // حداقل sections یا webengage برای آگهی معتبر
-      if (data.sections || data.webengage || data.seo || data.share) {
-        return data;
-      }
+      const post = unwrapDivarPayload(data);
+      if (post) return normalizeDivarPostShape(post);
 
       lastErr = new Error("UNRECOGNIZED_RESPONSE");
     } catch (e) {
+      if (e?.message === "BACKEND_UNAUTHORIZED" || e?.message === "RATE_LIMIT") {
+        throw e;
+      }
       if (e?.notFound) {
+        sawNotFound = true;
         lastErr = e;
         continue;
-      }
-      if (
-        e?.message === "BACKEND_UNAUTHORIZED" ||
-        e?.message === "RATE_LIMIT"
-      ) {
-        throw e;
       }
       lastErr = e;
     }
   }
 
+  // Fallback: صفحه HTML آگهی
+  try {
+    const pageUrl = `https://divar.ir/v/${encodeURIComponent(token)}`;
+    const res = await proxyFetchText(proxyBase, pageUrl, "text/html");
+
+    if (res.status === 404) {
+      const err = new Error("NOT_FOUND");
+      err.notFound = true;
+      throw err;
+    }
+
+    if (res.ok) {
+      const html = await res.text();
+      const post = extractPostFromDivarHtml(html);
+      if (post) return post;
+      lastErr = new Error("HTML_PARSE_FAILED");
+    } else {
+      lastErr = new Error(`HTML_HTTP_${res.status}`);
+    }
+  } catch (e) {
+    if (e?.notFound) throw e;
+    lastErr = e;
+  }
+
+  if (sawNotFound && lastErr?.notFound) throw lastErr;
   if (lastErr?.notFound) throw lastErr;
   if (lastErr) throw lastErr;
   throw new Error("BACKEND_HTTP_0");
@@ -1608,13 +1802,21 @@ export async function fetchDivarPost(
           "تعداد درخواست‌ها زیاد است. کمی بعد دوباره تلاش کنید.";
         break;
 
+      case "INVALID_JSON":
+      case "UNRECOGNIZED_RESPONSE":
+      case "HTML_PARSE_FAILED":
+      case "EMPTY_RESPONSE":
+        error =
+          "پاسخ دیوار قابل‌خواندن نبود. اتصال یا پروکسی را بررسی کنید.";
+        break;
+
       default:
 
         if (
           err?.message
         ) {
           error =
-            `${error} ${err.message}`;
+            `${error} (${err.message})`;
         }
     }
 
@@ -2007,11 +2209,12 @@ export async function importFromDivarUrl(
   typeHint = null
 ) {
 
-  const token =
-    extractDivarToken(url);
+  // لینک موبایل مثل ?ref=android را به فرم تمیز تبدیل کن
+  const token = extractDivarToken(url);
+  const cleanUrl = normalizeDivarUrl(url);
 
 
-  if (!token) {
+  if (!token || !cleanUrl) {
 
     throw new Error(
       "لینک دیوار معتبر نیست.\n\n" +
@@ -2063,7 +2266,7 @@ export async function importFromDivarUrl(
       mapDivarPostToFile(
         result.data,
         token,
-        String(url).trim()
+        cleanUrl
       );
 
 
@@ -2127,7 +2330,7 @@ export async function importFromDivarUrl(
     file =
       createStubDivarFile(
         token,
-        String(url).trim(),
+        cleanUrl,
         typeHint || "landlord"
       );
 
@@ -2153,7 +2356,7 @@ export async function importFromDivarUrl(
     file =
       createStubDivarFile(
         token,
-        String(url).trim(),
+        cleanUrl,
         typeHint || "landlord"
       );
 
