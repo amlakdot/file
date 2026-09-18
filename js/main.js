@@ -97,7 +97,7 @@ function setupDivarImport() {
 
   $("confirmDivarImportButton")?.addEventListener("click", async (e) => {
     e.preventDefault();
-    const url = ($("divarUrlInput")?.value || "").trim();
+    let url = ($("divarUrlInput")?.value || "").trim();
     const errEl = $("divarImportError");
     const btn = $("confirmDivarImportButton");
 
@@ -114,13 +114,17 @@ function setupDivarImport() {
       return;
     }
 
-    if (!extractDivarToken(url)) {
+    // لینک موبایل (?ref=android و …) را به فرم تمیز تبدیل کن
+    const token = extractDivarToken(url);
+    if (!token) {
       if (errEl) {
         errEl.textContent = "لینک دیوار معتبر نیست.";
         errEl.classList.remove("hidden");
       }
       return;
     }
+    url = buildDivarUrl(token);
+    if ($("divarUrlInput")) $("divarUrlInput").value = url;
 
     const hint =
       document.querySelector('input[name="divarTypeHint"]:checked')?.value ||
