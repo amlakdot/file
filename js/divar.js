@@ -1591,17 +1591,24 @@ function unwrapDivarPayload(data) {
   return isValidDivarPost(data) ? data : null;
 }
 
-async function proxyFetchText(proxyBase, targetUrl, accept) {
+async function proxyFetchText(proxyBase, targetUrl, accept, timeoutMs = 10000) {
   const url = `${proxyBase}/?url=${encodeURIComponent(targetUrl)}`;
-  const res = await fetch(url, {
-    method: "GET",
-    headers: {
-      Accept: accept || "*/*"
-    },
-    mode: "cors",
-    cache: "no-store"
-  });
-  return res;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        Accept: accept || "*/*"
+      },
+      mode: "cors",
+      cache: "no-store",
+      signal: controller.signal
+    });
+    return res;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 /**
@@ -1618,9 +1625,9 @@ async function fetchDivarPostFromBackend(token) {
     throw new Error("PROXY_NOT_CONFIGURED");
   }
 
+  // فقط یک endpoint اصلی — سریع‌تر از تست چند مسیر پشت‌سرهم
   const apiCandidates = [
-    `https://api.divar.ir/v8/posts-v2/web/${encodeURIComponent(token)}`,
-    `https://api.divar.ir/v8/posts-v2/${encodeURIComponent(token)}`
+    `https://api.divar.ir/v8/posts-v2/web/${encodeURIComponent(token)}`
   ];
 
   let lastErr = null;
@@ -1631,7 +1638,8 @@ async function fetchDivarPostFromBackend(token) {
       const res = await proxyFetchText(
         proxyBase,
         apiUrl,
-        "application/json"
+        "application/json",
+        9000
       );
 
       if (res.status === 404) {
@@ -1677,10 +1685,10 @@ async function fetchDivarPostFromBackend(token) {
     }
   }
 
-  // Fallback: صفحه HTML آگهی
+  // Fallback: صفحه HTML آگهی (برای موبایل وقتی API کند/قطع است)
   try {
     const pageUrl = `https://divar.ir/v/${encodeURIComponent(token)}`;
-    const res = await proxyFetchText(proxyBase, pageUrl, "text/html");
+    const res = await proxyFetchText(proxyBase, pageUrl, "text/html", 12000);
 
     if (res.status === 404) {
       const err = new Error("NOT_FOUND");
