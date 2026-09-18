@@ -10,8 +10,19 @@ import { renderHome } from "./render.js";
 import { decryptAllFiles, encryptAllFiles } from "./crypto.js";
 import { buildPublicDatabase } from "./public-data.js";
 
+function bytesToBase64(bytes) {
+  const arr = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  let binary = "";
+  const chunk = 0x8000;
+  for (let i = 0; i < arr.length; i += chunk) {
+    const slice = arr.subarray(i, Math.min(i + chunk, arr.length));
+    binary += String.fromCharCode.apply(null, slice);
+  }
+  return btoa(binary);
+}
+
 export async function githubRequest(url, options = {}) {
-  const TIMEOUT = 15000;
+  const TIMEOUT = options.timeoutMs || 12000;
 
   if (!state.token) {
     throw new Error("توکن GitHub وارد نشده است.");
@@ -190,28 +201,27 @@ export async function loadFiles(options = {}) {
     const purged = purgeExpiredTrash();
     const followChanged = updateFollowUpStatuses();
 
-    // اگر وضعیت پیگیری، کد فایل یا پاکسازی سطل عوض شد، روی GitHub هم ذخیره کن
+    // اول UI را نشان بده — ذخیرهٔ پس‌زمینه سرعت ورود را کم نکند
+    renderHome();
+    state.lastPollAt = Date.now();
+    setSyncStatus("success", "همگام با GitHub", new Date());
+
     if (
       (purged || followChanged || codeResult.changed) &&
       !state.isSaving &&
       !options.skipPersist
     ) {
-      try {
-        const msg = codeResult.changed
-          ? "Assign numeric file codes"
-          : purged
-            ? "Purge expired trash / update follow-ups"
-            : "Auto-update follow-up statuses";
-        await saveDatabase(state.files, msg);
-      } catch (persistErr) {
+      const msg = codeResult.changed
+        ? "Assign numeric file codes"
+        : purged
+          ? "Purge expired trash / update follow-ups"
+          : "Auto-update follow-up statuses";
+      // غیرمسدود — در پس‌زمینه
+      saveDatabase(state.files, msg).catch((persistErr) => {
         console.warn("persist follow-up/purge/codes failed:", persistErr);
-      }
+      });
     }
 
-    renderHome();
-    state.lastPollAt = Date.now();
-
-    setSyncStatus("success", "همگام با GitHub", new Date());
     return true;
   } catch (error) {
     console.error(error);
@@ -296,27 +306,27 @@ export async function saveDatabase(newFiles, commitMessage) {
   try {
     setSyncStatus("saving", "در حال ذخیره در GitHub...");
 
-    const latest = await getFilesFromGitHub();
-    const database = latest.database;
+    // رمزنگاری موازی با گرفتن sha — اگر sha محلی داریم یک round-trip کم می‌شود
+    const encryptPromise = encryptAllFiles(newFiles);
 
-    database.version = 1;
-    database.updatedAt = new Date().toISOString();
-    // قبل از ذخیره در GitHub، شماره تلفن‌ها را رمزنگاری کن
-    // state.files همچنان نسخه رمزگشایی‌شده را نگه می‌دارد
-    database.files = await encryptAllFiles(newFiles);
-
-    const content = JSON.stringify(database, null, 2);
-    const bytes = new TextEncoder().encode(content);
-    // تبدیل امن به base64 بدون spread روی آرایه بزرگ (باگ ذخیره)
-    let binary = "";
-    const chunkSize = 0x2000;
-    for (let i = 0; i < bytes.length; i += chunkSize) {
-      const end = Math.min(i + chunkSize, bytes.length);
-      for (let j = i; j < end; j++) {
-        binary += String.fromCharCode(bytes[j]);
-      }
+    let sha = state.lastSyncSha || null;
+    if (!sha) {
+      const latest = await getFilesFromGitHub();
+      sha = latest.sha;
     }
-    const base64 = btoa(binary);
+
+    const encryptedFiles = await encryptPromise;
+
+    const database = {
+      version: 1,
+      updatedAt: new Date().toISOString(),
+      files: encryptedFiles
+    };
+
+    // بدون indent برای حجم و سرعت بیشتر
+    const content = JSON.stringify(database);
+    const bytes = new TextEncoder().encode(content);
+    const base64 = bytesToBase64(bytes);
 
     const url =
       `${CONFIG.githubApi}/repos/` +
@@ -324,27 +334,46 @@ export async function saveDatabase(newFiles, commitMessage) {
       `${encodeURIComponent(CONFIG.repo)}/contents/` +
       CONFIG.dataPath;
 
-    const result = await githubRequest(url, {
-      method: "PUT",
-      headers: { "Content-Type": "application/vnd.github+json" },
-      body: JSON.stringify({
-        message: commitMessage || "Update real estate files",
-        content: base64,
-        sha: latest.sha,
-        branch: CONFIG.branch
-      })
-    });
+    let result;
+    try {
+      result = await githubRequest(url, {
+        method: "PUT",
+        headers: { "Content-Type": "application/vnd.github+json" },
+        body: JSON.stringify({
+          message: commitMessage || "Update real estate files",
+          content: base64,
+          sha,
+          branch: CONFIG.branch
+        })
+      });
+    } catch (err) {
+      // conflict: دوباره sha بگیر و یک‌بار retry
+      const msg = String(err?.message || "");
+      if (msg.includes("هم‌زمان") || msg.includes("409") || /conflict/i.test(msg)) {
+        const latest = await getFilesFromGitHub();
+        result = await githubRequest(url, {
+          method: "PUT",
+          headers: { "Content-Type": "application/vnd.github+json" },
+          body: JSON.stringify({
+            message: commitMessage || "Update real estate files",
+            content: base64,
+            sha: latest.sha,
+            branch: CONFIG.branch
+          })
+        });
+      } else {
+        throw err;
+      }
+    }
 
     state.files = newFiles;
-    state.lastSyncSha = result?.content?.sha || latest.sha;
+    state.lastSyncSha = result?.content?.sha || sha;
     state.lastLocalChangeAt = Date.now();
 
-    // نسخه عمومی بدون نام و تلفن
-    try {
-      await savePublicDatabase(newFiles);
-    } catch (pubErr) {
+    // نسخه عمومی در پس‌زمینه — UI را معطل نکند
+    savePublicDatabase(newFiles).catch((pubErr) => {
       console.warn("save public files failed:", pubErr);
-    }
+    });
 
     updateFollowUpStatuses();
     renderHome();
