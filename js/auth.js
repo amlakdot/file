@@ -7,7 +7,7 @@ import { state } from "./state.js";
 import { $, setLoginError } from "./helpers.js";
 import { verifyToken, loadFiles } from "./github.js";
 import { closeFileModal, closeDetailModal } from "./modal.js";
-import { clearCryptoCache } from "./crypto.js";
+import { clearCryptoCache, warmCryptoKey } from "./crypto.js";
 
 /** کلید ذخیره نشست در localStorage */
 const SESSION_KEY = "dot_auth_session_v1";
@@ -62,7 +62,9 @@ export async function loginWithToken(token, { persist = true } = {}) {
   if (!token) throw new Error("لطفاً GitHub Token را وارد کنید.");
 
   state.token = token;
-  await verifyToken();
+
+  // موازی: تأیید توکن + پیش‌گرم کلید رمزنگاری
+  await Promise.all([verifyToken(), warmCryptoKey(token)]);
 
   const loaded = await loadFiles();
   if (!loaded) {
@@ -79,14 +81,11 @@ export async function loginWithToken(token, { persist = true } = {}) {
   showApp();
   startPolling();
 
-  // یک‌بار بعد از ورود: اگر فایل هست، نسخه عمومی را هم بساز
-  try {
-    const { publishPublicFiles } = await import("./github.js");
-    if (Array.isArray(state.files) && state.files.length) {
-      publishPublicFiles().catch((e) => console.warn("auto public publish:", e));
-    }
-  } catch (e) {
-    console.warn("auto public publish skipped:", e);
+  // انتشار عمومی فقط در پس‌زمینه — ورود را معطل نکند
+  if (Array.isArray(state.files) && state.files.length) {
+    import("./github.js")
+      .then(({ publishPublicFiles }) => publishPublicFiles())
+      .catch((e) => console.warn("auto public publish:", e));
   }
 }
 
