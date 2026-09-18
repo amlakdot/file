@@ -34,11 +34,16 @@ const TAG_NEEDS_REVIEW_GENERAL = "needs-review";
 export function extractDivarToken(url) {
   if (!url) return null;
 
-  const s = String(url).trim();
+  let s = String(url).trim();
 
   // فقط token
   if (/^[A-Za-z0-9_-]{5,40}$/.test(s)) {
     return s;
+  }
+
+  // بدون پروتکل: divar.ir/v/...
+  if (!/^https?:\/\//i.test(s) && /divar\.ir/i.test(s)) {
+    s = "https://" + s.replace(/^\/+/, "");
   }
 
   try {
@@ -53,10 +58,17 @@ export function extractDivarToken(url) {
       .filter(Boolean);
 
     const vIndex = parts.findIndex(
-      part => part.toLowerCase() === "v"
+      (part) => part.toLowerCase() === "v"
     );
 
     if (vIndex === -1) {
+      // گاهی token فقط در query است
+      const qToken =
+        u.searchParams.get("token") ||
+        u.searchParams.get("post_token");
+      if (qToken && /^[A-Za-z0-9_-]{5,40}$/.test(qToken)) {
+        return qToken;
+      }
       return null;
     }
 
@@ -68,15 +80,14 @@ export function extractDivarToken(url) {
 
     /*
       دیوار ممکن است:
-
       /v/TOKEN
       /v/slug/TOKEN
-
-      داشته باشد.
-
+      /v/عنوان-فارسی/TOKEN
       آخرین بخش بعد از /v/ را token در نظر می‌گیریم.
     */
-    const token = afterV[afterV.length - 1];
+    const token = decodeURIComponent(
+      afterV[afterV.length - 1]
+    ).trim();
 
     if (!/^[A-Za-z0-9_-]{5,40}$/.test(token)) {
       return null;
@@ -84,7 +95,11 @@ export function extractDivarToken(url) {
 
     return token;
   } catch {
-    return null;
+    // آخرین شانس: پیدا کردن الگوی token در متن
+    const m = String(url).match(
+      /(?:\/v\/(?:[^/\s]+\/)?)([A-Za-z0-9_-]{5,40})(?:[/?#]|$)/
+    );
+    return m ? m[1] : null;
   }
 }
 
@@ -457,12 +472,17 @@ function extractImages(raw) {
     if (typeof value === "string") {
       url = value;
     } else if (typeof value === "object") {
+      // ساختار رایج IMAGE_CAROUSEL: { image: { url } }
+      const nested = getObject(value.image);
       url = firstString(
         value.url,
         value.image_url,
         value.src,
         value.original,
-        value.original_url
+        value.original_url,
+        nested.url,
+        nested.image_url,
+        nested.src
       );
     }
 
@@ -729,6 +749,9 @@ function parseDivarResponse(raw) {
       ) {
 
         if (
+          (wt === "LEGEND_TITLE_ROW" ||
+            wt === "TITLE_ROW" ||
+            d.title) &&
           d.title &&
           !result.title
         ) {
@@ -903,49 +926,33 @@ function parseDivarResponse(raw) {
           }
 
 
-          /* ودیعه */
+          /* ودیعه / رهن — نه ردیف ترکیبی «ودیعه و اجاره» */
+          const isComboDepositRent =
+            title.includes("ودیعه") &&
+            title.includes("اجاره");
 
           if (
-            title.includes("ودیعه") ||
-            title.includes("رهن")
+            !isComboDepositRent &&
+            (title.includes("ودیعه") ||
+              title.includes("رهن"))
           ) {
-
-            const money =
-              parseMoneyValue(
-                value
-              );
-
+            const money = parseMoneyValue(value);
             if (money > 0) {
-              result.credit =
-                money;
+              result.credit = money;
             }
           }
 
-
-          /* اجاره */
-
+          /* اجاره ماهانه */
           if (
+            !isComboDepositRent &&
             title.includes("اجاره")
           ) {
-
-            if (
-              /رایگان/.test(
-                String(value)
-              )
-            ) {
-
+            if (/رایگان/.test(String(value))) {
               result.rent = 0;
-
             } else {
-
-              const money =
-                parseMoneyValue(
-                  value
-                );
-
+              const money = parseMoneyValue(value);
               if (money > 0) {
-                result.rent =
-                  money;
+                result.rent = money;
               }
             }
           }
@@ -1110,6 +1117,39 @@ function parseDivarResponse(raw) {
     }
   }
 
+
+  /* =======================================================
+     FALLBACK از webengage (عددهای خام API)
+     ======================================================= */
+
+  const we = getObject(raw?.webengage);
+
+  if (!result.credit && we.credit != null) {
+    result.credit = parseMoneyValue(we.credit);
+  }
+  if (!result.rent && we.rent != null) {
+    result.rent = parseMoneyValue(we.rent);
+  }
+  if (!result.salePrice && we.price != null) {
+    const p = parseMoneyValue(we.price);
+    if (p > 0) result.salePrice = p;
+  }
+  if (!result.category && we.category) {
+    result.category = getString(we.category);
+  }
+  if (!result.district && we.district) {
+    result.district = getString(we.district);
+  }
+
+  // شهر فارسی از seo اولویت دارد روی slug انگلیسی webengage
+  if (!result.city || /^[a-z0-9-]+$/i.test(result.city)) {
+    const faCity = firstString(
+      webInfo?.city_persian,
+      cityObj?.name,
+      raw?.city_name
+    );
+    if (faCity) result.city = faCity;
+  }
 
   /* =======================================================
      IMAGES
@@ -1371,53 +1411,106 @@ async function fetchDivarPostFromBackend(token) {
     );
   }
 
-  const apiUrl = `https://api.divar.ir/v8/posts-v2/web/${encodeURIComponent(token)}`;
-  const url = `${proxyBase}/?url=${encodeURIComponent(apiUrl)}`;
+  // مسیرهای رایج API دیوار — اولی معمولاً پاسخ کامل می‌دهد
+  const apiCandidates = [
+    `https://api.divar.ir/v8/posts-v2/web/${encodeURIComponent(token)}`,
+    `https://api.divar.ir/v8/posts-v2/${encodeURIComponent(token)}`
+  ];
 
-  const res = await fetch(url, {
-    method: "GET",
-    headers: {
-      Accept: "application/json"
-    },
-    mode: "cors"
-  });
+  let lastErr = null;
 
-  if (res.status === 404) {
-    const err = new Error("NOT_FOUND");
-    err.notFound = true;
-    throw err;
+  for (const apiUrl of apiCandidates) {
+    const url = `${proxyBase}/?url=${encodeURIComponent(apiUrl)}`;
+
+    try {
+      const res = await fetch(url, {
+        method: "GET",
+        headers: {
+          Accept: "application/json"
+        },
+        mode: "cors",
+        cache: "no-store"
+      });
+
+      if (res.status === 404) {
+        const err = new Error("NOT_FOUND");
+        err.notFound = true;
+        lastErr = err;
+        continue;
+      }
+
+      if (res.status === 401) {
+        throw new Error("BACKEND_UNAUTHORIZED");
+      }
+
+      if (res.status === 403) {
+        lastErr = new Error("BACKEND_FORBIDDEN");
+        continue;
+      }
+
+      if (res.status === 429) {
+        throw new Error("RATE_LIMIT");
+      }
+
+      if (!res.ok) {
+        lastErr = new Error(`BACKEND_HTTP_${res.status}`);
+        continue;
+      }
+
+      const text = await res.text();
+      let data = null;
+      try {
+        data = text ? JSON.parse(text) : null;
+      } catch {
+        lastErr = new Error("INVALID_JSON");
+        continue;
+      }
+
+      if (!data || typeof data !== "object") {
+        lastErr = new Error("EMPTY_RESPONSE");
+        continue;
+      }
+
+      // اگر پروکسی فقط error برگرداند
+      if (data.error && !data.sections && !data.webengage) {
+        lastErr = new Error(String(data.error));
+        continue;
+      }
+
+      // پاسخ مستقیم دیوار یا { data: ... }
+      if (
+        data.data &&
+        typeof data.data === "object" &&
+        !Array.isArray(data.data) &&
+        !(data.sections || data.webengage || data.seo)
+      ) {
+        return data.data;
+      }
+
+      // حداقل sections یا webengage برای آگهی معتبر
+      if (data.sections || data.webengage || data.seo || data.share) {
+        return data;
+      }
+
+      lastErr = new Error("UNRECOGNIZED_RESPONSE");
+    } catch (e) {
+      if (e?.notFound) {
+        lastErr = e;
+        continue;
+      }
+      if (
+        e?.message === "BACKEND_UNAUTHORIZED" ||
+        e?.message === "RATE_LIMIT"
+      ) {
+        throw e;
+      }
+      lastErr = e;
+    }
   }
 
-  if (res.status === 401) {
-    throw new Error("BACKEND_UNAUTHORIZED");
-  }
-
-  if (res.status === 403) {
-    throw new Error("BACKEND_FORBIDDEN");
-  }
-
-  if (res.status === 429) {
-    throw new Error("RATE_LIMIT");
-  }
-
-  if (!res.ok) {
-    throw new Error(`BACKEND_HTTP_${res.status}`);
-  }
-
-  const data = await res.json();
-
-  // پاسخ مستقیم دیوار یا { data: ... }
-  if (
-    data &&
-    data.data &&
-    typeof data.data === "object" &&
-    !Array.isArray(data.data) &&
-    !(data.sections || data.webengage || data.seo)
-  ) {
-    return data.data;
-  }
-
-  return data;
+  if (lastErr?.notFound) throw lastErr;
+  if (lastErr) throw lastErr;
+  throw new Error("BACKEND_HTTP_0");
 }
 
 
