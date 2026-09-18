@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-18T16:44:26.063Z",
+  "updatedAt": "2026-09-18T16:44:46.672Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1551,60 +1551,6 @@
       },
       "source": "divar",
       "updatedAt": "2026-09-18T16:42:21.897Z"
-    },
-    {
-      "id": "file-1789749863524-82316efc862bfdd0e73754c3",
-      "code": 1057,
-      "type": "landlord",
-      "status": "active",
-      "title": "آپارتمان · 72 متر · 1 خواب · بومهن",
-      "data": {
-        "code": 1057,
-        "propertyType": "apartment",
-        "area": 72,
-        "rooms": 1,
-        "year": 1396,
-        "location": "بومهن، خ شهرآباد",
-        "unitFloor": "2",
-        "totalFloors": 0,
-        "salePrice": 0,
-        "currentDeposit": 0,
-        "currentRent": 0,
-        "suggestedDeposit": 400000000,
-        "suggestedRent": 0,
-        "capital": 0,
-        "tenantDeposit": 0,
-        "tenantRent": 0,
-        "familySize": 0,
-        "notes": "عنوان دیوار: خانه در بومهن رهن کامل 400 تومان\n72 متر\nادرس : بومهن خیابان حاج منصور شهرآباد کوچه اصحابی",
-        "amenities": [],
-        "divarDescription": "رهن کامل ۴۰۰ تومان\n۷۲ متر\nادرس : بومهن خیابان حاج منصور شهرآباد کوچه اصحابی",
-        "divarImages": [
-          "https://s100.divarcdn.com/static/photo/neda/webp_post/xNGDSyynKpQuNK4v2AXPvA/e0dd69a6-8541-4cab-b26e-cfa458b58e19.webp",
-          "https://s100.divarcdn.com/static/photo/neda/webp_post/7d7pvSLq5GGjEjtBGshB6g/114a8912-2618-4836-a720-0c9e5d15aec5.webp",
-          "https://s100.divarcdn.com/static/photo/neda/webp_post/vxlaLBrKxnrL5zDcN2s4_g/70c365a8-eaaa-4fa9-9938-9775f6132dbe.webp",
-          "https://s100.divarcdn.com/static/photo/neda/webp_post/qqRy2QyQeoMEcS2DAK9tTw/fd054f35-4b03-4d6a-9bdd-d773e96ff2a3.webp",
-          "https://s100.divarcdn.com/static/photo/neda/webp_post/aBwgG0Q_IYiuvDPR_ujASg/6258e009-4136-4ef5-abef-f050c446b44d.webp",
-          "https://s100.divarcdn.com/static/photo/neda/webp_post/mV4Ay1u--eOVDghdI6AfYA/0dabd9e2-e5fd-45ff-927d-a076488a9dff.webp",
-          "https://mapimage.divarcdn.com/v8/mapimage?encrypted_data=MTIzNDU2Nzg5MTIzXO84gPAxy6zuQmkb6jyBNfpL5Eat21KdpMMiYc5tUypYPA=="
-        ],
-        "divarAttributes": {
-          "متراژ": "۷۲",
-          "ساخت": "۱۳۹۶",
-          "اتاق": "۱",
-          "تصویر‌ها برای همین ملک است؟": "بله",
-          "ودیعه": "‏۴۰۰,۰۰۰,۰۰۰ تومان",
-          "اجارهٔ ماهانه": "رایگان",
-          "ودیعه و اجاره": "غیر قابل تبدیل",
-          "طبقه": "۲",
-          "آسانسور ندارد": false,
-          "پارکینگ ندارد": false,
-          "انباری ندارد": false
-        },
-        "yearBuilt": 1396
-      },
-      "source": "divar",
-      "updatedAt": "2026-09-18T16:44:23.524Z"
     }
   ]
 }
