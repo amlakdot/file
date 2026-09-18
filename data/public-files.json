@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-18T14:01:43.165Z",
+  "updatedAt": "2026-09-18T14:02:49.373Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1468,6 +1468,36 @@
       },
       "source": "panel",
       "updatedAt": "2026-09-17T15:38:43.690Z"
+    },
+    {
+      "id": "file-1789740163023-6aa9e3ac0f3c890ae4cd09a7",
+      "code": 1051,
+      "type": "landlord",
+      "status": "active",
+      "title": "آپارتمان",
+      "data": {
+        "code": 1051,
+        "propertyType": "apartment",
+        "area": 0,
+        "rooms": 0,
+        "year": 0,
+        "totalFloors": 0,
+        "salePrice": 0,
+        "currentDeposit": 0,
+        "currentRent": 0,
+        "suggestedDeposit": 0,
+        "suggestedRent": 0,
+        "capital": 0,
+        "tenantDeposit": 0,
+        "tenantRent": 0,
+        "familySize": 0,
+        "notes": "لینک دیوار:\nhttps://divar.ir/v/gatyTuDp?ref=android",
+        "amenities": [],
+        "divarImages": [],
+        "divarAttributes": {}
+      },
+      "source": "divar",
+      "updatedAt": "2026-09-18T14:02:42.535Z"
     }
   ]
 }
