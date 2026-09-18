@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-18T16:26:59.207Z",
+  "updatedAt": "2026-09-18T16:27:41.199Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1468,40 +1468,6 @@
       },
       "source": "panel",
       "updatedAt": "2026-09-17T15:38:43.690Z"
-    },
-    {
-      "id": "file-1789740163023-6aa9e3ac0f3c890ae4cd09a7",
-      "code": 1051,
-      "type": "landlord",
-      "status": "active",
-      "title": "آپارتمان · 72 متر · 2 خواب",
-      "data": {
-        "code": 1051,
-        "propertyType": "apartment",
-        "area": 72,
-        "rooms": 2,
-        "year": 1392,
-        "unitFloor": "2",
-        "totalFloors": 0,
-        "salePrice": 0,
-        "currentDeposit": 0,
-        "currentRent": 0,
-        "suggestedDeposit": 15000000,
-        "suggestedRent": 7000000,
-        "capital": 0,
-        "tenantDeposit": 0,
-        "tenantRent": 0,
-        "familySize": 0,
-        "amenities": [
-          "elevator",
-          "storage"
-        ],
-        "divarImages": [],
-        "divarAttributes": {},
-        "yearBuilt": 1392
-      },
-      "source": "divar",
-      "updatedAt": "2026-09-18T14:36:29.379Z"
     },
     {
       "id": "file-1789740545588-67ddf0a4abe2451f7c5acd21",
