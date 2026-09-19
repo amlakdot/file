@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-19T14:05:15.027Z",
+  "updatedAt": "2026-09-19T14:07:30.834Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1578,6 +1578,60 @@
       },
       "source": "divar",
       "updatedAt": "2026-09-19T14:05:12.889Z"
+    },
+    {
+      "id": "file-1789826849346-b3416c4d925044ef2971bb6c",
+      "code": 1061,
+      "type": "landlord",
+      "status": "active",
+      "title": "ویلا / خانه · 90 متر · 1 خواب · بومهن",
+      "data": {
+        "code": 1061,
+        "propertyType": "villa",
+        "area": 90,
+        "rooms": 1,
+        "year": 1390,
+        "location": "بومهن، خ نیلوفر",
+        "totalFloors": 0,
+        "salePrice": 0,
+        "currentDeposit": 0,
+        "currentRent": 0,
+        "suggestedDeposit": 650000000,
+        "suggestedRent": 100000,
+        "capital": 0,
+        "tenantDeposit": 0,
+        "tenantRent": 0,
+        "familySize": 0,
+        "notes": "عنوان دیوار: خانه 90 متری دربست خانه مسکونی 90 متری دربست آب برق گاز جدا حیاط دار جای پارکینگ داخل کوچه 2 ماشین 1 اتاق انباری کولر",
+        "amenities": [
+          "storage"
+        ],
+        "divarDescription": "خانه مسکونی ۹۰ متری دربست \nآب برق گاز جدا \nحیاط دار \nجای پارکینگ داخل کوچه ۲ ماشین \n۱ اتاق \nانباری \nکولر",
+        "divarImages": [
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/pkTpacFaGcZNXmY53fbJgw/12b75e8a-7ab0-45e9-a20d-271de857968e.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/nf33uo5MPePItleigQlocw/c982b8bd-709b-4a5a-929f-6986170a746d.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/Z78eeWkUKNuMXpz-vmMllw/8633ea34-cbce-4000-9da4-74e0d999d15e.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/47-njNUcH7aaQ6EKBf7KIQ/05a104cd-6c8a-467a-8eb2-481d4c3a5fb4.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/Es61Z33etdgw_t4johniCg/ee52e0e4-b06a-45d7-92b5-5c3b1cec93f0.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/dbPs0hRvLACEFem2OJVY4A/8a9701c9-2ef3-4fb3-b28a-81bd13add7cf.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/pF8ui0gsTAixSL4YvF02QA/b76c2ddc-2c3d-42fe-ae90-255e50bb8f50.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/wiSvWWlo054sv1dElIHbIw/16e33d8d-c50b-42c9-bb2b-ea59860e5be8.webp",
+          "https://mapimage.divarcdn.com/v8/mapimage?encrypted_data=MTIzNDU2Nzg5MTIzXMtr-5z4y6zuQuYzu2fIK_pLxPo6SBfGyGUvQA_wp4-SaA==&is_nearby=true"
+        ],
+        "divarAttributes": {
+          "پارکینگ ندارد": false,
+          "انباری": true,
+          "بالکن ندارد": false,
+          "متراژ": "۹۰",
+          "ساخت": "۱۳۹۰",
+          "اتاق": "۱",
+          "تصویر‌ها برای همین ملک است؟": "بله",
+          "متراژ زمین": "۱۰۰ متر مربع"
+        },
+        "yearBuilt": 1390
+      },
+      "source": "divar",
+      "updatedAt": "2026-09-19T14:07:29.345Z"
     }
   ]
 }
