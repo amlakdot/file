@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-19T14:08:33.343Z",
+  "updatedAt": "2026-09-19T14:20:47.771Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -120,13 +120,13 @@
       "code": 1004,
       "type": "landlord",
       "status": "active",
-      "title": "آپارتمان · 53 متر · ترکیده 3",
+      "title": "آپارتمان · 53 متر · ارکیده 3",
       "data": {
         "propertyType": "apartment",
         "area": 53,
         "rooms": 0,
         "year": 0,
-        "location": "ترکیده 3",
+        "location": "ارکیده 3",
         "keyHolder": "owner",
         "condition": "new",
         "occupancy": "empty",
@@ -146,10 +146,12 @@
           "cooler",
           "cabinet"
         ],
-        "code": 1004
+        "code": 1004,
+        "totalFloors": 0,
+        "salePrice": 0
       },
       "source": "panel",
-      "updatedAt": "2026-09-11T07:25:47.882Z"
+      "updatedAt": "2026-09-19T14:20:45.913Z"
     },
     {
       "id": "file-1789114972321-480-3iuki51h5",
