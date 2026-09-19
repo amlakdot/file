@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-19T13:48:56.501Z",
+  "updatedAt": "2026-09-19T14:04:27.076Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1520,6 +1520,63 @@
       },
       "source": "divar",
       "updatedAt": "2026-09-18T16:42:21.897Z"
+    },
+    {
+      "id": "file-1789826665548-6badecc0a9908db5a03a0d27",
+      "code": 1060,
+      "type": "landlord",
+      "status": "active",
+      "title": "آپارتمان · 70 متر · 1 خواب · بومهن",
+      "data": {
+        "code": 1060,
+        "propertyType": "apartment",
+        "area": 70,
+        "rooms": 1,
+        "year": 1370,
+        "location": "بومهن، خ الوند",
+        "unitFloor": "ground",
+        "totalFloors": 0,
+        "salePrice": 0,
+        "currentDeposit": 0,
+        "currentRent": 0,
+        "suggestedDeposit": 300000000,
+        "suggestedRent": 3000000,
+        "capital": 0,
+        "tenantDeposit": 0,
+        "tenantRent": 0,
+        "familySize": 0,
+        "notes": "عنوان دیوار: اجاره خانه یک عدد واحد 70 متری تک خواب دو خواب شو به همراه پارکینگ حیاط و انباری و مخزن آب برق و تلفن جدا اب و گاز مشترک به اجاره میرود",
+        "amenities": [
+          "parking",
+          "storage"
+        ],
+        "divarDescription": "یک عدد واحد ۷۰ متری تک خواب دو خواب شو به همراه پارکینگ حیاط و انباری و مخزن آب برق و تلفن جدا اب و گاز مشترک به اجاره میرود",
+        "divarImages": [
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/e_qo8Y_b4XN-FHcne-s5XA/10a26741-5809-4517-ac83-46ad5dbdec98.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/VcEXhnvtBZZ1mKstoZsdRg/36eae8be-acf2-42ab-a8d3-033f8c18601f.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/aHMIr5PJsyXQhdNTR0vraQ/c2a8251f-a115-4c83-b13b-099c6e9de0e2.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/LpQOQiFu4ESg590TrjyY_w/bfe8ec2a-4813-4716-adaa-d012239de677.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/IUwkgbfjDm7PXO88CwwyvQ/ece52311-7300-4499-9c68-6544d8dc933a.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/Znn9iGeYDW46sodeafM-oA/4137d965-6567-48e6-b249-34eeb2c1d747.webp",
+          "https://mapimage.divarcdn.com/v8/mapimage?encrypted_data=MTIzNDU2Nzg5MTIzXGUx9JCty6zuQl3ooov-NfpLbrYSU_sQu5CEpp5K9jzeJw=="
+        ],
+        "divarAttributes": {
+          "متراژ": "۷۰",
+          "ساخت": "قبل از ۱۳۷۰",
+          "اتاق": "۱",
+          "تصویر‌ها برای همین ملک است؟": "بله",
+          "ودیعه": "‏۳۰۰,۰۰۰,۰۰۰ تومان",
+          "اجارهٔ ماهانه": "‏۳,۰۰۰,۰۰۰ تومان",
+          "ودیعه و اجاره": "غیر قابل تبدیل",
+          "طبقه": "همکف",
+          "آسانسور ندارد": false,
+          "پارکینگ": true,
+          "انباری": true
+        },
+        "yearBuilt": 1370
+      },
+      "source": "divar",
+      "updatedAt": "2026-09-19T14:04:25.547Z"
     }
   ]
 }
