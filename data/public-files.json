@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-20T10:55:28.939Z",
+  "updatedAt": "2026-09-20T10:55:39.031Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1507,6 +1507,60 @@
       },
       "source": "divar",
       "updatedAt": "2026-09-19T14:08:22.435Z"
+    },
+    {
+      "id": "file-1789901737708-9ea8f74bfe3d8d0104b29869",
+      "code": 1066,
+      "type": "landlord",
+      "status": "active",
+      "title": "آپارتمان · 80 متر · 2 خواب · بومهن",
+      "data": {
+        "code": 1066,
+        "propertyType": "apartment",
+        "area": 80,
+        "rooms": 2,
+        "year": 1399,
+        "location": "بومهن",
+        "unitFloor": "1",
+        "totalFloors": 0,
+        "salePrice": 0,
+        "currentDeposit": 0,
+        "currentRent": 0,
+        "suggestedDeposit": 800000000,
+        "suggestedRent": 9000000,
+        "capital": 0,
+        "tenantDeposit": 0,
+        "tenantRent": 0,
+        "familySize": 0,
+        "notes": "عنوان دیوار: واحد 80م دوخوابه ط اول سلام واحد 80متری دوخوابه طبقه اول با بالکن بالای مغازه کلیه امکانات\nآب وبرق وگاز\nبر خیابان حاج منصور\n200متر داخل خیابان دسترسی 1دقیقه ای\nبه کلیه مایحتاج عمومی و رفاهی\nدرصورت لزوم مبله باکلیه وسایل اولیه زندگی اجاره داده میشود\nتخلیه بدون لوازم هم داده میشود\nآماده تخلیه میباشد *********** ********** ******* *** چهار",
+        "amenities": [],
+        "divarDescription": "سلام \nواحد ۸۰متری دوخوابه \nطبقه اول  با   بالکن \nبالای مغازه  کلیه امکانات\nآب وبرق وگاز\nبر خیابان حاج منصور\n۲۰۰متر داخل خیابان دسترسی ۱دقیقه ای\nبه کلیه مایحتاج عمومی و رفاهی\nدرصورت لزوم مبله باکلیه وسایل \nاولیه زندگی اجاره داده میشود\nتخلیه بدون لوازم هم داده میشود\nآماده  تخلیه میباشد\n *********** ********** ******* *** چهار",
+        "divarImages": [
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/QYJHGIu9CGpBxiIKP2H78A/c57bf9b6-1ab6-4fbf-8b5e-b8007fc9c9c2.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/9eZmPHBJxx19cUEu66lxkw/ba8119a4-981c-4e4b-a001-54452d549a4f.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/pgC81-F8Jnvq5nsyr5OyYQ/efde4cc3-d7e4-44de-8a49-2db0db76b362.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/jv6HrvcndBHJnV7Y5jaBvA/21faa505-e3ca-41e6-8d5a-b34cd7cd7366.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/0DuNmr3OGWrWisFKg7U0Yg/bbf3b0d1-ac24-4620-85d9-25af2f238099.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/DH4n3bUWin5vQ8CdJT4VRA/fffe9dab-a775-4d59-b006-62259853d583.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/8HL3r3S7fteo41Pf5Hiv1A/7eda001b-3af3-44a2-a277-e4a9aff2840b.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/ktzRzZyfhspaKt_cgScfCA/5f5855a2-56b6-45fd-a0a9-af36874e0031.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/AXbp2SEcugg3OkGN9Vm8Vw/de61b7d1-5924-49f5-ab9f-7d9025bd8c5f.webp",
+          "https://mapimage.divarcdn.com/v8/mapimage?encrypted_data=MTIzNDU2Nzg5MTIzXLHQmJc5yqzuQjc1TY9UNfpLVsuj4RDdDNDs0l0U12vjxw=="
+        ],
+        "divarAttributes": {
+          "متراژ": "۸۰",
+          "ساخت": "۱۳۹۹",
+          "اتاق": "۲",
+          "تصویر‌ها برای همین ملک است؟": "بله",
+          "طبقه": "۱",
+          "آسانسور ندارد": false,
+          "پارکینگ ندارد": false,
+          "انباری ندارد": false
+        },
+        "yearBuilt": 1399
+      },
+      "source": "divar",
+      "updatedAt": "2026-09-20T10:55:37.708Z"
     }
   ]
 }
