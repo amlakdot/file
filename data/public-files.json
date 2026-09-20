@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-20T13:22:09.558Z",
+  "updatedAt": "2026-09-20T13:27:25.038Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1561,6 +1561,38 @@
       },
       "source": "divar",
       "updatedAt": "2026-09-20T10:56:24.629Z"
+    },
+    {
+      "id": "file-1789910842750-da635a187877bbe3148e2412",
+      "code": 1067,
+      "type": "tenant",
+      "status": "active",
+      "title": "آپارتمان",
+      "data": {
+        "code": 1067,
+        "propertyType": "apartment",
+        "area": 0,
+        "rooms": 0,
+        "year": 0,
+        "totalFloors": 0,
+        "keyHolder": "owner",
+        "condition": "new",
+        "occupancy": "empty",
+        "salePrice": 0,
+        "currentDeposit": 0,
+        "currentRent": 0,
+        "suggestedDeposit": 0,
+        "suggestedRent": 0,
+        "capital": 0,
+        "tenantDeposit": 200000000,
+        "tenantRent": 5000000,
+        "familyStatus": "family",
+        "familySize": 2,
+        "tenantNotes": "پارکینگ انباری",
+        "amenities": []
+      },
+      "source": "panel",
+      "updatedAt": "2026-09-20T13:27:22.750Z"
     }
   ]
 }
