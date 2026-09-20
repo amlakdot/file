@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-20T08:24:54.355Z",
+  "updatedAt": "2026-09-20T08:26:26.167Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -888,38 +888,6 @@
       },
       "source": "panel",
       "updatedAt": "2026-09-11T08:58:06.117Z"
-    },
-    {
-      "id": "file-1789117156059-83-nraths4b9",
-      "code": 1030,
-      "type": "tenant",
-      "status": "active",
-      "title": "آپارتمان",
-      "data": {
-        "propertyType": "apartment",
-        "area": 0,
-        "rooms": 0,
-        "year": 0,
-        "totalFloors": 0,
-        "keyHolder": "owner",
-        "condition": "new",
-        "occupancy": "empty",
-        "salePrice": 0,
-        "currentDeposit": 0,
-        "currentRent": 0,
-        "suggestedDeposit": 0,
-        "suggestedRent": 0,
-        "capital": 0,
-        "tenantDeposit": 350000000,
-        "tenantRent": 3000000,
-        "familyStatus": "married",
-        "familySize": 0,
-        "tenantNotes": "دو نفر",
-        "amenities": [],
-        "code": 1030
-      },
-      "source": "panel",
-      "updatedAt": "2026-09-11T08:59:16.059Z"
     },
     {
       "id": "file-1789117242329-186-s2wk8875e",
