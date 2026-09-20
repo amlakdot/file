@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-20T08:23:01.493Z",
+  "updatedAt": "2026-09-20T08:24:54.355Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -730,38 +730,6 @@
       },
       "source": "panel",
       "updatedAt": "2026-09-11T08:48:11.562Z"
-    },
-    {
-      "id": "file-1789116651512-353-rnbnsjqkx",
-      "code": 1024,
-      "type": "tenant",
-      "status": "active",
-      "title": "آپارتمان · به سمت شهر و حاج منصور",
-      "data": {
-        "propertyType": "apartment",
-        "area": 0,
-        "rooms": 0,
-        "year": 0,
-        "location": "به سمت شهر و حاج منصور",
-        "totalFloors": 0,
-        "keyHolder": "owner",
-        "condition": "new",
-        "occupancy": "empty",
-        "salePrice": 0,
-        "currentDeposit": 0,
-        "currentRent": 0,
-        "suggestedDeposit": 0,
-        "suggestedRent": 0,
-        "capital": 0,
-        "tenantDeposit": 300000000,
-        "tenantRent": 3500000,
-        "familyStatus": "married",
-        "familySize": 0,
-        "amenities": [],
-        "code": 1024
-      },
-      "source": "panel",
-      "updatedAt": "2026-09-11T08:50:51.512Z"
     },
     {
       "id": "file-1789116701629-433-3397gt71l",
