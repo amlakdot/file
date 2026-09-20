@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-20T08:09:20.928Z",
+  "updatedAt": "2026-09-20T08:23:01.493Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -666,38 +666,6 @@
       },
       "source": "panel",
       "updatedAt": "2026-09-11T08:43:39.523Z"
-    },
-    {
-      "id": "file-1789116282712-362-h269i1xe8",
-      "code": 1021,
-      "type": "tenant",
-      "status": "active",
-      "title": "آپارتمان",
-      "data": {
-        "propertyType": "apartment",
-        "area": 0,
-        "rooms": 0,
-        "year": 0,
-        "totalFloors": 0,
-        "keyHolder": "owner",
-        "condition": "new",
-        "occupancy": "empty",
-        "salePrice": 0,
-        "currentDeposit": 0,
-        "currentRent": 0,
-        "suggestedDeposit": 0,
-        "suggestedRent": 0,
-        "capital": 0,
-        "tenantDeposit": 250000000,
-        "tenantRent": 5000000,
-        "familyStatus": "family",
-        "familySize": 1,
-        "tenantNotes": "یک نفر خانوم مسن",
-        "amenities": [],
-        "code": 1021
-      },
-      "source": "panel",
-      "updatedAt": "2026-09-11T08:44:42.712Z"
     },
     {
       "id": "file-1789116436694-195-6hekswgda",
