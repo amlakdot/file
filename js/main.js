@@ -3,7 +3,7 @@
 ========================================================= */
 
 import { state } from "./state.js";
-import { $, setLoginError, parseMoney, setupMoneyInputs, showToast } from "./helpers.js";
+import { $, setLoginError, parseMoney, setupMoneyInputs, showToast, copyToClipboard } from "./helpers.js";
 import { loginWithToken, logout, manualSync, tryRestoreSession } from "./auth.js";
 import { setupCalculator } from "./calculator.js";
 import { publishPublicFiles } from "./github.js";
@@ -61,6 +61,11 @@ function openDivarImportModal() {
   if ($("divarImportError")) {
     $("divarImportError").textContent = "";
     $("divarImportError").classList.add("hidden");
+  }
+  const confirmBtn = $("confirmDivarImportButton");
+  if (confirmBtn) {
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = "دریافت و ذخیره";
   }
   const auto = document.querySelector('input[name="divarTypeHint"][value="auto"]');
   if (auto) auto.checked = true;
@@ -136,6 +141,7 @@ function setupDivarImport() {
       btn.textContent = "در حال دریافت...";
     }
 
+    let hadError = false;
     try {
       const file = await importFromDivarUrl(url, typeHint);
       closeDivarImportModal();
@@ -144,6 +150,7 @@ function setupDivarImport() {
       // باز کردن جزئیات فایل جدید
       if (file?.id) openDetailModal(file.id);
     } catch (err) {
+      hadError = true;
       if (errEl) {
         errEl.textContent = err.message || "خطا در دریافت آگهی.";
         errEl.classList.remove("hidden");
@@ -152,7 +159,7 @@ function setupDivarImport() {
     } finally {
       if (btn) {
         btn.disabled = false;
-        btn.textContent = "دریافت و ذخیره";
+        btn.textContent = hadError ? "تلاش مجدد" : "دریافت و ذخیره";
       }
     }
   });
@@ -380,8 +387,23 @@ function setupDetailActions() {
   });
 }
 
-// کارت → جزئیات کامل (نه مستقیم ادیت)
-document.addEventListener("click", (e) => {
+// کپی شماره با لمس روی شماره کارت
+document.addEventListener("click", async (e) => {
+  const phoneBtn = e.target?.closest(".card-phone-copy");
+  if (phoneBtn) {
+    e.preventDefault();
+    e.stopPropagation();
+    const phone = phoneBtn.getAttribute("data-phone") || phoneBtn.textContent || "";
+    if (!phone || phone === "—") {
+      showToast("شماره‌ای ثبت نشده.", "error");
+      return;
+    }
+    const ok = await copyToClipboard(phone.trim());
+    showToast(ok ? "شماره کپی شد." : "کپی نشد.", ok ? "success" : "error");
+    return;
+  }
+
+  // کارت → جزئیات کامل (نه مستقیم ادیت)
   if (e.target.closest("button, a, input, select, textarea, label")) return;
   const card = e.target?.closest(".file-card");
   if (!card) return;
