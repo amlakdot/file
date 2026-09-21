@@ -279,12 +279,6 @@ function setupTopBar() {
     openMoreMenu();
   });
   $("moreMenuBackdrop")?.addEventListener("click", () => closeMoreMenu());
-
-  $("openCalculatorFromMenu")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    closeMoreMenu();
-    $("openCalculatorButton")?.click();
-  });
 }
 
 function setupSearchAndFilters() {
