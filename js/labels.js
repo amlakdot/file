@@ -89,7 +89,7 @@ export function getStatusLabel(status) {
     pending: "در انتظار",
     archived: "بایگانی",
     done: "انجام شده",
-    followup: "نیاز به پیگیری"
+    followup: "پیگیری"
   };
   return labels[status] || status;
 }
