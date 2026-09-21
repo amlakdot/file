@@ -261,11 +261,19 @@ export async function saveFile() {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
     d.setDate(d.getDate() + days);
+    // ظهر محلی تا جابه‌جایی timezone باعث یک روز عقب/جلو نشود
+    d.setHours(12, 0, 0, 0);
     followUpDate = d.toISOString();
+    // تمدید به آینده: وضعیت را از «پیگیری» به «فعال» برگردان
+    if (status === "followup") {
+      status = "active";
+    }
   }
 
   if (status === "followup" && !followUpDate) {
-    followUpDate = new Date().toISOString();
+    const d = new Date();
+    d.setHours(12, 0, 0, 0);
+    followUpDate = d.toISOString();
   }
 
   let existingFile = null;
@@ -672,7 +680,8 @@ export function loadFileIntoForm(fileId) {
     target.setHours(0, 0, 0, 0);
     const diffDays = Math.round((target - today) / (1000 * 60 * 60 * 24));
     if ($("followUpDays")) {
-      $("followUpDays").value = Math.max(1, diffDays);
+      // اگر تاریخ پیگیری گذشته باشد، برای تمدید پیش‌فرض ۷ روز پیشنهاد می‌شود
+      $("followUpDays").value = diffDays > 0 ? diffDays : 7;
     }
   } else if ($("followUpDays")) {
     $("followUpDays").value = 10;
