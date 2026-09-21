@@ -7,6 +7,7 @@ import {
   $,
   normalize,
   escapeHtml,
+  highlightMatches,
   formatDate,
   formatMoney,
   formatFileCode
@@ -177,6 +178,77 @@ export function getFilteredFiles() {
   return result;
 }
 
+/** شمارش فایل‌ها برای هر چیپ فیلتر (بدون اعمال جست‌وجو/قیمت) */
+export function getFilterCounts() {
+  const active = getActiveFiles();
+  const counts = {
+    all: active.length,
+    sale: 0,
+    landlord: 0,
+    buyer: 0,
+    tenant: 0,
+    followup: 0,
+    "needs-review": 0,
+    trash: 0
+  };
+
+  for (const f of active) {
+    if (f.type && counts[f.type] != null) counts[f.type] += 1;
+    if (isFollowUp(f)) counts.followup += 1;
+    const tags = getFileTags(f);
+    const name = (getFileName(f) || "").trim();
+    if (
+      tags.includes("needs-review-from-ad") ||
+      tags.includes("needs-review") ||
+      name.startsWith("آگهی دیوار") ||
+      (f.source === "divar" && !getFilePhone(f))
+    ) {
+      counts["needs-review"] += 1;
+    }
+  }
+
+  for (const f of state.files) {
+    if (f && isInTrash(f)) counts.trash += 1;
+  }
+
+  return counts;
+}
+
+function updateFilterChipCounts() {
+  const counts = getFilterCounts();
+  document.querySelectorAll(".filter-button[data-filter]").forEach((btn) => {
+    const key = btn.getAttribute("data-filter");
+    const el = btn.querySelector(".filter-count");
+    if (!el || key == null) return;
+    const n = counts[key];
+    el.textContent = n != null ? String(n) : "0";
+  });
+}
+
+function updateResultsCount(filteredLength, totalActive) {
+  const el = $("resultsCount");
+  if (!el) return;
+  const inTrash = state.currentFilter === "trash";
+  if (inTrash) {
+    el.textContent = `نمایش ${filteredLength} فایل در سطل`;
+    el.classList.remove("hidden");
+    return;
+  }
+  const hasExtraFilter = !!(
+    state.search ||
+    state.region ||
+    state.priceMin != null ||
+    state.priceMax != null ||
+    state.currentFilter !== "all"
+  );
+  if (!hasExtraFilter) {
+    el.textContent = `${totalActive} فایل`;
+  } else {
+    el.textContent = `نمایش ${filteredLength} از ${totalActive} فایل`;
+  }
+  el.classList.remove("hidden");
+}
+
 export function renderHome() {
   const container = $("filesContainer");
   const empty = $("emptyState");
@@ -185,6 +257,9 @@ export function renderHome() {
   const filtered = getFilteredFiles();
   const activeCount = getActiveFiles().length;
   const inTrash = state.currentFilter === "trash";
+
+  updateFilterChipCounts();
+  updateResultsCount(filtered.length, activeCount);
 
   if (filtered.length === 0) {
     container.innerHTML = "";
@@ -316,6 +391,8 @@ export function renderFileCard(file) {
             ? "type-tenant"
             : "type-default";
 
+  const searchKw = state.search || "";
+
   const priceHtml = priceRows.length
     ? `<div class="card-prices">${priceRows
         .map(
@@ -334,13 +411,24 @@ export function renderFileCard(file) {
         .join("")}</div>`
     : "";
 
+  const nameHtml = highlightMatches(name, searchKw);
+  const locationHtml = location
+    ? highlightMatches(location, searchKw)
+    : escapeHtml("—");
+  const metaHtml = metaBits.length
+    ? highlightMatches(metaBits.join(" · "), searchKw)
+    : "";
+  const notesHtml = notesPreview
+    ? `<div class="card-notes">${highlightMatches(notesPreview, searchKw)}</div>`
+    : "";
+
   return `
     <div class="file-card card-summary md-card ${typeClass}" data-file-id="${escapeHtml(file.id)}" role="button" tabindex="0">
       <div class="card-type-stripe" aria-hidden="true"></div>
       <div class="card-top">
         <div class="card-top-main">
           <div class="card-type">${escapeHtml(TYPE_LABELS[type] || type)}${isDivar ? ' <span class="divar-source-mark">دیوار</span>' : ""}</div>
-          <div class="card-title">${escapeHtml(name)}</div>
+          <div class="card-title">${nameHtml}</div>
         </div>
         <div class="card-top-badges">
           ${
@@ -359,8 +447,18 @@ export function renderFileCard(file) {
       ${priceHtml}
 
       <div class="card-info">
-        ${infoItem("موقعیت", escapeHtml(location || "—"))}
-        ${metaBits.length ? infoItem("مشخصات", escapeHtml(metaBits.join(" · "))) : ""}
+        <div class="info-item">
+          <div class="info-label">موقعیت</div>
+          <div class="info-value">${locationHtml}</div>
+        </div>
+        ${
+          metaHtml
+            ? `<div class="info-item">
+          <div class="info-label">مشخصات</div>
+          <div class="info-value">${metaHtml}</div>
+        </div>`
+            : ""
+        }
         ${
           phone
             ? `<div class="info-item">
@@ -371,7 +469,7 @@ export function renderFileCard(file) {
         }
       </div>
 
-      ${notesPreview ? `<div class="card-notes">${escapeHtml(notesPreview)}</div>` : ""}
+      ${notesHtml}
 
       ${amenitiesHtml}
 
