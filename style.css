@@ -2090,3 +2090,713 @@ textarea:focus-visible {
         font-size: 12px;
     }
 }
+
+
+/* =========================================================
+   TELEGRAM-LEVEL UX POLISH
+   Spacing, hierarchy, motion, mobile sheets, feedback
+========================================================= */
+
+:root {
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --motion-fast: 120ms;
+    --motion-normal: 180ms;
+    --motion-sheet: 240ms;
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-press: cubic-bezier(0.4, 0, 0.2, 1);
+    --touch-min: 44px;
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-top: env(safe-area-inset-top, 0px);
+}
+
+html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+}
+
+body {
+    overscroll-behavior-y: contain;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+}
+
+/* ---------- Login ---------- */
+.login-card {
+    border-radius: 20px;
+    padding: 36px 28px 28px;
+    border-color: var(--border);
+    animation: ux-fade-up 0.28s var(--ease-out);
+}
+
+.login-logo {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    margin-bottom: 22px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.login-title {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.login-subtitle {
+    margin-top: 6px;
+    margin-bottom: 26px;
+    font-size: 13.5px;
+    color: var(--text-muted);
+}
+
+.login-button {
+    width: 100%;
+    height: 48px;
+    border-radius: 12px;
+    font-size: 15px;
+    margin-top: 8px;
+}
+
+.login-error {
+    animation: ux-fade-up 0.2s var(--ease-out);
+}
+
+/* ---------- Top bar ---------- */
+.topbar.md-app-bar {
+    padding-top: max(12px, var(--safe-top));
+    background: rgba(11, 13, 15, 0.88);
+    backdrop-filter: blur(18px) saturate(1.2);
+    -webkit-backdrop-filter: blur(18px) saturate(1.2);
+    border-bottom: 1px solid rgba(41, 47, 53, 0.9);
+    transition: box-shadow var(--motion-normal) ease;
+}
+
+.brand-name {
+    font-size: 15.5px;
+    letter-spacing: -0.01em;
+}
+
+.icon-button {
+    min-width: var(--touch-min);
+    min-height: var(--touch-min);
+    border-radius: 50%;
+    transition: background var(--motion-fast) ease, transform var(--motion-fast) var(--ease-press);
+}
+
+.icon-button:active {
+    transform: scale(0.92);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.header-button {
+    min-height: 40px;
+    border-radius: 999px;
+    padding: 8px 14px;
+    transition: background var(--motion-fast) ease, transform var(--motion-fast) var(--ease-press), opacity var(--motion-fast) ease;
+}
+
+.header-button:active {
+    transform: scale(0.97);
+}
+
+.md-badge {
+    box-shadow: 0 0 0 2px var(--bg);
+}
+
+/* ---------- Toolbar / Search sticky feel ---------- */
+.main-container {
+    padding-bottom: calc(88px + var(--safe-bottom));
+}
+
+.toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 15;
+    margin: 0 -4px 12px;
+    padding: 4px 4px 8px;
+    background: linear-gradient(180deg, var(--bg) 70%, transparent);
+}
+
+.search-box.md-search input,
+.toolbar .search-box input {
+    height: 48px;
+    border-radius: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding-right: 44px;
+    font-size: 14.5px;
+    transition: border-color var(--motion-fast) ease, background var(--motion-fast) ease, box-shadow var(--motion-fast) ease;
+}
+
+.search-box input:focus {
+    border-color: rgba(231, 200, 75, 0.55);
+    background: var(--surface-2);
+    box-shadow: 0 0 0 3px rgba(231, 200, 75, 0.12);
+}
+
+.search-icon {
+    font-size: 18px;
+    opacity: 0.7;
+}
+
+.filter-toggle-btn {
+    height: 48px;
+    border-radius: 14px;
+    min-width: var(--touch-min);
+    transition: background var(--motion-fast) ease, border-color var(--motion-fast) ease, transform var(--motion-fast) var(--ease-press);
+}
+
+.filter-toggle-btn:active {
+    transform: scale(0.97);
+}
+
+.filter-toggle-btn.open,
+.filter-toggle-btn.has-active {
+    border-color: rgba(231, 200, 75, 0.5);
+    background: rgba(231, 200, 75, 0.1);
+    color: var(--accent);
+}
+
+/* ---------- Filter chips ---------- */
+.md-chip-row {
+    gap: 8px;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    scrollbar-width: none;
+}
+
+.md-chip-row::-webkit-scrollbar {
+    display: none;
+}
+
+.filter-button {
+    min-height: 36px;
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 999px;
+    transition: background var(--motion-fast) ease, color var(--motion-fast) ease, border-color var(--motion-fast) ease, transform var(--motion-fast) var(--ease-press);
+}
+
+.filter-button:active {
+    transform: scale(0.96);
+}
+
+.filter-button.active {
+    box-shadow: 0 2px 8px rgba(231, 200, 75, 0.25);
+}
+
+/* ---------- Sync status ---------- */
+.sync-status {
+    margin-bottom: 12px;
+    font-size: 11.5px;
+    opacity: 0.9;
+}
+
+/* ---------- File cards — hierarchy ---------- */
+.files-grid {
+    gap: 10px;
+}
+
+.file-card.md-card {
+    border-radius: 16px;
+    padding: 14px 14px 12px 16px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    box-shadow: none;
+    transition: background var(--motion-fast) ease, border-color var(--motion-fast) ease, transform var(--motion-fast) var(--ease-press);
+}
+
+.file-card.md-card:hover {
+    background: var(--surface-2);
+    border-color: var(--border-light);
+    box-shadow: none;
+    transform: none;
+}
+
+.file-card.md-card:active {
+    background: var(--surface-3);
+    transform: scale(0.992);
+}
+
+.card-type-stripe {
+    width: 3px;
+    border-radius: 0 2px 2px 0;
+}
+
+.card-type {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    opacity: 0.95;
+}
+
+.card-title {
+    margin-top: 3px;
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+}
+
+.card-prices {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(231, 200, 75, 0.07);
+    border: 1px solid rgba(231, 200, 75, 0.16);
+}
+
+.card-price-value {
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+}
+
+.card-info {
+    gap: 6px 10px;
+    margin-top: 2px;
+}
+
+.info-label {
+    font-size: 10.5px;
+    letter-spacing: 0.01em;
+}
+
+.info-value {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-soft);
+}
+
+.card-footer {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(41, 47, 53, 0.85);
+    font-size: 11px;
+}
+
+.followup-badge {
+    animation: none;
+}
+
+/* ---------- Empty state ---------- */
+.empty-state {
+    min-height: 52vh;
+    padding: 32px 20px;
+}
+
+.empty-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 20px;
+    font-size: 28px;
+    margin-bottom: 18px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+}
+
+.empty-state h2 {
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    max-width: 280px;
+    line-height: 1.65;
+    margin-bottom: 20px;
+    font-size: 13.5px;
+}
+
+.empty-state .primary-button {
+    min-height: 46px;
+    padding: 12px 22px;
+    border-radius: 12px;
+}
+
+/* ---------- FAB ---------- */
+.md-fab {
+    left: max(16px, env(safe-area-inset-left, 0px));
+    bottom: max(20px, calc(16px + var(--safe-bottom)));
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(231, 200, 75, 0.25);
+    transition: transform var(--motion-fast) var(--ease-press), box-shadow var(--motion-normal) ease, opacity var(--motion-normal) ease;
+}
+
+.md-fab:active {
+    transform: scale(0.94);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+}
+
+/* ---------- Modals → bottom sheet on mobile ---------- */
+.modal {
+    padding: 0;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.modal-backdrop {
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    animation: ux-fade-in var(--motion-normal) ease;
+}
+
+.modal-card {
+    width: 100%;
+    max-width: 100%;
+    max-height: min(92vh, 100%);
+    margin: 0;
+    border-radius: 20px 20px 0 0;
+    border: 1px solid var(--border);
+    border-bottom: 0;
+    padding: 18px 18px calc(18px + var(--safe-bottom));
+    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.45);
+    animation: ux-sheet-up var(--motion-sheet) var(--ease-out);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.modal-card.large-modal,
+.modal-card.small-modal,
+.modal-card.calc-modal-card {
+    max-width: 100%;
+}
+
+.modal-header {
+    flex-shrink: 0;
+    margin-bottom: 16px;
+    padding-bottom: 4px;
+}
+
+.modal-header h2 {
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+}
+
+.close-button {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    transition: background var(--motion-fast) ease, color var(--motion-fast) ease;
+}
+
+.close-button:active {
+    background: var(--surface-3);
+}
+
+#fileForm,
+.detail-body,
+.calc-content {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    flex: 1;
+    min-height: 0;
+}
+
+.modal-actions {
+    flex-shrink: 0;
+    position: sticky;
+    bottom: 0;
+    margin: 12px -4px 0;
+    padding: 12px 4px 4px;
+    background: linear-gradient(180deg, transparent, var(--surface) 28%);
+    gap: 8px;
+    z-index: 2;
+}
+
+.modal-actions .primary-button {
+    min-height: 46px;
+    border-radius: 12px;
+    padding: 12px 18px;
+}
+
+.modal-actions .ghost-button,
+.modal-actions .secondary-button,
+.modal-actions .danger-button {
+    min-height: 44px;
+    border-radius: 12px;
+}
+
+.detail-actions {
+    flex-wrap: wrap;
+}
+
+/* Desktop: centered card again */
+@media (min-width: 801px) {
+    .modal {
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+    }
+
+    .modal-card {
+        max-width: 650px;
+        max-height: calc(100vh - 48px);
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        padding: 24px;
+        animation: ux-fade-up 0.22s var(--ease-out);
+    }
+
+    .modal-card.large-modal {
+        max-width: 860px;
+    }
+
+    .modal-card.small-modal {
+        max-width: 440px;
+    }
+
+    .modal-card.calc-modal-card {
+        max-width: 520px;
+    }
+
+    .modal-actions {
+        background: transparent;
+        margin-top: 8px;
+        padding-top: 8px;
+    }
+}
+
+/* ---------- Form polish ---------- */
+.form-section {
+    padding-bottom: 18px;
+    margin-bottom: 18px;
+}
+
+.section-title {
+    font-size: 12.5px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    color: var(--text-soft);
+    margin-bottom: 12px;
+}
+
+.type-option span {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    transition: border-color var(--motion-fast) ease, background var(--motion-fast) ease, color var(--motion-fast) ease;
+}
+
+.type-option input:checked + span {
+    box-shadow: 0 0 0 1px rgba(231, 200, 75, 0.35);
+}
+
+input,
+select,
+textarea {
+    border-radius: 12px;
+    padding: 12px 14px;
+    min-height: 46px;
+    transition: border-color var(--motion-fast) ease, background var(--motion-fast) ease, box-shadow var(--motion-fast) ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: rgba(231, 200, 75, 0.55);
+    box-shadow: 0 0 0 3px rgba(231, 200, 75, 0.1);
+}
+
+textarea {
+    min-height: 96px;
+}
+
+/* ---------- Toast ---------- */
+.toast {
+    bottom: calc(24px + var(--safe-bottom));
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%) translateY(8px);
+    max-width: min(90vw, 360px);
+    padding: 12px 18px;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 600;
+    background: var(--surface-3);
+    border: 1px solid var(--border-light);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    animation: ux-toast-in 0.22s var(--ease-out) forwards;
+    pointer-events: none;
+}
+
+.toast.hidden {
+    display: none !important;
+}
+
+.toast.success {
+    border-color: rgba(85, 184, 120, 0.45);
+    background: #15241c;
+}
+
+.toast.error {
+    border-color: rgba(224, 82, 82, 0.45);
+    background: #2a1616;
+}
+
+/* ---------- Buttons global press ---------- */
+.primary-button,
+.secondary-button,
+.ghost-button,
+.danger-button {
+    min-height: 44px;
+    border-radius: 12px;
+    transition: transform var(--motion-fast) var(--ease-press), opacity var(--motion-fast) ease, background var(--motion-fast) ease, box-shadow var(--motion-fast) ease;
+}
+
+.primary-button:active,
+.secondary-button:active,
+.ghost-button:active,
+.danger-button:active {
+    transform: scale(0.97);
+}
+
+.primary-button {
+    background: var(--accent);
+    color: #111;
+}
+
+.primary-button:hover {
+    background: #f0d45a;
+    transform: none;
+}
+
+/* ---------- Sheet menu polish ---------- */
+.md-sheet-panel {
+    padding-bottom: calc(20px + var(--safe-bottom));
+    animation: ux-sheet-up var(--motion-sheet) var(--ease-out);
+}
+
+.md-sheet-item {
+    min-height: 48px;
+    border-radius: 12px;
+    transition: background var(--motion-fast) ease;
+}
+
+.md-sheet-item:active {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* ---------- Skeleton ---------- */
+.skeleton-grid {
+    gap: 10px;
+}
+
+.skeleton-grid .skeleton-card {
+    height: 148px;
+    border-radius: 16px;
+}
+
+/* ---------- Advanced filters panel ---------- */
+.advanced-filters-panel {
+    transition: max-height 0.28s var(--ease-out), opacity 0.2s ease, margin 0.2s ease;
+}
+
+.advanced-filters {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+    padding: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+}
+
+/* ---------- Mobile density ---------- */
+@media (max-width: 700px) {
+    .files-grid {
+        gap: 8px;
+    }
+
+    .file-card.md-card,
+    .file-card.card-summary {
+        padding: 12px 12px 11px 14px;
+        border-radius: 14px;
+    }
+
+    .card-title {
+        font-size: 15px;
+    }
+
+    .card-price-value {
+        font-size: 13.5px;
+    }
+
+    .main-container {
+        padding: 12px 12px calc(96px + var(--safe-bottom));
+    }
+
+    .toolbar {
+        margin-bottom: 10px;
+    }
+
+    .type-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ---------- Keyframes ---------- */
+@keyframes ux-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes ux-fade-up {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes ux-sheet-up {
+    from {
+        opacity: 0.85;
+        transform: translateY(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes ux-toast-in {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
