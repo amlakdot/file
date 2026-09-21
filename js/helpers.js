@@ -19,6 +19,45 @@ export function escapeHtml(value) {
 }
 
 /**
+ * هایلایت کلمات جست‌وجو داخل متن (خروجی HTML امن)
+ * keywords: آرایه یا رشته؛ زیررشته‌ها case-insensitive match می‌شوند
+ */
+export function highlightMatches(text, keywords) {
+  const raw = String(text ?? "");
+  if (!raw) return "";
+
+  let list = [];
+  if (Array.isArray(keywords)) {
+    list = keywords.map((k) => String(k ?? "").trim()).filter(Boolean);
+  } else if (keywords != null && String(keywords).trim()) {
+    list = String(keywords)
+      .trim()
+      .split(/\s+/)
+      .map((k) => k.trim())
+      .filter((k) => k.length >= 1);
+  }
+
+  if (!list.length) return escapeHtml(raw);
+
+  const escaped = list.map((k) =>
+    k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+  );
+  const pattern = new RegExp(`(${escaped.join("|")})`, "gi");
+  const parts = raw.split(pattern);
+
+  return parts
+    .map((part) => {
+      if (!part) return "";
+      const isMatch = list.some(
+        (k) => part.toLowerCase() === k.toLowerCase()
+      );
+      const safe = escapeHtml(part);
+      return isMatch ? `<mark class="search-highlight">${safe}</mark>` : safe;
+    })
+    .join("");
+}
+
+/**
  * تبدیل ارقام فارسی/عربی به لاتین
  */
 export function toEnglishDigits(value) {
