@@ -187,6 +187,27 @@ function openNewFile() {
 function goFollowUp() {
   state.currentFilter = "followup";
   applyFilters();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  const n = document.querySelectorAll("#filesContainer .file-card").length;
+  if (n === 0) {
+    showToast("فایلی برای پیگیری نیست.", "success");
+  } else {
+    showToast(`${n.toLocaleString("fa-IR")} فایل برای پیگیری`, "success");
+  }
+}
+
+function clearSearch() {
+  state.search = "";
+  const input = $("searchInput");
+  if (input) input.value = "";
+  $("clearSearchButton")?.classList.add("hidden");
+  renderHome();
+  input?.focus();
+}
+
+function syncClearSearchVisibility() {
+  const has = !!(state.search && String(state.search).trim());
+  $("clearSearchButton")?.classList.toggle("hidden", !has);
 }
 
 function updateActiveFiltersBadge() {
@@ -258,12 +279,25 @@ function setupTopBar() {
     openMoreMenu();
   });
   $("moreMenuBackdrop")?.addEventListener("click", () => closeMoreMenu());
+
+  $("openCalculatorFromMenu")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    closeMoreMenu();
+    $("openCalculatorButton")?.click();
+  });
 }
 
 function setupSearchAndFilters() {
   $("searchInput")?.addEventListener("input", (e) => {
     state.search = e.target?.value || "";
+    syncClearSearchVisibility();
     renderHome();
+  });
+
+  $("clearSearchButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    clearSearch();
   });
 
   $("regionFilter")?.addEventListener("input", (e) => {
