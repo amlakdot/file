@@ -748,6 +748,7 @@ button.info-value.card-phone-copy:focus-visible {
     max-width: 650px;
     max-height: calc(100vh - 40px);
     overflow: hidden;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
     background: var(--surface);
@@ -755,6 +756,7 @@ button.info-value.card-phone-copy:focus-visible {
     border-radius: 16px;
     box-shadow: var(--shadow);
     padding: 22px;
+    box-sizing: border-box;
 }
 
 .large-modal {
@@ -826,16 +828,28 @@ button.info-value.card-phone-copy:focus-visible {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 13px;
+    width: 100%;
+    min-width: 0;
+}
+
+.form-grid > .field,
+.form-grid > .field-full {
+    min-width: 0;
+    max-width: 100%;
 }
 
 .type-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 8px;
+    width: 100%;
+    min-width: 0;
 }
 
 .type-option {
     cursor: pointer;
+    min-width: 0;
+    display: block;
 }
 
 .type-option input {
@@ -843,13 +857,22 @@ button.info-value.card-phone-copy:focus-visible {
 }
 
 .type-option span {
-    display: block;
-    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
+    padding: 10px 6px;
+    min-height: 48px;
     background: var(--surface-2);
     border: 1px solid var(--border);
     border-radius: var(--radius-small);
     color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.35;
+    white-space: normal;
+    word-break: break-word;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .type-option input:checked + span {
@@ -866,6 +889,8 @@ button.info-value.card-phone-copy:focus-visible {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 8px;
+    width: 100%;
+    min-width: 0;
 }
 
 .amenities-grid label {
@@ -1050,11 +1075,11 @@ button.info-value.card-phone-copy:focus-visible {
     }
 
     .type-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .amenities-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
@@ -1251,29 +1276,64 @@ button.info-value.card-phone-copy:focus-visible {
 
 .divar-import-body {
     padding: 4px 0 8px;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.divar-import-body .field {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.divar-import-body .field > label {
+    display: block;
+    line-height: 1.5;
+    white-space: normal;
+    word-break: break-word;
 }
 
 .divar-import-body .radio-row {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
-    margin-top: 6px;
+    margin-top: 8px;
+    width: 100%;
+    min-width: 0;
 }
 
 .divar-import-body .radio-chip {
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
-    padding: 8px 12px;
+    padding: 10px 8px;
+    min-height: 44px;
     border-radius: 10px;
     border: 1px solid var(--border);
-    background: var(--surface-2, rgba(255,255,255,0.03));
+    background: var(--surface-2, rgba(255, 255, 255, 0.03));
     cursor: pointer;
-    font-size: 13px;
+    font-size: 12.5px;
+    line-height: 1.3;
+    text-align: center;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+}
+
+.divar-import-body .radio-chip span {
+    min-width: 0;
+    white-space: normal;
+    word-break: break-word;
 }
 
 .divar-import-body .radio-chip input {
-    accent-color: var(--primary, #55b878);
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--accent, #e7c84b);
 }
 
 #divarUrlInput {
@@ -1281,6 +1341,20 @@ button.info-value.card-phone-copy:focus-visible {
     text-align: left;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 13px;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+@media (max-width: 420px) {
+    .divar-import-body .radio-row {
+        grid-template-columns: 1fr;
+    }
+
+    .divar-import-body .radio-chip {
+        justify-content: flex-start;
+        padding: 12px 14px;
+        font-size: 13.5px;
+    }
 }
 
 /* =========================================================
@@ -2512,15 +2586,22 @@ body {
     background: var(--surface-3);
 }
 
-/* یک لایه اسکرول داخل مودال — خود modal-card اسکرول نمی‌کند */
+/* یک لایه اسکرول داخل مودال — بدون اسکرول افقی */
 #fileForm,
 .detail-body,
-.calc-content {
+.calc-content,
+.modal-body,
+.divar-import-body {
     flex: 1 1 auto;
     min-height: 0;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
+    box-sizing: border-box;
 }
 
 #fileForm {
@@ -2532,17 +2613,36 @@ body {
 #fileForm > .type-grid,
 #fileForm > input[type="hidden"] {
     flex-shrink: 0;
+    min-width: 0;
+    max-width: 100%;
+}
+
+#fileForm .form-section,
+#fileForm .form-grid,
+#fileForm .amenities-grid {
+    min-width: 0;
+    max-width: 100%;
+}
+
+#fileForm input,
+#fileForm select,
+#fileForm textarea {
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .modal-actions {
     flex-shrink: 0;
     position: sticky;
     bottom: 0;
-    margin: 12px -4px 0;
-    padding: 12px 4px 4px;
+    margin: 12px 0 0;
+    padding: 12px 0 4px;
     background: linear-gradient(180deg, transparent 0%, var(--surface) 35%);
     gap: 8px;
     z-index: 2;
+    max-width: 100%;
+    box-sizing: border-box;
+    flex-wrap: wrap;
 }
 
 .modal-actions .primary-button {
@@ -2616,16 +2716,24 @@ body {
 }
 
 .type-option span {
-    min-height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     border-radius: 12px;
     transition: border-color var(--motion-fast) ease, background var(--motion-fast) ease, color var(--motion-fast) ease;
 }
 
 .type-option input:checked + span {
     box-shadow: 0 0 0 1px rgba(231, 200, 75, 0.35);
+}
+
+@media (max-width: 600px) {
+    .type-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .type-option span {
+        font-size: 12.5px;
+        padding: 12px 8px;
+    }
 }
 
 input,
