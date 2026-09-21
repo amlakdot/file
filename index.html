@@ -185,20 +185,23 @@
             </div>
 
             <div class="filters md-chip-row">
-                <button class="filter-button active" data-filter="all" type="button">همه</button>
-                <button class="filter-button" data-filter="sale" type="button">فروشی</button>
-                <button class="filter-button" data-filter="landlord" type="button">مالک / موجر</button>
-                <button class="filter-button" data-filter="buyer" type="button">خریدار</button>
-                <button class="filter-button" data-filter="tenant" type="button">مستاجر</button>
-                <button class="filter-button" data-filter="followup" type="button">پیگیری</button>
-                <button class="filter-button filter-review" data-filter="needs-review" type="button">نیاز به بررسی</button>
-                <button class="filter-button" data-filter="trash" type="button">سطل</button>
+                <button class="filter-button active" data-filter="all" type="button">همه <span class="filter-count">0</span></button>
+                <button class="filter-button" data-filter="sale" type="button">فروشی <span class="filter-count">0</span></button>
+                <button class="filter-button" data-filter="landlord" type="button">مالک / موجر <span class="filter-count">0</span></button>
+                <button class="filter-button" data-filter="buyer" type="button">خریدار <span class="filter-count">0</span></button>
+                <button class="filter-button" data-filter="tenant" type="button">مستاجر <span class="filter-count">0</span></button>
+                <button class="filter-button" data-filter="followup" type="button">پیگیری <span class="filter-count">0</span></button>
+                <button class="filter-button filter-review" data-filter="needs-review" type="button">نیاز به بررسی <span class="filter-count">0</span></button>
+                <button class="filter-button" data-filter="trash" type="button">سطل <span class="filter-count">0</span></button>
             </div>
 
-            <div class="sync-status">
-                <span id="syncIndicator" class="sync-dot"></span>
-                <span id="syncText">در حال اتصال...</span>
-                <span id="lastSyncText" class="last-sync"></span>
+            <div class="list-meta-row">
+                <div id="resultsCount" class="results-count" aria-live="polite"></div>
+                <div class="sync-status">
+                    <span id="syncIndicator" class="sync-dot"></span>
+                    <span id="syncText">در حال اتصال...</span>
+                    <span id="lastSyncText" class="last-sync"></span>
+                </div>
             </div>
 
             <div id="skeletonGrid" class="files-grid skeleton-grid hidden" aria-hidden="true">
