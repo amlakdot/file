@@ -126,7 +126,8 @@
             <div class="md-sheet-backdrop" id="moreMenuBackdrop"></div>
             <div class="md-sheet-panel" role="menu">
                 <div class="md-sheet-handle"></div>
-                <div class="md-sheet-title">تنظیمات</div>
+                <div class="md-sheet-title">منو</div>
+                <button type="button" class="md-sheet-item" id="openCalculatorFromMenu" role="menuitem">ماشین حساب</button>
                 <button type="button" class="md-sheet-item" id="publishPublicButton" role="menuitem">انتشار برای عموم</button>
                 <a class="md-sheet-item" id="openPublicPageLink" href="public.html" target="_blank" rel="noopener" role="menuitem">باز کردن صفحه عمومی</a>
                 <button type="button" class="md-sheet-item danger" id="logoutButton" role="menuitem">خروج از حساب</button>
@@ -140,9 +141,11 @@
                     <input
                         id="searchInput"
                         type="search"
-                        placeholder="جست‌وجو: نام، تلفن، منطقه، قیمت..."
+                        placeholder="نام، تلفن، منطقه..."
                         autocomplete="off"
+                        enterkeyhint="search"
                     >
+                    <button type="button" id="clearSearchButton" class="search-clear hidden" aria-label="پاک کردن جستجو" title="پاک کردن">×</button>
                 </div>
                 <button id="toggleFiltersButton" class="filter-toggle-btn" type="button" aria-expanded="false">
                     فیلترها
@@ -544,11 +547,12 @@
             </div>
             <div id="detailBody" class="detail-body"></div>
             <div class="modal-actions detail-actions">
+                <a id="detailCallButton" class="primary-button detail-call-btn hidden" href="#">تماس</a>
+                <button id="detailWhatsAppButton" type="button" class="secondary-button">واتساپ</button>
                 <button id="detailCopyPhoneButton" type="button" class="ghost-button">کپی تلفن</button>
                 <button id="detailCopyAddressButton" type="button" class="ghost-button">کپی آدرس</button>
-                <button id="detailWhatsAppButton" type="button" class="secondary-button">واتساپ</button>
                 <button id="detailShareCopyButton" type="button" class="secondary-button">کپی متن</button>
-                <button id="detailDivarLinkButton" type="button" class="secondary-button hidden">مشاهده این فایل در دیوار</button>
+                <button id="detailDivarLinkButton" type="button" class="secondary-button hidden">مشاهده در دیوار</button>
                 <button id="detailEditButton" type="button" class="primary-button">ویرایش</button>
                 <button id="detailArchiveButton" type="button" class="danger-button">انتقال به سطل</button>
                 <button id="detailRestoreButton" type="button" class="primary-button hidden">بازگردانی</button>
