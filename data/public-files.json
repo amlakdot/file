@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-21T18:58:50.851Z",
+  "updatedAt": "2026-09-21T18:59:26.620Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1653,6 +1653,58 @@
       },
       "source": "divar",
       "updatedAt": "2026-09-21T14:12:47.806Z"
+    },
+    {
+      "id": "file-1790017164421-3e0600f7493c73ac6b4ead86",
+      "code": 1071,
+      "type": "landlord",
+      "status": "active",
+      "title": "آپارتمان · 75 متر · 2 خواب · بومهن",
+      "data": {
+        "code": 1071,
+        "propertyType": "apartment",
+        "area": 75,
+        "rooms": 2,
+        "year": 1393,
+        "location": "بومهن، خ شهید زاهدی",
+        "unitFloor": "2",
+        "totalFloors": 4,
+        "salePrice": 0,
+        "currentDeposit": 0,
+        "currentRent": 0,
+        "suggestedDeposit": 200000000,
+        "suggestedRent": 5000000,
+        "capital": 0,
+        "tenantDeposit": 0,
+        "tenantRent": 0,
+        "familySize": 0,
+        "notes": "عنوان دیوار: آپارتمان اجاره ای تک واحدی برق و گاز جدا و آب مشترک\nطبقه دوم کوچه بن بست\nمحیطی آرام",
+        "amenities": [],
+        "divarDescription": "برق و گاز جدا و آب مشترک\nطبقه دوم \nکوچه بن بست\nمحیطی آرام",
+        "divarImages": [
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/uVq5DyhsWX1OsDXB-nwDnQ/cfb09244-1d94-41cc-adf4-6e775e459437.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/xG-yt6rL0uW_a9bVc7zNQA/6efc0c80-b399-4093-9a49-0493563864a4.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/SOIRUPGKOpCk4qOmtDmyYA/7b3765b0-95e9-4743-bdac-91f99c251155.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/WuPldtr_0WyxBBjmlHeu0w/45d15062-5141-48bc-acea-079ec6afc33b.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/j-1Ri9g49mSXfCm2UBng6Q/a62c4db8-b5a8-48cb-9d48-a5dfe0185a11.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/juRaDOXuE4RwtpDrzenmNA/916d350a-0d6f-4920-9594-f57d3c460512.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/IwzGVKOzZbjCTMXq46Gq6Q/621f56f1-921c-4dc1-8fc7-c3283abd9908.webp",
+          "https://mapimage.divarcdn.com/v8/mapimage?encrypted_data=MTIzNDU2Nzg5MTIzXCOIXF-Iy6zuQjDVb1yKK_pLtK0ScYPE8S98ph2tXmbxug==&is_nearby=true"
+        ],
+        "divarAttributes": {
+          "متراژ": "۷۵",
+          "ساخت": "۱۳۹۳",
+          "اتاق": "۲",
+          "تصویر‌ها برای همین ملک است؟": "بله",
+          "طبقه": "۲ از ۴",
+          "آسانسور ندارد": false,
+          "پارکینگ ندارد": false,
+          "انباری ندارد": false
+        },
+        "yearBuilt": 1393
+      },
+      "source": "divar",
+      "updatedAt": "2026-09-21T18:59:24.421Z"
     }
   ]
 }
