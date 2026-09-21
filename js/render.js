@@ -141,7 +141,23 @@ export function getFilteredFiles() {
     });
   }
 
-  // مرتب‌سازی
+  // پیگیری: قدیمی‌ترین موعد اول (بیشترین تأخیر بالاتر)
+  if (state.currentFilter === "followup") {
+    result.sort((a, b) => {
+      const ta = a.followUpDate ? new Date(a.followUpDate).getTime() : 0;
+      const tb = b.followUpDate ? new Date(b.followUpDate).getTime() : 0;
+      const sa = Number.isFinite(ta) ? ta : 0;
+      const sb = Number.isFinite(tb) ? tb : 0;
+      if (sa !== sb) return sa - sb;
+      return (
+        new Date(b.updatedAt || 0).getTime() -
+        new Date(a.updatedAt || 0).getTime()
+      );
+    });
+    return result;
+  }
+
+  // مرتب‌سازی عادی
   const dir = state.sortDir === "asc" ? 1 : -1;
   const sortBy = state.sortBy || "updatedAt";
 
@@ -176,6 +192,18 @@ export function getFilteredFiles() {
   });
 
   return result;
+}
+
+/** متن کوتاه وضعیت پیگیری برای کارت */
+function followUpBadgeText(file) {
+  if (!file?.followUpDate) return "پیگیری";
+  const ts = new Date(file.followUpDate).getTime();
+  if (!Number.isFinite(ts)) return "پیگیری";
+  const dayMs = 24 * 60 * 60 * 1000;
+  const diffDays = Math.floor((Date.now() - ts) / dayMs);
+  if (diffDays > 0) return `${diffDays} روز تأخیر`;
+  if (diffDays === 0) return "امروز";
+  return "پیگیری";
 }
 
 /** شمارش فایل‌ها برای هر چیپ فیلتر (بدون اعمال جست‌وجو/قیمت) */
@@ -438,7 +466,17 @@ export function renderFileCard(file) {
                 )}</div>`
               : ""
           }
-          ${hasFollowUp ? `<div class="followup-badge">پیگیری</div>` : ""}
+          ${
+            hasFollowUp
+              ? `<div class="followup-badge${
+                  file.followUpDate &&
+                  Number.isFinite(new Date(file.followUpDate).getTime()) &&
+                  new Date(file.followUpDate).getTime() < Date.now() - 86400000
+                    ? " followup-overdue"
+                    : ""
+                }">${escapeHtml(followUpBadgeText(file))}</div>`
+              : ""
+          }
           ${isInTrash(file) ? `<div class="trash-badge">حذف‌شده</div>` : ""}
           ${tagBadges}
         </div>
