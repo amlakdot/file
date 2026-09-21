@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-21T23:26:18.037Z",
+  "updatedAt": "2026-09-21T23:26:30.767Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1705,6 +1705,58 @@
       },
       "source": "divar",
       "updatedAt": "2026-09-21T18:59:56.764Z"
+    },
+    {
+      "id": "file-1790033189048-68000e6a37feab6dd609e51d",
+      "code": 1072,
+      "type": "landlord",
+      "status": "active",
+      "title": "آپارتمان · 65 متر · بومهن",
+      "data": {
+        "code": 1072,
+        "propertyType": "apartment",
+        "area": 65,
+        "rooms": 0,
+        "year": 1402,
+        "location": "بومهن، خ مسعود زاهدی",
+        "unitFloor": "3",
+        "totalFloors": 0,
+        "salePrice": 0,
+        "currentDeposit": 0,
+        "currentRent": 0,
+        "suggestedDeposit": 200000000,
+        "suggestedRent": 4000000,
+        "capital": 0,
+        "tenantDeposit": 0,
+        "tenantRent": 0,
+        "familySize": 0,
+        "notes": "عنوان دیوار: در بومهن اجاره یا رهن کامل قیمت مناسب داری حیاط و حمام دست شویی کابینت ام دی اف بدون خواب و عالی نور گیر خوب طبقه 3 فقط تماس",
+        "amenities": [
+          "storage"
+        ],
+        "divarDescription": "داری حیاط و حمام دست شویی کابینت ام دی اف بدون خواب و عالی نور گیر خوب طبقه ۳ \nفقط تماس",
+        "divarImages": [
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/ZrPnwAK6drrLKopDAhvsXw/57d72d0d-c3ed-447a-b2a1-8fbbf4880731.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/-CzxMI8OxQTLbNaro-rZLQ/3534ea66-711e-4c34-b9ab-78b9ce02e556.webp",
+          "https://mapimage.divarcdn.com/v8/mapimage?encrypted_data=MTIzNDU2Nzg5MTIzXHh8_xwxzKzuQlEKL0_wNPpLjN_lX4kB0w_Phjot3TX-wA==&is_nearby=true"
+        ],
+        "divarAttributes": {
+          "متراژ": "۶۵",
+          "ساخت": "۱۴۰۲",
+          "اتاق": "بدون اتاق",
+          "تصویر‌ها برای همین ملک است؟": "بله",
+          "ودیعه": "‏۲۰۰,۰۰۰,۰۰۰ تومان",
+          "اجارهٔ ماهانه": "‏۴,۰۰۰,۰۰۰ تومان",
+          "ودیعه و اجاره": "غیر قابل تبدیل",
+          "طبقه": "۳",
+          "آسانسور ندارد": false,
+          "پارکینگ ندارد": false,
+          "انباری": true
+        },
+        "yearBuilt": 1402
+      },
+      "source": "divar",
+      "updatedAt": "2026-09-21T23:26:29.048Z"
     }
   ]
 }
