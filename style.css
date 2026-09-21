@@ -3246,3 +3246,79 @@ button.info-value.card-phone-copy,
         gap: 10px;
     }
 }
+
+
+/* =========================================================
+   AGENT PAIN POINTS: follow-up, find, call, register speed
+========================================================= */
+
+.search-box {
+    position: relative;
+}
+
+.search-clear {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--surface-3);
+    color: var(--text-soft);
+    font-size: 18px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+    padding: 0;
+}
+
+.search-clear:hover,
+.search-clear:active {
+    background: var(--border-light);
+    color: var(--text);
+}
+
+.search-box.md-search input[type="search"] {
+    padding-left: 40px;
+}
+
+.followup-badge.followup-overdue {
+    background: rgba(224, 82, 82, 0.18);
+    border-color: rgba(224, 82, 82, 0.45);
+    color: #f27777;
+    font-weight: 800;
+}
+
+.followup-badge {
+    white-space: nowrap;
+}
+
+a.detail-call-btn.primary-button {
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.detail-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.detail-actions .detail-call-btn {
+    order: -1;
+}
+
+@media (max-width: 700px) {
+    .calc-chip {
+        display: none;
+    }
+}
