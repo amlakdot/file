@@ -2356,36 +2356,13 @@ export async function importFromDivarUrl(
 
 
   /* =======================================================
-     ERROR
+     ERROR — هیچ کارتی اضافه نشود
      ======================================================= */
 
   else {
-
-    file =
-      createStubDivarFile(
-        token,
-        cleanUrl,
-        typeHint || "landlord"
-      );
-
-
-    /*
-      اینجا آگهی را حذف‌شده نمی‌کنیم.
-      چون ممکن است مشکل موقت API یا Backend باشد.
-    */
-
-    file.tags = [
-      ...new Set([
-        ...(file.tags || []),
-        TAG_NEEDS_REVIEW_GENERAL
-      ])
-    ];
-
-
-    showToast(
+    throw new Error(
       result.error ||
-      "دریافت خودکار کامل نشد. لینک ذخیره شد؛ مشخصات را دستی تکمیل کنید.",
-      "warning"
+      "دریافت آگهی از دیوار ناموفق بود. دوباره تلاش کنید."
     );
   }
 
