@@ -343,15 +343,20 @@ select {
 
 .header-button span {
     display: inline-flex;
-    min-width: 21px;
-    height: 21px;
+    min-width: 22px;
+    height: 22px;
     align-items: center;
     justify-content: center;
     margin-right: 5px;
-    border-radius: 50%;
+    border-radius: 999px;
     background: var(--warning);
     color: #111;
     font-size: 11px;
+    font-weight: 800;
+    line-height: 1;
+    padding: 0 5px;
+    box-sizing: border-box;
+    font-variant-numeric: tabular-nums;
 }
 
 .login-button {
@@ -612,10 +617,12 @@ button.info-value.card-phone-copy {
     background: transparent;
     color: inherit;
     font: inherit;
-    text-align: inherit;
     cursor: pointer;
     direction: ltr;
-    text-align: right;
+    text-align: left;
+    unicode-bidi: isolate;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
 }
 
 button.info-value.card-phone-copy:active,
@@ -1060,20 +1067,6 @@ button.info-value.card-phone-copy:focus-visible {
    RESPONSIVE
 ========================= */
 @media (max-width: 800px) {
-    .topbar {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .topbar-actions {
-        width: 100%;
-        flex-wrap: wrap;
-    }
-
-    .topbar-actions > button {
-        flex: 1;
-    }
-
     .type-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -1450,8 +1443,11 @@ button.info-value.card-phone-copy:focus-visible {
     background: var(--danger);
     color: #fff;
     font-size: 11px;
-    font-weight: 700;
+    font-weight: 800;
     line-height: 1;
+    box-sizing: border-box;
+    font-variant-numeric: tabular-nums;
+    vertical-align: middle;
 }
 
 .md-badge.sm {
@@ -1459,6 +1455,7 @@ button.info-value.card-phone-copy:focus-visible {
     height: 16px;
     font-size: 10px;
     padding: 0 4px;
+    line-height: 1;
 }
 
 .topbar-actions-mobile {
@@ -1937,7 +1934,7 @@ textarea:focus-visible {
 
 .card-price-row {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: space-between;
     gap: 12px;
 }
@@ -1954,6 +1951,10 @@ textarea:focus-visible {
     font-size: 13px;
     text-align: left;
     direction: ltr;
+    unicode-bidi: isolate;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+    line-height: 1.3;
 }
 
 .card-notes {
@@ -3099,4 +3100,149 @@ mark.search-highlight,
     background: var(--surface-2);
     border-color: var(--border-light);
     color: var(--text);
+}
+
+
+/* =========================================================
+   UX FIXES: mobile header, numbers, filters, badges
+========================================================= */
+
+/* Badge / count — عدد دقیقاً وسط عمودی و افقی */
+.filter-button .filter-count {
+    min-width: 1.4em;
+    height: 1.4em;
+    padding: 0 5px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-variant-numeric: tabular-nums;
+}
+
+.followup-chip .md-badge,
+.header-button .md-badge {
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* مبلغ و تلفن — اعداد همیشه LTR و تراز ثابت */
+.card-price-value,
+button.info-value.card-phone-copy,
+.money-input {
+    direction: ltr;
+    unicode-bidi: isolate;
+    font-variant-numeric: tabular-nums;
+}
+
+.money-input {
+    text-align: left;
+}
+
+/* موبایل: هدر جمع‌وجور مثل اپ — نه دکمه‌های پهن flex:1 */
+@media (max-width: 800px) {
+    .topbar {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 8px 12px;
+        min-height: 56px;
+    }
+
+    .topbar-actions {
+        width: auto;
+        flex: 0 0 auto;
+        flex-wrap: nowrap;
+        gap: 4px;
+        margin-inline-start: auto;
+    }
+
+    .topbar-actions > button {
+        flex: 0 0 auto;
+    }
+
+    .brand-subtitle {
+        display: none;
+    }
+
+    /* متن دکمه‌ها مخفی — فقط کوتاه/آیکون */
+    .followup-chip .btn-label {
+        display: none;
+    }
+
+    .divar-chip,
+    .calc-chip {
+        padding: 0 10px;
+        min-height: 40px;
+        font-size: 12px;
+        max-width: 7.5rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .calc-chip {
+        /* روی گوشی باریک‌تر */
+        max-width: 5.5rem;
+    }
+
+    .header-button {
+        min-height: 40px;
+        padding: 6px 10px;
+    }
+
+    .icon-button {
+        min-width: 40px;
+        min-height: 40px;
+    }
+}
+
+@media (max-width: 420px) {
+    .divar-chip,
+    .calc-chip {
+        max-width: 4.8rem;
+        padding: 0 8px;
+        font-size: 11px;
+    }
+
+    .brand-name {
+        font-size: 13.5px;
+    }
+
+    .brand-mark {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+/* فیلترها روی موبایل — لمس راحت‌تر + اسکرول نرم */
+@media (max-width: 800px) {
+    .md-chip-row {
+        gap: 6px;
+        margin-inline: -4px;
+        padding-inline: 4px;
+        padding-bottom: 8px;
+        scroll-padding-inline: 8px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .filter-button {
+        min-height: 40px;
+        padding: 8px 12px;
+        font-size: 12.5px;
+        gap: 4px;
+    }
+
+    .filter-button .filter-count {
+        min-width: 1.35em;
+        height: 1.35em;
+        font-size: 10.5px;
+    }
+
+    .card-info {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
 }
