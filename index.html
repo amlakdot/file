@@ -109,7 +109,10 @@
                 </button>
 
                 <button id="manualSyncButton" class="icon-button" type="button" title="همگام‌سازی" aria-label="همگام‌سازی">
-                    ↻
+                    <svg class="refresh-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M21 12a9 9 0 1 1-2.64-6.36"/>
+                        <polyline points="21 3 21 9 15 9"/>
+                    </svg>
                 </button>
 
                 <button id="moreMenuButton" class="icon-button" type="button" title="منو" aria-label="منو">
@@ -498,7 +501,7 @@
                             <label for="fileStatus">وضعیت</label>
                             <select id="fileStatus">
                                 <option value="active">فعال</option>
-                                <option value="followup">نیاز به پیگیری</option>
+                                <option value="followup">پیگیری</option>
                                 <option value="pending">در انتظار</option>
                                 <option value="archived">بایگانی</option>
                                 <option value="done">انجام شده</option>
