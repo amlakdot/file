@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-21T14:15:02.295Z",
+  "updatedAt": "2026-09-21T14:15:08.485Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1653,36 +1653,6 @@
       },
       "source": "divar",
       "updatedAt": "2026-09-21T14:12:47.806Z"
-    },
-    {
-      "id": "file-1790000100688-3517c20ee3efdc9ef10e7c8d",
-      "code": 1070,
-      "type": "landlord",
-      "status": "active",
-      "title": "آپارتمان",
-      "data": {
-        "code": 1070,
-        "propertyType": "apartment",
-        "area": 0,
-        "rooms": 0,
-        "year": 0,
-        "totalFloors": 0,
-        "salePrice": 0,
-        "currentDeposit": 0,
-        "currentRent": 0,
-        "suggestedDeposit": 0,
-        "suggestedRent": 0,
-        "capital": 0,
-        "tenantDeposit": 0,
-        "tenantRent": 0,
-        "familySize": 0,
-        "notes": "لینک دیوار:\nhttps://divar.ir/v/gatekVgo",
-        "amenities": [],
-        "divarImages": [],
-        "divarAttributes": {}
-      },
-      "source": "divar",
-      "updatedAt": "2026-09-21T14:15:00.676Z"
     }
   ]
 }
