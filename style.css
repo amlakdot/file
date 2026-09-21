@@ -1184,13 +1184,21 @@ button.info-value.card-phone-copy:focus-visible {
 }
 
 .detail-body {
-    /* اسکرول فقط اینجا — نه روی modal-card */
     flex: 1 1 auto;
     min-height: 0;
+    overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     margin-bottom: 4px;
     overscroll-behavior: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.detail-body::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
 }
 
 .detail-actions {
@@ -1303,11 +1311,11 @@ button.info-value.card-phone-copy:focus-visible {
 }
 
 .divar-import-body .radio-chip {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    padding: 10px 8px;
+    padding: 12px 8px;
     min-height: 44px;
     border-radius: 10px;
     border: 1px solid var(--border);
@@ -1320,20 +1328,42 @@ button.info-value.card-phone-copy:focus-visible {
     width: 100%;
     min-width: 0;
     margin: 0;
+    color: var(--text-muted);
+    transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
 }
 
 .divar-import-body .radio-chip span {
     min-width: 0;
     white-space: normal;
     word-break: break-word;
+    pointer-events: none;
 }
 
+/* مخفی کردن رادیوی پیش‌فرض مرورگر — منبع مستطیل عمودی باگ */
 .divar-import-body .radio-chip input {
-    flex-shrink: 0;
-    width: 16px;
-    height: 16px;
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
     margin: 0;
-    accent-color: var(--accent, #e7c84b);
+    padding: 0;
+    border: 0;
+    clip: rect(0, 0, 0, 0);
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.divar-import-body .radio-chip:has(input:checked) {
+    border-color: var(--accent);
+    background: rgba(231, 200, 75, 0.1);
+    color: var(--accent);
+    font-weight: 700;
+    box-shadow: 0 0 0 1px rgba(231, 200, 75, 0.25);
+}
+
+.divar-import-body .radio-chip:has(input:focus-visible) {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
 }
 
 #divarUrlInput {
@@ -2586,7 +2616,7 @@ body {
     background: var(--surface-3);
 }
 
-/* یک لایه اسکرول داخل مودال — بدون اسکرول افقی */
+/* اسکرول نرم بدون کادر/نوار اسکرول可见 */
 #fileForm,
 .detail-body,
 .calc-content,
@@ -2602,6 +2632,30 @@ body {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
     box-sizing: border-box;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge legacy */
+}
+
+#fileForm::-webkit-scrollbar,
+.detail-body::-webkit-scrollbar,
+.calc-content::-webkit-scrollbar,
+.modal-body::-webkit-scrollbar,
+.divar-import-body::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+    background: transparent;
+}
+
+.modal-card {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.modal-card::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
 }
 
 #fileForm {
