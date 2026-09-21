@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-21T13:52:14.444Z",
+  "updatedAt": "2026-09-21T14:03:32.004Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1542,6 +1542,64 @@
       },
       "source": "panel",
       "updatedAt": "2026-09-20T13:27:22.750Z"
+    },
+    {
+      "id": "file-1789999409936-0f96e10214b95dbd368ea874",
+      "code": 1068,
+      "type": "landlord",
+      "status": "active",
+      "title": "آپارتمان · 55 متر · 1 خواب · بومهن",
+      "data": {
+        "code": 1068,
+        "propertyType": "apartment",
+        "area": 55,
+        "rooms": 1,
+        "year": 1400,
+        "location": "بومهن، خ گلستان",
+        "unitFloor": "4",
+        "totalFloors": 0,
+        "salePrice": 0,
+        "currentDeposit": 0,
+        "currentRent": 0,
+        "suggestedDeposit": 330000000,
+        "suggestedRent": 10000,
+        "capital": 0,
+        "tenantDeposit": 0,
+        "tenantRent": 0,
+        "familySize": 0,
+        "notes": "عنوان دیوار: خانه در مهرآباد بومهن سلام واحد فوق دارای کمد دیواری\nآسانسور\nسرامیک\nگاز و هود تمیز\nبالکن پارکینگ‌ داخل محوطه\nنور عالی",
+        "amenities": [
+          "elevator",
+          "parking"
+        ],
+        "divarDescription": "سلام واحد فوق دارای\n کمد دیواری\nآسانسور\nسرامیک\nگاز و هود تمیز\nبالکن \nپارکینگ‌ داخل محوطه\nنور عالی",
+        "divarImages": [
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/ioSa7LDc94LQzpUNOHOVew/6261220d-332d-46bb-b17b-29f567b57668.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/i6xOWM017WEv0KI3XL1mZg/3567bdb8-d29b-4be2-b0e2-b9b4bb80b731.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/8nox4kqTFAY171Up07VyoA/b86956ba-c846-4525-b5b6-64c35dc858e4.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/eDRLQUAb37U0TJdfsVenEg/71941321-290d-4041-9156-ceeaf858d37e.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/ZJoBkDQEBTqYfy3NkVqkVA/ccdf42ad-fb36-4b68-b1de-fc818a887b10.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/cNi6sT65tWLtEwMZ4wk4fg/d69cebd1-1b7d-4726-ae6a-e5759dbafc46.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/cp1LM0jKC2hp-f64PzOLyA/1b318865-29a3-4451-825b-f445f9495d70.webp",
+          "https://mapimage.divarcdn.com/v8/mapimage?encrypted_data=MTIzNDU2Nzg5MTIzXP_HoTeTy6zuQlQ6azkCK_pLFDhSN3MThH0TjLJdybrSlg=="
+        ],
+        "divarAttributes": {
+          "متراژ": "۵۵",
+          "ساخت": "۱۴۰۰",
+          "اتاق": "۱",
+          "تصویر‌ها برای همین ملک است؟": "بله",
+          "ودیعه": "‏۳۳۰,۰۰۰,۰۰۰ تومان",
+          "اجارهٔ ماهانه": "‏۱۰,۰۰۰ تومان",
+          "ودیعه و اجاره": "غیر قابل تبدیل",
+          "طبقه": "۴",
+          "آسانسور": true,
+          "پارکینگ": true,
+          "انباری ندارد": false
+        },
+        "yearBuilt": 1400
+      },
+      "source": "divar",
+      "updatedAt": "2026-09-21T14:03:29.936Z"
     }
   ]
 }
