@@ -357,7 +357,14 @@ export function renderFileCard(file) {
       </div>
 
       <div class="card-info">
-        ${infoItem("تلفن", escapeHtml(phone || "—"))}
+        ${
+          phone
+            ? `<div class="info-item">
+          <div class="info-label">تلفن</div>
+          <button type="button" class="info-value card-phone-copy" data-phone="${escapeHtml(phone)}" title="کپی شماره">${escapeHtml(phone)}</button>
+        </div>`
+            : infoItem("تلفن", "—")
+        }
         ${infoItem("موقعیت", escapeHtml(location || "—"))}
         ${metaBits.length ? infoItem("مشخصات", escapeHtml(metaBits.join(" · "))) : ""}
       </div>
