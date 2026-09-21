@@ -96,6 +96,17 @@ export function openFileModal() {
     form.addEventListener("input", markFormDirty);
     form.addEventListener("change", markFormDirty);
   }
+
+  // ثبت سریع: فوکوس روی نام برای فایل جدید
+  if (!state.editingFileId) {
+    requestAnimationFrame(() => {
+      const nameInput = $("name");
+      if (nameInput) {
+        nameInput.focus();
+        nameInput.select?.();
+      }
+    });
+  }
 }
 
 export function closeFileModal(force = false) {
@@ -129,6 +140,19 @@ export function openDetailModal(fileId) {
   $("detailArchiveButton")?.classList.toggle("hidden", inTrash);
   $("detailRestoreButton")?.classList.toggle("hidden", !inTrash);
   $("detailPurgeButton")?.classList.toggle("hidden", !inTrash);
+
+  const phone = getFilePhone(file);
+  const callBtn = $("detailCallButton");
+  if (callBtn) {
+    const canCall = !!(phone && !inTrash);
+    callBtn.classList.toggle("hidden", !canCall);
+    if (canCall) {
+      const digits = String(phone).replace(/[^\d+]/g, "");
+      callBtn.setAttribute("href", digits ? `tel:${digits}` : "#");
+    } else {
+      callBtn.setAttribute("href", "#");
+    }
+  }
 
   const divarBtn = $("detailDivarLinkButton");
   if (divarBtn) {
