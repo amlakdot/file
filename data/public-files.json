@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-21T14:04:00.170Z",
+  "updatedAt": "2026-09-21T14:09:31.472Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1600,6 +1600,59 @@
       },
       "source": "divar",
       "updatedAt": "2026-09-21T14:03:58.474Z"
+    },
+    {
+      "id": "file-1789999769484-53c46fa4ae9946795295605e",
+      "code": 1069,
+      "type": "landlord",
+      "status": "active",
+      "title": "آپارتمان · 60 متر · 1 خواب · بومهن",
+      "data": {
+        "code": 1069,
+        "propertyType": "apartment",
+        "area": 60,
+        "rooms": 1,
+        "year": 1390,
+        "location": "بومهن، خ ستاره",
+        "unitFloor": "2",
+        "totalFloors": 0,
+        "salePrice": 0,
+        "currentDeposit": 0,
+        "currentRent": 0,
+        "suggestedDeposit": 300000000,
+        "suggestedRent": 1000000,
+        "capital": 0,
+        "tenantDeposit": 0,
+        "tenantRent": 0,
+        "familySize": 0,
+        "notes": "عنوان دیوار: خونه 60 متری ستاره ستاره دوم خونه تمیز کابینت های گلاس گاز رومیزی هود لوستر وجای پارک ماشین فراوان با همسایه های خوب محله ای ساکت",
+        "amenities": [],
+        "divarDescription": "خونه تمیز کابینت های گلاس گاز رومیزی هود لوستر وجای پارک ماشین فراوان با همسایه های خوب محله ای ساکت",
+        "divarImages": [
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/eaLx0Mr41Cq2VA_-nZIFYA/614a6267-9dbc-4bc9-80cd-ae81c8e4b2f9.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/3Jtd4Hzem39qEdZQMICQCQ/3a360cd2-ad0b-4865-9bcc-f9a211b6647c.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/FrioMbCJ7Zb_CtqGR6EuRg/15880e93-a5ab-4e87-af33-c25164808527.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/oG0or7cvNh340xDaVt18UQ/2248f84b-ef12-418f-9bd8-7a98c2e12dbb.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/VjC_DyYwqXUh9FCFsY8Trw/af841904-7c4c-4044-9438-376e062b2479.webp",
+          "https://mapimage.divarcdn.com/v8/mapimage?encrypted_data=MTIzNDU2Nzg5MTIzXHgBXETky6zuQmZjn9SYNvpLjsbUfoKF_zxcw6poFN-uaQ=="
+        ],
+        "divarAttributes": {
+          "متراژ": "۶۰",
+          "ساخت": "۱۳۹۰",
+          "اتاق": "۱",
+          "تصویر‌ها برای همین ملک است؟": "بله",
+          "ودیعه": "‏۳۰۰,۰۰۰,۰۰۰ تومان",
+          "اجارهٔ ماهانه": "‏۱,۰۰۰,۰۰۰ تومان",
+          "ودیعه و اجاره": "غیر قابل تبدیل",
+          "طبقه": "۲",
+          "آسانسور ندارد": false,
+          "پارکینگ ندارد": false,
+          "انباری ندارد": false
+        },
+        "yearBuilt": 1390
+      },
+      "source": "divar",
+      "updatedAt": "2026-09-21T14:09:29.481Z"
     }
   ]
 }
