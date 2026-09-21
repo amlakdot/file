@@ -101,12 +101,17 @@ export function getFilePrice(file) {
 export function isFollowUp(file) {
   if (!file || isDeleted(file)) return false;
   if (file.status === "archived" || file.status === "done") return false;
-  if (file.status === "followup" || file.status === "needs-followup") {
-    return true;
+  // اگر تاریخ پیگیری در آینده است، دیگر «نیاز به پیگیری» محسوب نشود
+  if (file.followUpDate) {
+    const timestamp = new Date(file.followUpDate).getTime();
+    if (Number.isFinite(timestamp) && timestamp > Date.now()) {
+      return false;
+    }
+    if (Number.isFinite(timestamp) && timestamp <= Date.now()) {
+      return true;
+    }
   }
-  if (!file.followUpDate) return false;
-  const timestamp = new Date(file.followUpDate).getTime();
-  return Number.isFinite(timestamp) && timestamp <= Date.now();
+  return file.status === "followup";
 }
 
 export function updateFollowUpStatuses() {
