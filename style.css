@@ -603,6 +603,27 @@ select {
     word-break: break-word;
 }
 
+button.info-value.card-phone-copy {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: inherit;
+    cursor: pointer;
+    direction: ltr;
+    text-align: right;
+}
+
+button.info-value.card-phone-copy:active,
+button.info-value.card-phone-copy:focus-visible {
+    color: var(--primary, #4f8cff);
+    text-decoration: underline;
+}
+
 .card-info-full .info-value {
     white-space: normal;
 }
@@ -1644,8 +1665,13 @@ textarea:focus-visible {
     gap: 8px;
 }
 
-#manualSyncButton.spinning {
+#manualSyncButton.spinning .refresh-icon {
     animation: boot-spin 0.7s linear;
+}
+
+#manualSyncButton .refresh-icon {
+    display: block;
+    flex-shrink: 0;
 }
 
 .md-sheet-title {
