@@ -876,40 +876,6 @@ export function groupMatchesByDemand(matches) {
 }
 
 
-function renderFocusSummary(file, sampleMatch) {
-  if (!file) return "";
-  const name = escapeHtml(getFileName(file));
-  const code = file.code != null ? ` #${escapeHtml(String(file.code))}` : "";
-  const type = file.type || "";
-  let moneyLine = "";
-  if (type === "landlord" || type === "tenant") {
-    const m =
-      type === "landlord"
-        ? sampleMatch?.supplyMoney || getRentMoney(file)
-        : sampleMatch?.demandMoney || getRentMoney(file);
-    const dep = m?.deposit ? formatMoney(m.deposit) : "—";
-    const rent = m?.rent ? formatMoney(m.rent) : "—";
-    moneyLine = `<span class="match-focus-money">رهن: ${dep}</span> <span class="match-focus-money">اجاره: ${rent}</span>`;
-  } else if (type === "sale" || type === "buyer") {
-    const sm = getSaleMoney(file);
-    moneyLine = `<span class="match-focus-money">${formatMoney(sm.amount)}</span>`;
-  }
-  const role =
-    type === "landlord"
-      ? "مستأجر مناسب برای"
-      : type === "sale"
-        ? "خریدار مناسب برای"
-        : type === "tenant"
-          ? "ملک مناسب برای"
-          : type === "buyer"
-            ? "فروشی مناسب برای"
-            : "تطبیق برای";
-  return `<div class="match-focus-summary">
-    <div class="match-focus-title">${role} <strong>${name}</strong>${code}</div>
-    <div class="match-focus-prices">${moneyLine}</div>
-  </div>`;
-}
-
 export function renderMatchList(matches, opts = {}) {
   const statusFilter = opts.statusFilter || "all";
   /**
@@ -934,14 +900,12 @@ export function renderMatchList(matches, opts = {}) {
     return `<p class="match-empty">پیشنهادی با امتیاز بالای ۷۰٪ پیدا نشد. فیلتر امکانات یا وضعیت پیگیری را عوض کنید.</p>`;
   }
 
-  // از روی یک فایل خاص: خلاصه فایل مبدأ + فقط طرف مقابل
+  // از روی یک فایل خاص: فقط طرف مقابل (خلاصه در عنوان مودال است)
   if (perspective === "from-demand" || perspective === "from-supply") {
     const capped = list.slice(0, MAX_SUGGESTIONS_PER_CARD);
     const showSide = perspective === "from-demand" ? "supply" : "demand";
-    const focusFile = opts.focusFile || null;
-    const head = renderFocusSummary(focusFile, capped[0]);
     const cards = capped.map((m) => renderMatchSuggestionCard(m, showSide)).join("");
-    return `${head}<div class="match-card-grid">${cards}</div>`;
+    return `<div class="match-card-grid">${cards}</div>`;
   }
 
   // مرور همه: گروه بر اساس متقاضی
