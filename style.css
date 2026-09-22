@@ -3151,17 +3151,37 @@ button.info-value.card-phone-copy,
         flex-direction: row;
         align-items: center;
         justify-content: space-between;
-        gap: 8px;
-        padding: 8px 12px;
-        min-height: 56px;
+        gap: 6px;
+        padding: 6px 10px;
+        min-height: 52px;
+    }
+
+    .brand {
+        flex: 0 1 auto;
+        min-width: 0;
+        max-width: 38%;
+    }
+
+    .brand-text {
+        min-width: 0;
+    }
+
+    .brand-name {
+        font-size: 13px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .topbar-actions {
         width: auto;
-        flex: 0 0 auto;
+        flex: 1 1 auto;
         flex-wrap: nowrap;
-        gap: 4px;
+        gap: 3px;
         margin-inline-start: auto;
+        justify-content: flex-end;
+        min-width: 0;
+        overflow: hidden;
     }
 
     .topbar-actions > button {
@@ -3177,51 +3197,87 @@ button.info-value.card-phone-copy,
         display: none;
     }
 
-    .divar-chip {
-        padding: 0 10px;
-        min-height: 40px;
-        font-size: 12px;
-        max-width: 7.5rem;
+    .followup-chip {
+        padding: 0 8px;
+        min-width: 36px;
+    }
+
+    .divar-chip,
+    .match-chip,
+    .calc-chip {
+        padding: 0 8px;
+        min-height: 36px;
+        height: 36px;
+        font-size: 11.5px;
+        max-width: none;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-    }
-
-    .calc-chip {
-        padding: 0 12px;
-        min-height: 40px;
-        font-size: 12px;
         flex-shrink: 0;
-        white-space: nowrap;
-        max-width: none;
     }
 
     .header-button {
-        min-height: 40px;
-        padding: 6px 10px;
+        min-height: 36px;
+        padding: 4px 8px;
+        font-size: 11.5px;
     }
 
     .icon-button {
-        min-width: 40px;
-        min-height: 40px;
+        min-width: 36px;
+        min-height: 36px;
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        flex-shrink: 0;
+    }
+
+    .header-button.match-chip {
+        padding: 0 8px;
     }
 }
 
 @media (max-width: 420px) {
-    .divar-chip {
-        max-width: 4.8rem;
-        padding: 0 8px;
-        font-size: 11px;
-    }
-
-    .calc-chip {
-        padding: 0 10px;
-        font-size: 11.5px;
+    .brand {
+        max-width: 28%;
     }
 
     .brand-name {
-        font-size: 13.5px;
+        font-size: 12px;
     }
+
+    .divar-chip,
+    .match-chip,
+    .calc-chip {
+        padding: 0 6px;
+        font-size: 10.5px;
+        min-height: 34px;
+        height: 34px;
+    }
+
+    /* روی عرض خیلی کم: متن ماشین حساب کوتاه‌تر */
+    .calc-chip {
+        font-size: 0;
+    }
+    .calc-chip::after {
+        content: "حساب";
+        font-size: 10.5px;
+    }
+
+    .divar-chip {
+        font-size: 0;
+    }
+    .divar-chip::after {
+        content: "دیوار";
+        font-size: 10.5px;
+    }
+
+    .icon-button {
+        min-width: 34px;
+        min-height: 34px;
+        width: 34px;
+        height: 34px;
+    }
+}
 
     .brand-mark {
         width: 36px;
@@ -3679,4 +3735,55 @@ button.match-open-btn {
 .match-score {
     font-variant-numeric: tabular-nums;
     direction: ltr;
+}
+
+/* ---- Match tabs 3-way + hint + mobile ---- */
+.match-mode-hint {
+    margin: 0;
+    font-size: 11px;
+    color: var(--text-muted, #888);
+    line-height: 1.4;
+}
+.match-tabs {
+    display: flex;
+    gap: 4px;
+}
+.match-tab {
+    flex: 1;
+    min-width: 0;
+    border: 1px solid var(--border, #333);
+    background: var(--surface-2, #1a1a1a);
+    color: var(--text-soft, #ccc);
+    border-radius: 10px;
+    padding: 8px 6px;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.match-tab.active {
+    background: var(--primary, #4f8cff);
+    border-color: var(--primary, #4f8cff);
+    color: #fff;
+}
+@media (max-width: 560px) {
+    .match-settings {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .match-refresh-btn {
+        width: 100%;
+    }
+    .match-tab {
+        font-size: 11px;
+        padding: 8px 4px;
+    }
+    .match-modal-card {
+        max-height: 92vh;
+        border-radius: 16px 16px 0 0;
+    }
+    .match-results {
+        max-height: 48vh;
+    }
 }
