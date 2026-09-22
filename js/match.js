@@ -477,7 +477,7 @@ export function matchSaleToBuyers(sale, opts = {}) {
   return results;
 }
 
-/** همه جفت‌های اجاره (بدون تکرار جفت) */
+/** همه جفت‌های اجاره با تبدیل به رهن کامل */
 export function getAllRentMatches(opts = {}) {
   const tenants = getActiveFiles().filter(
     (f) => f.type === "tenant" && f.status !== "done" && f.status !== "archived"
@@ -486,6 +486,141 @@ export function getAllRentMatches(opts = {}) {
   const all = [];
   for (const t of tenants) {
     for (const m of matchTenantToLandlords(t, opts)) {
+      const key = `${m.demand.id}|${m.supply.id}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      all.push(m);
+    }
+  }
+  all.sort((a, b) => b.score - a.score);
+  return all;
+}
+
+/**
+ * تطبیق مستقیم رهن و اجاره — بدون تبدیل به رهن کامل
+ * هر جزء (رهن، اجاره) جداگانه با تلرانس مقایسه می‌شود.
+ */
+function componentOk(budgetPart, askPart, tolerance) {
+  // اگر هر دو صفر باشند، این جزء را نادیده می‌گیریم
+  if ((!budgetPart || budgetPart <= 0) && (!askPart || askPart <= 0)) {
+    return { ok: true, skip: true, score: 0 };
+  }
+  // یکی هست و دیگری نیست → ضعیف ولی حذف مطلق نکن اگر طرف دیگر قوی باشد
+  if (!budgetPart || budgetPart <= 0 || !askPart || askPart <= 0) {
+    return { ok: true, skip: false, score: 0.15, partial: true };
+  }
+  if (!withinTolerance(budgetPart, askPart, tolerance)) {
+    return { ok: false, skip: false, score: 0 };
+  }
+  return {
+    ok: true,
+    skip: false,
+    score: priceScore(budgetPart, askPart, tolerance),
+    partial: false
+  };
+}
+
+function buildDirectRentResult(tenant, land, tolerance) {
+  const tm = getRentMoney(tenant);
+  const lm = getRentMoney(land);
+
+  const dep = componentOk(tm.deposit, lm.deposit, tolerance);
+  const ren = componentOk(tm.rent, lm.rent, tolerance);
+
+  // حداقل یکی از دو جزء باید قابل مقایسه باشد
+  if (dep.skip && ren.skip) return null;
+  // اگر هر دو جزء موجودند و هیچ‌کدام در تلرانس نیست → رد
+  if (!dep.skip && !ren.skip && !dep.ok && !ren.ok) return null;
+  // اگر فقط یک جزء داریم و خارج تلرانس است → رد
+  if (!dep.skip && ren.skip && !dep.ok) return null;
+  if (dep.skip && !ren.skip && !ren.ok) return null;
+
+  // امتیاز قیمت ترکیبی از رهن و اجاره
+  let priceCombined = 0;
+  let w = 0;
+  if (!dep.skip) {
+    // رهن معمولاً وزن بیشتری دارد
+    const wd = ren.skip ? 1 : 0.55;
+    priceCombined += dep.score * wd;
+    w += wd;
+  }
+  if (!ren.skip) {
+    const wr = dep.skip ? 1 : 0.45;
+    priceCombined += ren.score * wr;
+    w += wr;
+  }
+  if (w > 0) priceCombined /= w;
+
+  // اگر یکی خارج تلرانس بود ولی دیگری داخل، جریمه
+  if (!dep.skip && !dep.ok) priceCombined *= 0.35;
+  if (!ren.skip && !ren.ok) priceCombined *= 0.35;
+
+  // فیلتر نرم: امتیاز قیمت ترکیبی خیلی پایین رد شود
+  if (priceCombined < 0.2) return null;
+
+  const lScore = locationScore(tenant, land);
+  const aScore = areaRoomsScore(tenant, land);
+  const total = combineScores(
+    { price: priceCombined, location: lScore, specs: aScore },
+    "rent"
+  );
+
+  const depDiff =
+    lm.deposit > 0 && tm.deposit > 0
+      ? Math.round(((tm.deposit - lm.deposit) / lm.deposit) * 1000) / 10
+      : null;
+  const rentDiff =
+    lm.rent > 0 && tm.rent > 0
+      ? Math.round(((tm.rent - lm.rent) / lm.rent) * 1000) / 10
+      : null;
+
+  return {
+    mode: "rent-direct",
+    demand: tenant,
+    supply: land,
+    score: total,
+    budgetFull: tm.full, // فقط برای نمایش کمکی
+    askFull: lm.full,
+    demandMoney: tm,
+    supplyMoney: lm,
+    diffPct: depDiff != null ? depDiff : rentDiff || 0,
+    depositDiffPct: depDiff,
+    rentDiffPct: rentDiff,
+    priceScore: Math.round(priceCombined * 1000) / 10,
+    depositScore: dep.skip ? null : Math.round(dep.score * 1000) / 10,
+    rentScore: ren.skip ? null : Math.round(ren.score * 1000) / 10,
+    locationScore: lScore.hasData ? Math.round(lScore.score * 1000) / 10 : null,
+    areaScore: aScore.hasData ? Math.round(aScore.score * 1000) / 10 : null
+  };
+}
+
+export function matchTenantToLandlordsDirect(tenant, opts = {}) {
+  const tolerance = opts.tolerance ?? getMatchTolerance();
+  const tm = getRentMoney(tenant);
+  if (!tm.deposit && !tm.rent) return [];
+
+  const landlords = getActiveFiles().filter(
+    (f) => f.type === "landlord" && f.status !== "done" && f.status !== "archived"
+  );
+
+  const results = [];
+  for (const land of landlords) {
+    const m = buildDirectRentResult(tenant, land, tolerance);
+    if (m) results.push(m);
+  }
+  results.sort((a, b) => b.score - a.score);
+  return results;
+}
+
+/** همه جفت‌های اجاره با مقایسه مستقیم رهن و اجاره */
+export function getAllRentDirectMatches(opts = {}) {
+  const tenants = getActiveFiles().filter(
+    (f) => f.type === "tenant" && f.status !== "done" && f.status !== "archived"
+  );
+  const seen = new Set();
+  const all = [];
+  for (const t of tenants) {
+    for (const m of matchTenantToLandlordsDirect(t, opts)) {
       const key = `${m.demand.id}|${m.supply.id}`;
       if (seen.has(key)) continue;
       seen.add(key);
@@ -531,9 +666,27 @@ function typeLabel(type) {
 }
 
 function formatDiff(diffPct) {
+  if (diffPct == null || Number.isNaN(Number(diffPct))) return "";
   if (diffPct === 0) return "دقیقاً روی قیمت";
   if (diffPct > 0) return `${diffPct}٪ بالاتر از قیمت`;
   return `${Math.abs(diffPct)}٪ پایین‌تر از قیمت`;
+}
+
+function formatDirectDiff(match) {
+  const parts = [];
+  if (match.depositDiffPct != null) {
+    const d = match.depositDiffPct;
+    if (d === 0) parts.push("رهن مساوی");
+    else if (d > 0) parts.push(`رهن ${d}٪ بیشتر`);
+    else parts.push(`رهن ${Math.abs(d)}٪ کمتر`);
+  }
+  if (match.rentDiffPct != null) {
+    const r = match.rentDiffPct;
+    if (r === 0) parts.push("اجاره مساوی");
+    else if (r > 0) parts.push(`اجاره ${r}٪ بیشتر`);
+    else parts.push(`اجاره ${Math.abs(r)}٪ کمتر`);
+  }
+  return parts.length ? parts.join(" · ") : formatDiff(match.diffPct);
 }
 
 function moneyLineRent(money) {
@@ -580,19 +733,19 @@ export function renderMatchCard(match) {
   const dSpecs = escapeHtml(sideSpecs(demand));
   const sSpecs = escapeHtml(sideSpecs(supply));
 
-  const isRent = match.mode === "rent";
+  const isDirect = match.mode === "rent-direct";
+  const isRent = match.mode === "rent" || isDirect;
   const budgetHtml = isRent
     ? moneyLineRent(match.demandMoney)
     : moneyLineSale(match.demandMoney);
   const askHtml = isRent
     ? moneyLineRent(match.supplyMoney)
     : moneyLineSale(match.supplyMoney);
-
   const scoreClass =
     match.score >= 80 ? "high" : match.score >= 55 ? "mid" : "low";
 
-  const demandRole = isRent ? "مستأجر" : "خریدار";
-  const supplyRole = isRent ? "ملک / مالک" : "ملک فروشی";
+  const demandRole = isRent || isDirect ? "مستأجر" : "خریدار";
+  const supplyRole = isRent || isDirect ? "ملک / مالک" : "ملک فروشی";
 
   const locLabel =
     match.locationScore == null
@@ -603,16 +756,30 @@ export function renderMatchCard(match) {
       ? "مشخصات: بدون داده"
       : `مشخصات ${formatScorePct(match.areaScore)}`;
 
+  const diffText = isDirect ? formatDirectDiff(match) : formatDiff(match.diffPct);
+
+  let breakdownItems = "";
+  if (isDirect) {
+    if (match.depositScore != null) {
+      breakdownItems += `<span class="mb-item">رهن ${formatScorePct(match.depositScore)}</span>`;
+    }
+    if (match.rentScore != null) {
+      breakdownItems += `<span class="mb-item">اجاره ${formatScorePct(match.rentScore)}</span>`;
+    }
+  } else {
+    breakdownItems += `<span class="mb-item">قیمت ${formatScorePct(match.priceScore)}</span>`;
+  }
+  breakdownItems += `<span class="mb-item">${escapeHtml(locLabel)}</span>`;
+  breakdownItems += `<span class="mb-item">${escapeHtml(specLabel)}</span>`;
+
   return `
   <article class="match-card" data-demand-id="${escapeHtml(demand.id)}" data-supply-id="${escapeHtml(supply.id)}">
     <div class="match-card-top">
       <span class="match-score ${scoreClass}" title="امتیاز کل تطبیق">${formatScorePct(match.score)}</span>
-      <span class="match-diff">${escapeHtml(formatDiff(match.diffPct))}</span>
+      <span class="match-diff">${escapeHtml(diffText)}</span>
     </div>
     <div class="match-breakdown" title="جزئیات امتیاز">
-      <span class="mb-item">قیمت ${formatScorePct(match.priceScore)}</span>
-      <span class="mb-item">${escapeHtml(locLabel)}</span>
-      <span class="mb-item">${escapeHtml(specLabel)}</span>
+      ${breakdownItems}
     </div>
     <div class="match-pair">
       <div class="match-side">
