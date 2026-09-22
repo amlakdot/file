@@ -247,6 +247,12 @@ export function supplyHasAmenities(file, required) {
   return required.every((a) => list.includes(a));
 }
 
+/**
+ * سقف اختلاف قابل قبول در حالت رهن‌کامل:
+ * معادل ۹ میلیون اجاره ≈ ۳۰۰ میلیون رهن (با نرخ ۳)
+ */
+export const MAX_FULL_DEPOSIT_DELTA = 300_000_000;
+
 function buildMatchResult({
   mode,
   demand,
@@ -257,6 +263,13 @@ function buildMatchResult({
   supplyMoney
 }) {
   if (!hasPriceData(budgetFull, askFull)) return null;
+
+  // رهن‌کامل: فقط اگر اختلاف رهن‌کامل ≤ ۳۰۰ میلیون باشد
+  if (mode === "rent") {
+    const delta = Math.abs(budgetFull - askFull);
+    if (delta > MAX_FULL_DEPOSIT_DELTA) return null;
+  }
+
   const pScore = priceScore(budgetFull, askFull);
   const total = Math.round(pScore * 1000) / 10;
   const diffPct =
@@ -682,7 +695,7 @@ function sideSpecs(file) {
 }
 
 function scoreClassOf(score) {
-  return score >= 80 ? "high" : score >= 55 ? "mid" : "low";
+  return score >= 80 ? "high" : score >= 70 ? "mid" : "low";
 }
 
 function moneyHtmlForMatch(match, side /* demand|supply */) {
@@ -705,20 +718,24 @@ function breakdownForMatch(match) {
   return bits.map((t) => `<span class="mb-item">${escapeHtml(t)}</span>`).join("");
 }
 
-/** یک ردیف پیشنهاد (ملک/طرف مقابل) داخل کارت گروه */
-function renderMatchRow(match) {
+/**
+ * یک فایل پیشنهادی — ظاهر شبیه کارت لیست اصلی + نوار تطبیق
+ */
+function renderMatchSuggestionCard(match) {
   const supply = match?.supply;
   const demand = match?.demand;
   if (!supply || !demand) return "";
-  const sName = escapeHtml(getFileName(supply));
-  const sLoc = escapeHtml(getFileLocation(supply) || "منطقه ثبت نشده");
-  const sPhone = getFilePhone(supply) || "";
-  const sCode = supply.code != null ? escapeHtml(String(supply.code)) : "—";
-  const sSpecs = escapeHtml(sideSpecs(supply));
+
+  const type = supply.type || "sale";
+  const data = getFileData(supply);
+  const name = escapeHtml(getFileName(supply));
+  const loc = escapeHtml(getFileLocation(supply) || "—");
+  const phone = getFilePhone(supply) || "";
+  const code = supply.code != null ? escapeHtml(String(supply.code)) : "";
+  const specs = escapeHtml(sideSpecs(supply));
   const isDirect = match.mode === "rent-direct";
   const isRent = match.mode === "rent" || isDirect;
-  const supplyRole = isRent ? "ملک / مالک" : "ملک فروشی";
-  const askHtml = moneyHtmlForMatch(match, "supply");
+  const money = moneyHtmlForMatch(match, "supply");
   const diffText = isDirect ? formatDirectDiff(match) : formatDiff(match.diffPct);
   const fu = getMatchFollowup(demand.id, supply.id);
   const fuOpts = ["open", "suggested", "called", "rejected", "done"]
@@ -728,66 +745,95 @@ function renderMatchRow(match) {
     )
     .join("");
 
+  const typeLabel =
+    type === "landlord"
+      ? "ملک / مالک"
+      : type === "sale"
+        ? "فروشی"
+        : type === "tenant"
+          ? "مستأجر"
+          : type === "buyer"
+            ? "خریدار"
+            : type;
+
+  const area = data.area ? `${Number(data.area).toLocaleString("fa-IR")} متر` : "";
+  const rooms = data.rooms ? `${Number(data.rooms).toLocaleString("fa-IR")} خواب` : "";
+  const meta = [area, rooms].filter(Boolean).join(" · ");
+
   return `
-  <div class="match-row" data-demand-id="${escapeHtml(demand.id)}" data-supply-id="${escapeHtml(supply.id)}" data-followup="${escapeHtml(fu)}">
-    <div class="match-row-top">
-      <span class="match-score ${scoreClassOf(match.score)}" title="نزدیکی قیمت">${formatScorePct(match.score)}</span>
-      <div class="match-row-title">
-        <span class="match-role">${supplyRole}</span>
-        <span class="match-name">${sName} <span class="match-code">#${sCode}</span></span>
+  <article class="file-card card-summary md-card match-suggestion-card" data-demand-id="${escapeHtml(demand.id)}" data-supply-id="${escapeHtml(supply.id)}" data-followup="${escapeHtml(fu)}">
+    <div class="card-type-stripe" aria-hidden="true"></div>
+    <div class="match-score-bar">
+      <span class="match-score ${scoreClassOf(match.score)}">${formatScorePct(match.score)}</span>
+      ${diffText ? `<span class="match-diff">${escapeHtml(diffText)}</span>` : ""}
+      <div class="match-breakdown">${breakdownForMatch(match)}</div>
+    </div>
+    <div class="card-top">
+      <div class="card-top-main">
+        <div class="card-type">${escapeHtml(typeLabel)}</div>
+        <div class="card-title">${name}</div>
+      </div>
+      <div class="card-top-badges">
+        ${code ? `<div class="file-code-badge">کد ${code}</div>` : ""}
       </div>
     </div>
-    <div class="match-meta">📍 ${sLoc}${sSpecs ? ` · ${sSpecs}` : ""}</div>
-    <div class="match-money">${askHtml}</div>
-    ${diffText ? `<div class="match-diff-line">${escapeHtml(diffText)}</div>` : ""}
-    <div class="match-breakdown">${breakdownForMatch(match)}</div>
-    <div class="match-side-actions">
+    <div class="card-price-block"><div class="card-price-row"><span class="card-price-value">${money}</span></div></div>
+    <div class="card-info">
+      <div class="info-item">
+        <div class="info-label">موقعیت</div>
+        <div class="info-value">${loc}</div>
+      </div>
       ${
-        sPhone
-          ? `<button type="button" class="match-call-btn" data-phone="${escapeHtml(sPhone)}" data-role="supply">تماس</button>`
+        meta
+          ? `<div class="info-item"><div class="info-label">مشخصات</div><div class="info-value">${meta}</div></div>`
+          : ""
+      }
+    </div>
+    <div class="match-side-actions card-match-actions">
+      ${
+        phone
+          ? `<button type="button" class="match-call-btn" data-phone="${escapeHtml(phone)}" data-role="supply">تماس</button>`
           : ""
       }
       <button type="button" class="match-open-btn" data-file-id="${escapeHtml(supply.id)}">جزئیات</button>
       <label class="match-followup-label">
-        <span class="sr-only">پیگیری</span>
         <select class="match-followup-select" data-demand-id="${escapeHtml(demand.id)}" data-supply-id="${escapeHtml(supply.id)}" title="وضعیت پیگیری">
           ${fuOpts}
         </select>
       </label>
     </div>
-  </div>`;
+  </article>`;
 }
 
 /**
- * کارت گروهی: یک طرف تقاضا + لیست همه پیشنهادهای مناسب
+ * هدر گروه: فایل مبدأ (تقاضا) + لیست کارت‌های پیشنهاد
  */
 export function renderMatchGroup(demand, matches) {
   if (!matches || !matches.length) return "";
   const sample = matches[0];
   const isRent = sample.mode === "rent" || sample.mode === "rent-direct";
-  const demandRole = isRent ? "مستأجر" : "خریدار";
+  const demandRole = isRent ? "مستأجر / تقاضا" : "خریدار / تقاضا";
+  // اگر از سمت ملک باز شده باشد، demand همان متقاضی است
   const dName = escapeHtml(getFileName(demand));
-  const dLoc = escapeHtml(getFileLocation(demand) || "منطقه ثبت نشده");
+  const dLoc = escapeHtml(getFileLocation(demand) || "—");
   const dPhone = getFilePhone(demand) || "";
-  const dCode = demand.code != null ? escapeHtml(String(demand.code)) : "—";
-  const dSpecs = escapeHtml(sideSpecs(demand));
+  const dCode = demand.code != null ? escapeHtml(String(demand.code)) : "";
   const budgetHtml = moneyHtmlForMatch(sample, "demand");
   const best = matches[0].score;
   const count = matches.length;
-
-  const rows = matches.map(renderMatchRow).join("");
+  const rows = matches.map(renderMatchSuggestionCard).join("");
 
   return `
-  <article class="match-group-card" data-demand-id="${escapeHtml(demand.id)}">
-    <header class="match-group-head">
+  <section class="match-group-card" data-demand-id="${escapeHtml(demand.id)}">
+    <header class="match-group-head file-card card-summary">
       <div class="match-group-head-main">
         <div class="match-role">${demandRole}</div>
-        <div class="match-name">${dName} <span class="match-code">#${dCode}</span></div>
-        <div class="match-meta">📍 ${dLoc}${dSpecs ? ` · ${dSpecs}` : ""}</div>
+        <div class="match-name">${dName}${dCode ? ` <span class="match-code">#${dCode}</span>` : ""}</div>
+        <div class="match-meta">📍 ${dLoc}</div>
         <div class="match-money">${budgetHtml}</div>
       </div>
       <div class="match-group-head-side">
-        <span class="match-score ${scoreClassOf(best)}" title="بهترین امتیاز">${formatScorePct(best)}</span>
+        <span class="match-score ${scoreClassOf(best)}">${formatScorePct(best)}</span>
         <span class="match-count-badge">${count.toLocaleString("fa-IR")} پیشنهاد</span>
         <div class="match-side-actions">
           ${
@@ -799,17 +845,17 @@ export function renderMatchGroup(demand, matches) {
         </div>
       </div>
     </header>
-    <div class="match-group-label">پیشنهادهای مناسب (مرتب‌شده بر اساس امتیاز)</div>
-    <div class="match-group-rows">
+    <div class="match-group-label">پیشنهادهای مناسب (≥ ۷۰٪)</div>
+    <div class="match-group-rows match-card-grid">
       ${rows}
     </div>
-  </article>`;
+  </section>`;
 }
 
 /** گروه‌بندی بر اساس demand (مستأجر / خریدار) */
-/** حداکثر پیشنهاد در هر کارت + حداقل امتیاز نمایش */
 const MAX_SUGGESTIONS_PER_CARD = 8;
-const MIN_SCORE_TO_SHOW = 70;  /* فقط پیشنهاد ≥ ۷۰٪ */
+/** فقط پیشنهادهای با امتیاز ۷۰٪ به بالا نمایش داده می‌شوند */
+const MIN_SCORE_TO_SHOW = 70;
 
 export function groupMatchesByDemand(matches) {
   const map = new Map();
@@ -842,9 +888,12 @@ export function renderMatchList(matches, opts = {}) {
     });
   }
   if (!list.length) {
-    return `<p class="match-empty">پیشنهادی با این فیلتر پیدا نشد. امکانات یا وضعیت پیگیری را تغییر دهید.</p>`;
+    return `<p class="match-empty">پیشنهادی با امتیاز بالای ۷۰٪ پیدا نشد. فیلتر امکانات یا وضعیت پیگیری را عوض کنید.</p>`;
   }
   const groups = groupMatchesByDemand(list);
+  if (!groups.length) {
+    return `<p class="match-empty">پیشنهادی با امتیاز بالای ۷۰٪ پیدا نشد.</p>`;
+  }
   return groups.map((g) => renderMatchGroup(g.demand, g.items)).join("");
 }
 
