@@ -809,7 +809,7 @@ export function renderMatchGroup(demand, matches) {
 /** گروه‌بندی بر اساس demand (مستأجر / خریدار) */
 /** حداکثر پیشنهاد در هر کارت + حداقل امتیاز نمایش */
 const MAX_SUGGESTIONS_PER_CARD = 8;
-const MIN_SCORE_TO_SHOW = 12;
+const MIN_SCORE_TO_SHOW = 70;  /* فقط پیشنهاد ≥ ۷۰٪ */
 
 export function groupMatchesByDemand(matches) {
   const map = new Map();
