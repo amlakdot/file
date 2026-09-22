@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-22T09:58:13.597Z",
+  "updatedAt": "2026-09-22T09:58:48.953Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1642,6 +1642,57 @@
       },
       "source": "panel",
       "updatedAt": "2026-09-22T09:26:29.204Z"
+    },
+    {
+      "id": "file-1790071127320-d90ff4a178a1aa456a1742a8",
+      "code": 1076,
+      "type": "landlord",
+      "status": "active",
+      "title": "آپارتمان · 50 متر · 1 خواب · بومهن",
+      "data": {
+        "code": 1076,
+        "propertyType": "apartment",
+        "area": 50,
+        "rooms": 1,
+        "year": 1389,
+        "location": "بومهن، خ شبنم",
+        "unitFloor": "2",
+        "totalFloors": 2,
+        "salePrice": 0,
+        "currentDeposit": 0,
+        "currentRent": 0,
+        "suggestedDeposit": 150000000,
+        "suggestedRent": 4000000,
+        "capital": 0,
+        "tenantDeposit": 0,
+        "tenantRent": 0,
+        "familySize": 0,
+        "notes": "عنوان دیوار: اجاره تک واحدی طبقه دوم واحد 50متری طبقه دوم کف پارکت دیوار کاغذ دیواری. کابینت ام دی اف خوش ساخت مناسب خانواده و افراد مجرد موجه آدرس دقیق بومهن کوچه اسلامی ده متری یاس بن بست گلبرگ پلاک چهار طبقه دوم",
+        "amenities": [
+          "storage"
+        ],
+        "divarDescription": "واحد ۵۰متری طبقه دوم کف پارکت دیوار کاغذ دیواری. کابینت ام دی اف  خوش ساخت مناسب خانواده و افراد مجرد موجه \n\nآدرس دقیق \nبومهن کوچه اسلامی ده متری یاس بن بست گلبرگ پلاک چهار طبقه دوم",
+        "divarImages": [
+          "https://s100.divarcdn.com/static/videos/thumbnails/thumbnail/e49ca643-a3b3-4961-86a5-c52f39547913.jpg",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/3Vaq8YGt2efvvELPuzEqDA/0a4e5d51-226e-499d-b408-4b4986252385.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/9DNmxCo8wU0uLikOPQd7yQ/ae130b36-aebf-4365-aa94-69110033c37a.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/0z27yf-ouN0razBNn07xjw/3b05520b-c15d-4516-982e-cf6f79ef831b.webp",
+          "https://mapimage.divarcdn.com/v8/mapimage?encrypted_data=MTIzNDU2Nzg5MTIzXCIHvJpRyqzuQpN3sdI2NPpL9l031wBvaY5ahTMI7SEL_w=="
+        ],
+        "divarAttributes": {
+          "متراژ": "۵۰",
+          "ساخت": "۱۳۸۹",
+          "اتاق": "۱",
+          "تصویر‌ها برای همین ملک است؟": "بله",
+          "طبقه": "۲ از ۲",
+          "آسانسور ندارد": false,
+          "پارکینگ ندارد": false,
+          "انباری": true
+        },
+        "yearBuilt": 1389
+      },
+      "source": "divar",
+      "updatedAt": "2026-09-22T09:58:47.320Z"
     }
   ]
 }
