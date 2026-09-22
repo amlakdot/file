@@ -3,7 +3,19 @@
 ========================================================= */
 
 import { state } from "./state.js";
-import { $, setLoginError, parseMoney, setupMoneyInputs, showToast, copyToClipboard } from "./helpers.js";
+import {
+  $,
+  setLoginError,
+  parseMoney,
+  setupMoneyInputs,
+  showToast,
+  copyToClipboard,
+  appLog,
+  getAppLogs,
+  clearAppLogs,
+  formatLogsForCopy,
+  escapeHtml
+} from "./helpers.js";
 import { loginWithToken, logout, manualSync, tryRestoreSession } from "./auth.js";
 import { setupCalculator } from "./calculator.js";
 import { publishPublicFiles } from "./github.js";
@@ -100,6 +112,32 @@ function setupDivarImport() {
     closeDivarImportModal();
   });
 
+  // دکمه پیست لینک از کلیپ‌بورد
+  $("pasteDivarUrlButton")?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    const input = $("divarUrlInput");
+    if (!input) return;
+    try {
+      let text = "";
+      if (navigator.clipboard?.readText) {
+        text = await navigator.clipboard.readText();
+      }
+      text = String(text || "").trim();
+      if (!text) {
+        showToast("کلیپ‌بورد خالی است یا دسترسی داده نشد.", "error");
+        appLog("warn", "ui", "پیست لینک دیوار: کلیپ‌بورد خالی");
+        return;
+      }
+      input.value = text;
+      input.focus();
+      showToast("لینک چسبانده شد.", "success");
+      appLog("info", "ui", "لینک دیوار از کلیپ‌بورد پیست شد", { length: text.length });
+    } catch (err) {
+      showToast("دسترسی به کلیپ‌بورد ممکن نیست. لینک را دستی بچسبانید.", "error");
+      appLog("error", "ui", "خطا در پیست لینک دیوار", { message: err?.message });
+    }
+  });
+
   $("confirmDivarImportButton")?.addEventListener("click", async (e) => {
     e.preventDefault();
     let url = ($("divarUrlInput")?.value || "").trim();
@@ -142,15 +180,21 @@ function setupDivarImport() {
     }
 
     let hadError = false;
+    appLog("info", "divar", "شروع import از لینک", { url, typeHint });
     try {
       const file = await importFromDivarUrl(url, typeHint);
       closeDivarImportModal();
       showToast("آگهی از دیوار ذخیره شد. نام و تلفن را تکمیل کنید.", "success");
+      appLog("info", "divar", "import موفق", { id: file?.id, token });
       renderHome();
       // باز کردن جزئیات فایل جدید
       if (file?.id) openDetailModal(file.id);
     } catch (err) {
       hadError = true;
+      appLog("error", "divar", "import ناموفق", {
+        message: err?.message,
+        name: err?.name
+      });
       if (errEl) {
         errEl.textContent = err.message || "خطا در دریافت آگهی.";
         errEl.classList.remove("hidden");
@@ -177,6 +221,104 @@ function closeMoreMenu() {
   if (!sheet) return;
   sheet.classList.add("hidden");
   sheet.setAttribute("aria-hidden", "true");
+}
+
+/* ---------- Logs panel ---------- */
+let _logsFilterCat = "all";
+
+function openLogsModal() {
+  closeMoreMenu();
+  const modal = $("logsModal");
+  if (!modal) return;
+  modal.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+  renderLogsList();
+  appLog("debug", "ui", "باز شدن پنل لاگ");
+}
+
+function closeLogsModal() {
+  $("logsModal")?.classList.add("hidden");
+  if (
+    $("fileModal")?.classList.contains("hidden") &&
+    $("detailModal")?.classList.contains("hidden") &&
+    $("divarImportModal")?.classList.contains("hidden") &&
+    $("calculatorModal")?.classList.contains("hidden")
+  ) {
+    document.body.style.overflow = "";
+  }
+}
+
+function renderLogsList() {
+  const listEl = $("logsList");
+  const emptyEl = $("logsEmpty");
+  if (!listEl) return;
+
+  const entries = getAppLogs({ category: _logsFilterCat }).reverse();
+  if (!entries.length) {
+    listEl.innerHTML = "";
+    emptyEl?.classList.remove("hidden");
+    return;
+  }
+  emptyEl?.classList.add("hidden");
+
+  listEl.innerHTML = entries
+    .map((e) => {
+      const time = new Date(e.ts).toLocaleString("fa-IR", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        day: "2-digit",
+        month: "2-digit"
+      });
+      const detail = e.detail
+        ? `<div class="log-detail">${escapeHtml(e.detail)}</div>`
+        : "";
+      return `<div class="logs-entry level-${escapeHtml(e.level)}">
+        <div class="log-meta">
+          <span class="log-cat">${escapeHtml(e.category)}</span>
+          <span>${escapeHtml(time)}</span>
+          <span> · ${escapeHtml(e.level)}</span>
+        </div>
+        <div class="log-msg">${escapeHtml(e.message)}</div>
+        ${detail}
+      </div>`;
+    })
+    .join("");
+}
+
+function setupLogsPanel() {
+  $("openLogsButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    openLogsModal();
+  });
+  $("closeLogsButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    closeLogsModal();
+  });
+  $("logsModalBackdrop")?.addEventListener("click", () => closeLogsModal());
+
+  document.querySelectorAll(".logs-filter-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".logs-filter-btn").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      _logsFilterCat = btn.getAttribute("data-log-cat") || "all";
+      renderLogsList();
+    });
+  });
+
+  $("clearLogsButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    clearAppLogs();
+    renderLogsList();
+    showToast("لاگ‌ها پاک شد.", "success");
+  });
+
+  $("copyLogsButton")?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    const text = formatLogsForCopy(getAppLogs({ category: _logsFilterCat }));
+    const ok = await copyToClipboard(text || "(empty)");
+    showToast(ok ? "لاگ‌ها کپی شد." : "کپی نشد.", ok ? "success" : "error");
+  });
 }
 
 function openNewFile() {
@@ -247,6 +389,7 @@ function setupTopBar() {
       logout();
     } catch (err) {
       console.error(err);
+      appLog("error", "auth", "خطا در logout", { message: err?.message });
       state.token = null;
       $("loginScreen")?.classList.remove("hidden");
       $("appScreen")?.classList.add("hidden");
@@ -454,8 +597,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   setupModalClose();
   setupDetailActions();
   setupDivarImport();
+  setupLogsPanel();
   setupCalculator();
   setupMoneyInputs(document);
+  appLog("info", "ui", "اپ آماده شد");
 
   document.addEventListener("change", (e) => {
     const id = e.target?.id;
