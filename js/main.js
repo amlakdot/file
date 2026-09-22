@@ -45,6 +45,17 @@ import {
   buildDivarUrl,
   extractDivarToken
 } from "./divar.js";
+import {
+  getMatchRate,
+  setMatchRate,
+  getMatchTolerance,
+  setMatchTolerance,
+  getAllRentMatches,
+  getAllSaleMatches,
+  getMatchStats,
+  renderMatchList,
+  DEFAULT_RAHN_RATE
+} from "./match.js";
 
 function setupLoginForm() {
   const form = $("loginForm");
@@ -242,7 +253,8 @@ function closeLogsModal() {
     $("fileModal")?.classList.contains("hidden") &&
     $("detailModal")?.classList.contains("hidden") &&
     $("divarImportModal")?.classList.contains("hidden") &&
-    $("calculatorModal")?.classList.contains("hidden")
+    $("calculatorModal")?.classList.contains("hidden") &&
+    $("matchModal")?.classList.contains("hidden")
   ) {
     document.body.style.overflow = "";
   }
@@ -284,6 +296,121 @@ function renderLogsList() {
       </div>`;
     })
     .join("");
+}
+
+/* ---------- Match panel ---------- */
+let _matchTab = "rent";
+
+function openMatchModal() {
+  closeMoreMenu();
+  const modal = $("matchModal");
+  if (!modal) return;
+  const rateEl = $("matchRateInput");
+  const tolEl = $("matchToleranceInput");
+  if (rateEl) rateEl.value = String(getMatchRate());
+  if (tolEl) tolEl.value = String(Math.round(getMatchTolerance() * 100));
+  modal.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+  refreshMatchResults();
+  appLog("info", "ui", "باز شدن پنل تطبیق");
+}
+
+function closeMatchModal() {
+  $("matchModal")?.classList.add("hidden");
+  if (
+    $("fileModal")?.classList.contains("hidden") &&
+    $("detailModal")?.classList.contains("hidden") &&
+    $("divarImportModal")?.classList.contains("hidden") &&
+    $("calculatorModal")?.classList.contains("hidden") &&
+    $("logsModal")?.classList.contains("hidden")
+  ) {
+    document.body.style.overflow = "";
+  }
+}
+
+function refreshMatchResults() {
+  const rate = setMatchRate($("matchRateInput")?.value || DEFAULT_RAHN_RATE);
+  const tolPct = Number($("matchToleranceInput")?.value);
+  const tolerance = setMatchTolerance(
+    Number.isFinite(tolPct) ? tolPct : 15
+  );
+
+  const stats = getMatchStats();
+  const statsEl = $("matchStatsLine");
+  if (statsEl) {
+    statsEl.textContent = `فعال: ${stats.landlords} مالک · ${stats.tenants} مستأجر · ${stats.sales} فروشی · ${stats.buyers} خریدار · نرخ ${rate} · تلرانس ${Math.round(tolerance * 100)}٪`;
+  }
+
+  const opts = { rate, tolerance };
+  const matches =
+    _matchTab === "sale" ? getAllSaleMatches(opts) : getAllRentMatches(opts);
+  const box = $("matchResults");
+  if (box) box.innerHTML = renderMatchList(matches);
+  appLog("debug", "ui", "تطبیق بروزرسانی شد", {
+    tab: _matchTab,
+    count: matches.length,
+    rate,
+    tolerance
+  });
+}
+
+function setupMatchPanel() {
+  const open = (e) => {
+    e?.preventDefault?.();
+    openMatchModal();
+  };
+  $("openMatchButton")?.addEventListener("click", open);
+  $("openMatchHeaderButton")?.addEventListener("click", open);
+
+  $("closeMatchButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    closeMatchModal();
+  });
+  $("matchModalBackdrop")?.addEventListener("click", () => closeMatchModal());
+
+  $("matchRefreshButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    refreshMatchResults();
+    showToast("تطبیق بروزرسانی شد.", "success");
+  });
+
+  document.querySelectorAll(".match-tab").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".match-tab").forEach((t) => t.classList.remove("active"));
+      tab.classList.add("active");
+      _matchTab = tab.getAttribute("data-match-tab") || "rent";
+      refreshMatchResults();
+    });
+  });
+
+  // تماس و جزئیات داخل نتایج
+  $("matchResults")?.addEventListener("click", (e) => {
+    const callBtn = e.target?.closest?.(".match-call-btn");
+    if (callBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      const phone = callBtn.getAttribute("data-phone") || "";
+      if (!phone) {
+        showToast("شماره‌ای ثبت نشده.", "error");
+        return;
+      }
+      const digits = String(phone).replace(/[^\d+]/g, "");
+      if (digits) {
+        window.location.href = `tel:${digits}`;
+        appLog("info", "ui", "تماس از تطبیق", { phone: digits });
+      }
+      return;
+    }
+    const openBtn = e.target?.closest?.(".match-open-btn");
+    if (openBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      const id = openBtn.getAttribute("data-file-id");
+      if (!id) return;
+      closeMatchModal();
+      openDetailModal(id);
+    }
+  });
 }
 
 function setupLogsPanel() {
@@ -598,6 +725,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   setupDetailActions();
   setupDivarImport();
   setupLogsPanel();
+  setupMatchPanel();
   setupCalculator();
   setupMoneyInputs(document);
   appLog("info", "ui", "اپ آماده شد");
