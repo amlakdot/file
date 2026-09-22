@@ -339,3 +339,111 @@ export function openWhatsApp(text) {
   const url = "https://wa.me/?text=" + encodeURIComponent(text || "");
   window.open(url, "_blank", "noopener,noreferrer");
 }
+
+/* =========================================================
+   APP LOGGER — دسته‌بندی‌شده برای دیباگ
+========================================================= */
+
+const LOG_MAX = 300;
+const LOG_STORAGE_KEY = "amlakdot_app_logs_v1";
+
+/** @type {{ id: number, ts: number, level: string, category: string, message: string, detail?: string }[]} */
+let _logEntries = [];
+let _logIdSeq = 1;
+
+function _loadLogsFromStorage() {
+  try {
+    const raw = localStorage.getItem(LOG_STORAGE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      _logEntries = parsed.slice(-LOG_MAX);
+      const maxId = _logEntries.reduce((m, e) => Math.max(m, e.id || 0), 0);
+      _logIdSeq = maxId + 1;
+    }
+  } catch {
+    /* ignore */
+  }
+}
+
+function _persistLogs() {
+  try {
+    localStorage.setItem(LOG_STORAGE_KEY, JSON.stringify(_logEntries.slice(-LOG_MAX)));
+  } catch {
+    /* quota / private mode */
+  }
+}
+
+_loadLogsFromStorage();
+
+/**
+ * ثبت لاگ دسته‌بندی‌شده
+ * @param {'debug'|'info'|'warn'|'error'} level
+ * @param {string} category  e.g. divar | network | github | auth | ui | general
+ * @param {string} message
+ * @param {unknown} [detail]
+ */
+export function appLog(level, category, message, detail) {
+  const entry = {
+    id: _logIdSeq++,
+    ts: Date.now(),
+    level: level || "info",
+    category: category || "general",
+    message: String(message || ""),
+    detail:
+      detail == null
+        ? undefined
+        : typeof detail === "string"
+          ? detail
+          : (() => {
+              try {
+                return JSON.stringify(detail, null, 2);
+              } catch {
+                return String(detail);
+              }
+            })()
+  };
+  _logEntries.push(entry);
+  if (_logEntries.length > LOG_MAX) {
+    _logEntries = _logEntries.slice(-LOG_MAX);
+  }
+  _persistLogs();
+
+  // console هم برای DevTools
+  const prefix = `[${entry.category}]`;
+  if (level === "error") console.error(prefix, message, detail ?? "");
+  else if (level === "warn") console.warn(prefix, message, detail ?? "");
+  else if (level === "debug") console.debug(prefix, message, detail ?? "");
+  else console.info(prefix, message, detail ?? "");
+
+  return entry;
+}
+
+export function getAppLogs({ category, level, limit } = {}) {
+  let list = _logEntries;
+  if (category && category !== "all") {
+    if (category === "error") {
+      list = list.filter((e) => e.level === "error");
+    } else {
+      list = list.filter((e) => e.category === category);
+    }
+  }
+  if (level) list = list.filter((e) => e.level === level);
+  if (limit && limit > 0) list = list.slice(-limit);
+  return list.slice();
+}
+
+export function clearAppLogs() {
+  _logEntries = [];
+  _persistLogs();
+}
+
+export function formatLogsForCopy(entries) {
+  return (entries || _logEntries)
+    .map((e) => {
+      const t = new Date(e.ts).toISOString();
+      const d = e.detail ? `\n  ${e.detail.replace(/\n/g, "\n  ")}` : "";
+      return `[${t}] ${e.level.toUpperCase()} ${e.category}: ${e.message}${d}`;
+    })
+    .join("\n");
+}
