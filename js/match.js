@@ -863,6 +863,96 @@ export function getMatchStats() {
   };
 }
 
+/**
+ * تطبیق فقط برای یک فایل مشخص
+ * @returns {{ matches: array, defaultTab: string, title: string, tabs: string[] }}
+ */
+export function getMatchesForFile(file, opts = {}) {
+  if (!file || !file.id) {
+    return { matches: [], defaultTab: "rent", title: "تطبیق", tabs: ["rent", "rent-direct", "sale"] };
+  }
+  const type = file.type || "sale";
+  const name = getFileName(file);
+  const code = file.code != null ? `#${file.code}` : "";
+
+  if (type === "tenant") {
+    const tab = opts.tab === "rent-direct" ? "rent-direct" : "rent";
+    const matches =
+      tab === "rent-direct"
+        ? matchTenantToLandlordsDirect(file, opts)
+        : matchTenantToLandlords(file, opts);
+    return {
+      matches,
+      defaultTab: tab,
+      title: `ملک مناسب برای ${name} ${code}`.trim(),
+      tabs: ["rent", "rent-direct"],
+      focusRole: "tenant"
+    };
+  }
+  if (type === "landlord") {
+    const tab = opts.tab === "rent-direct" ? "rent-direct" : "rent";
+    // از سمت ملک: همه مستأجرها را بگیر و فقط جفت‌هایی که supply همین ملک است
+    let matches;
+    if (tab === "rent-direct") {
+      const tenants = getActiveFiles().filter(
+        (f) => f.type === "tenant" && f.status !== "done" && f.status !== "archived"
+      );
+      matches = [];
+      for (const t of tenants) {
+        for (const m of matchTenantToLandlordsDirect(t, opts)) {
+          if (m.supply?.id === file.id) matches.push(m);
+        }
+      }
+    } else {
+      matches = matchLandlordToTenants(file, opts);
+    }
+    matches.sort((a, b) => b.score - a.score);
+    return {
+      matches,
+      defaultTab: tab,
+      title: `مستأجر مناسب برای ${name} ${code}`.trim(),
+      tabs: ["rent", "rent-direct"],
+      focusRole: "landlord"
+    };
+  }
+  if (type === "buyer") {
+    const matches = matchBuyerToSales(file, opts);
+    return {
+      matches,
+      defaultTab: "sale",
+      title: `ملک فروشی برای ${name} ${code}`.trim(),
+      tabs: ["sale"],
+      focusRole: "buyer"
+    };
+  }
+  // sale
+  const matches = matchSaleToBuyers(file, opts);
+  return {
+    matches,
+    defaultTab: "sale",
+    title: `خریدار مناسب برای ${name} ${code}`.trim(),
+    tabs: ["sale"],
+    focusRole: "sale"
+  };
+}
+
+export function matchButtonLabel(file) {
+  const type = file?.type || "";
+  switch (type) {
+    case "tenant":
+      return "ملک مناسب";
+    case "landlord":
+      return "مستأجر مناسب";
+    case "buyer":
+      return "فروشی مناسب";
+    case "sale":
+      return "خریدار مناسب";
+    default:
+      return "تطبیق";
+  }
+}
+
+
 export function findFileById(id) {
   return state.files.find((f) => f && f.id === id && !isDeleted(f)) || null;
 }
