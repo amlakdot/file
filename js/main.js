@@ -316,6 +316,7 @@ function openMatchModal() {
 }
 
 function closeMatchModal() {
+  state.returnToMatch = false;
   $("matchModal")?.classList.add("hidden");
   if (
     $("fileModal")?.classList.contains("hidden") &&
@@ -407,7 +408,9 @@ function setupMatchPanel() {
       e.stopPropagation();
       const id = openBtn.getAttribute("data-file-id");
       if (!id) return;
-      closeMatchModal();
+      // پنل تطبیق را فقط مخفی می‌کنیم؛ با بستن جزئیات دوباره باز می‌شود
+      state.returnToMatch = true;
+      $("matchModal")?.classList.add("hidden");
       openDetailModal(id);
     }
   });
