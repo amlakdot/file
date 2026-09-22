@@ -876,6 +876,84 @@ export function groupMatchesByDemand(matches) {
 }
 
 
+
+/**
+ * توضیح می‌دهد چرا لیست تطبیق خالی است (برای مشاور)
+ */
+export function explainEmptyMatches(matches, opts = {}) {
+  const statusFilter = opts.statusFilter || "all";
+  const perspective = opts.perspective || "auto";
+  const focusFile = opts.focusFile || null;
+  const raw = Array.isArray(matches) ? matches : [];
+  const reasons = [];
+
+  if (focusFile) {
+    const type = focusFile.type || "";
+    if (type === "tenant" || type === "landlord") {
+      const m = getRentMoney(focusFile, opts.rate ?? getMatchRate());
+      if (!m.deposit && !m.rent && !m.full) {
+        reasons.push("این فایل رهن یا اجاره ندارد؛ بدون مبلغ، تطبیق ممکن نیست.");
+      }
+    } else if (type === "buyer" || type === "sale") {
+      const sm = getSaleMoney(focusFile);
+      if (!sm.amount) {
+        reasons.push("این فایل قیمت / سرمایه ندارد؛ بدون مبلغ، تطبیق ممکن نیست.");
+      }
+    }
+  }
+
+  if (!raw.length) {
+    if (!reasons.length) {
+      reasons.push("جفت قابل‌مقایسه‌ای با دادهٔ قیمت پیدا نشد (فایل‌های مقابل ممکن است مبلغ نداشته باشند).");
+    }
+  } else {
+    const above70 = raw.filter((m) => m && m.score >= MIN_SCORE_TO_SHOW);
+    const below70 = raw.length - above70.length;
+    if (!above70.length && below70 > 0) {
+      reasons.push(
+        `${below70.toLocaleString("fa-IR")} مورد پیدا شد ولی امتیاز همه زیر ۷۰٪ بود.`
+      );
+    }
+    if (statusFilter && statusFilter !== "all") {
+      const afterStatus = (above70.length ? above70 : raw).filter((m) => {
+        const st = getMatchFollowup(m.demand.id, m.supply.id);
+        if (statusFilter === "open") return st === "open";
+        return st === statusFilter;
+      });
+      if (!afterStatus.length) {
+        reasons.push("با فیلتر وضعیت پیگیری فعلی موردی باقی نماند.");
+      }
+    }
+  }
+
+  if (opts.amenities && opts.amenities.length) {
+    reasons.push(
+      "فیلتر امکانات فعال است؛ فقط ملک‌هایی که همهٔ امکانات انتخاب‌شده را دارند در نظر گرفته می‌شوند."
+    );
+  }
+
+  if (!reasons.length) {
+    reasons.push("پیشنهادی با شرایط فعلی پیدا نشد.");
+  }
+
+  const tips = [
+    "رهن و اجاره (یا قیمت) هر دو طرف را کامل کنید.",
+    "فیلتر امکانات را خاموش کنید.",
+    "وضعیت پیگیری را روی «همه» بگذارید."
+  ];
+
+  return {
+    reasons,
+    html: `<div class="match-empty">
+      <p class="match-empty-title">پیشنهادی نمایش داده نشد</p>
+      <ul class="match-empty-reasons">
+        ${reasons.map((r) => `<li>${escapeHtml(r)}</li>`).join("")}
+      </ul>
+      <p class="match-empty-tips"><strong>چه کار کنید:</strong> ${escapeHtml(tips.join(" · "))}</p>
+    </div>`
+  };
+}
+
 export function renderMatchList(matches, opts = {}) {
   const statusFilter = opts.statusFilter || "all";
   /**
@@ -897,7 +975,7 @@ export function renderMatchList(matches, opts = {}) {
   list.sort((a, b) => b.score - a.score || Math.abs(a.diffPct || 0) - Math.abs(b.diffPct || 0));
 
   if (!list.length) {
-    return `<p class="match-empty">پیشنهادی با امتیاز بالای ۷۰٪ پیدا نشد. فیلتر امکانات یا وضعیت پیگیری را عوض کنید.</p>`;
+    return explainEmptyMatches(matches, opts).html;
   }
 
   // از روی یک فایل خاص: فقط طرف مقابل (خلاصه در عنوان مودال است)
@@ -911,7 +989,7 @@ export function renderMatchList(matches, opts = {}) {
   // مرور همه: گروه بر اساس متقاضی
   const groups = groupMatchesByDemand(list);
   if (!groups.length) {
-    return `<p class="match-empty">پیشنهادی با امتیاز بالای ۷۰٪ پیدا نشد.</p>`;
+    return explainEmptyMatches(matches, opts).html;
   }
   return groups.map((g) => renderMatchGroup(g.demand, g.items)).join("");
 }
