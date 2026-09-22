@@ -371,20 +371,29 @@ function refreshMatchResults() {
   }
 
   const opts = { rate, amenities };
-  let matches;
-  if (_matchTab === "sale") matches = getAllSaleMatches(opts);
-  else if (_matchTab === "rent-direct") matches = getAllRentDirectMatches(opts);
-  else matches = getAllRentMatches(opts);
-
   const box = $("matchResults");
-  if (box) box.innerHTML = renderMatchList(matches, { statusFilter });
-  appLog("debug", "ui", "تطبیق بروزرسانی شد", {
-    tab: _matchTab,
-    count: matches.length,
-    rate,
-    amenities,
-    statusFilter
-  });
+  try {
+    let matches;
+    if (_matchTab === "sale") matches = getAllSaleMatches(opts);
+    else if (_matchTab === "rent-direct") matches = getAllRentDirectMatches(opts);
+    else matches = getAllRentMatches(opts);
+
+    if (box) box.innerHTML = renderMatchList(matches, { statusFilter });
+    appLog("debug", "ui", "تطبیق بروزرسانی شد", {
+      tab: _matchTab,
+      count: matches.length,
+      rate,
+      amenities,
+      statusFilter
+    });
+  } catch (err) {
+    console.error(err);
+    appLog("error", "ui", "خطا در رندر تطبیق", { message: err?.message });
+    if (box) {
+      box.innerHTML = `<p class="match-empty">خطا در ساخت پیشنهادها. جزئیات در لاگ دیباگ است.</p>`;
+    }
+    showToast(err?.message || "خطا در تطبیق", "error");
+  }
 }
 
 function setupMatchPanel() {
