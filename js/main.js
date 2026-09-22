@@ -446,14 +446,25 @@ function refreshMatchResults() {
       matches = getAllRentMatches(opts);
     }
 
-    if (box) box.innerHTML = renderMatchList(matches, { statusFilter });
+    let perspective = "auto";
+    if (_matchFocusFileId) {
+      const f = state.files.find((x) => x && x.id === _matchFocusFileId);
+      const ty = f?.type || "";
+      if (ty === "tenant" || ty === "buyer") perspective = "from-demand";
+      else if (ty === "landlord" || ty === "sale") perspective = "from-supply";
+    }
+
+    if (box) {
+      box.innerHTML = renderMatchList(matches, { statusFilter, perspective });
+    }
     appLog("debug", "ui", "تطبیق بروزرسانی شد", {
       tab: _matchTab,
       count: matches.length,
       rate,
       amenities,
       statusFilter,
-      focus: _matchFocusFileId
+      focus: _matchFocusFileId,
+      perspective
     });
   } catch (err) {
     console.error(err);
