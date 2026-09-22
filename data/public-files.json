@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-22T17:57:51.878Z",
+  "updatedAt": "2026-09-22T18:01:02.322Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1646,6 +1646,76 @@
       },
       "source": "panel",
       "updatedAt": "2026-09-22T15:13:03.734Z"
+    },
+    {
+      "id": "file-1790100060676-6fac646baa6c240ec3442d37",
+      "code": 1079,
+      "type": "landlord",
+      "status": "active",
+      "title": "باغ · 245 متر · 3 خواب · تهران",
+      "data": {
+        "code": 1079,
+        "propertyType": "garden",
+        "area": 245,
+        "rooms": 3,
+        "year": 1402,
+        "location": "تهران، velenjak",
+        "unitFloor": "6",
+        "totalFloors": 10,
+        "salePrice": 0,
+        "currentDeposit": 0,
+        "currentRent": 0,
+        "suggestedDeposit": 35000000000,
+        "suggestedRent": 150000000,
+        "capital": 0,
+        "tenantDeposit": 0,
+        "tenantRent": 0,
+        "familySize": 0,
+        "amenities": [
+          "elevator",
+          "parking",
+          "storage"
+        ],
+        "divarDescription": "✅️عکس و توضیحات تماما واقعی✅️\n\n⭐️مطرح ترین برج باغ شمیرانات چاپ شده در مجلات معماری روز ایران⭐️\n\n_ بهترین فرعی منتهی به سمت دره ساسان _\n\n۲۱۰۰ متر زمین\nدر کل ۱۵ طبقه\n۱۰ طبقه مسکونی\n۵ طبقه مشاعات\nسازه فلزی\n\n《آرشیتکت: مهندس افشین حجت》\n\nمجموعا ۳۲ واحد\n\nطبقه ۱ تا ۶ هر طبقه ۴ واحد ۲۴۵ متری ۳ خوابه داری حدود ۲۰ متر تراس سبز و ۲ واحد پارکینگ.\n\nطبقه ۷ تا ۱۰ هر طبقه ۲ واحدی ۴۷۲ متری ‌.\n\n‼️طبقه ۶‼️\n‼️۲۴۵ متر‼️\n\nآشپز خانه فرنیش kuppersbusch + مطبخ مجزا\n \nسنگ آشپزخانه black cosmic برزیل\n\n۲ لاین آسانسور ۱۸ نفره kohler آلمان\n\nسیستم هوشمند berker آلمان\n\nکاشی و سرامیک سرویس ها برند atlas concorde ایتالیا\nاکسسوری سرویسها cielo  دست ساز ایتالیا\nشیرآلات hansgrohe و axor آلمان\nکابینت ها شرکت مینیاتور \nسینک ها Franke ایتالیا\nسنگ کف اسلبsivec یونان\n\nچیلرها شرکت hidros ایتالیا\nمشاعات شامل\nاستخر ،سونا ،جکوزی،استخر کودک ،حمام ترکی\nاتاق نمک و ماساژ\nسالن بیلیارد،سالن سینما،کتابخانه، واحد مانیتورینگ و مدیریت\nسالن اجتماعات ،روف گاردن، زمین مینی گلف، لابی و پارکینگها\n\nمشاور شما: اخلاقی\n\n⭐️املاک امیران زعفرانیه⭐️",
+        "divarImages": [
+          "https://s100.divarcdn.com/static/videos/thumbnails/thumbnail/41ebbb66-67aa-4e73-8bcb-e721b92e384d.jpg",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/v9Jk_1LsmHwT4fv0obzBGA/fe8a575a-0725-46e9-8915-998033ef03f6.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/BAn__2jt-g48jqWTqhdOnA/ebdb8f38-081d-4b24-9f81-ac3d67aa8373.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/cIaAEzNtaVpaXwfouCdXJw/c37c4850-a945-4236-aa9b-dc9f9aa7e196.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/LXerfgPz7XAS2Q0cU-jsYA/8ff78e63-6320-4eb0-bfc0-0218eb614004.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/2inkjYN3r8yRh7Li2-YWxA/ca03ab36-b736-4da5-a086-add6be3c9702.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/4UMLQcM1uupq_k_Usd8OuQ/d9b6b32c-9ed0-4e85-8d7c-2867265bbbbf.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/Dz3MX1l8wZHRlQyNPTk9kQ/836e06ca-c6ef-4295-9231-001f1b7b398f.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/HUvJ45Sp6X5-qMeoH6bWWw/9f0d0b5d-9bbf-4af3-b84b-a6da18c71837.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/2VDW4tiibqGqr2ZccNOu-w/8e3d3c4b-3c89-4dc4-ba39-a7e1535db237.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/bliE8YfsYQv45uN7T-GM2w/7266fe8e-366c-47e1-9bd6-c80ce102c4ce.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/9G9qxIb-GHz85XPy4YcCbg/b20871da-187f-47c1-a1b0-2640367f99e6.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/y6ZJyy6p51w-bqzGVZsuUA/e907fe15-c952-4106-88b5-ea19dbadcd2a.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/R1Qlk4MviVFjlG_aYxRPkQ/78d4a21f-a370-419e-b7e0-96779f1d205f.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/Vf_bl5mnA0zSxfl2nZ4JBw/49039fd7-ad48-46d0-b909-a27cd55f23d2.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/ViDdB21E04vIFqkoRYZ4_A/305a97bd-12bf-4b3a-aa54-47a0a1aeb95d.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/sMfYBH7aiFJ73byZkdA6mQ/0b117806-e925-43df-bba6-3bbb2ab544cd.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/ADqdp996MAH-iiGpLGQRfw/c6587cf6-cf52-4e0b-a1a3-f674abf2136a.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/zwUHbPxl1g3m4WbOfD_XBw/cc957b2a-266d-486a-9e9c-630220cf8c04.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/hNUgOQPcRHsX4_BInemFLQ/d56f22d8-4f44-46d8-b96f-bbb31f2cdfc8.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/1DXh4g_BjjrWnnIdvIuu9Q/37ae7d7e-48f5-4394-a202-39f4678ae2ba.webp",
+          "https://mapimage.divarcdn.com/v8/mapimage?encrypted_data=MTIzNDU2Nzg5MTIzXMlIOa3j8KzuQkykYUq-aPpLQpVlzinbt-poSPfoHPekqg==&is_nearby=true"
+        ],
+        "divarAttributes": {
+          "متراژ": "۲۴۵",
+          "ساخت": "۱۴۰۲",
+          "اتاق": "۳",
+          "تصویر‌ها برای همین ملک است؟": "بله",
+          "طبقه": "۶ از ۱۰",
+          "آسانسور": true,
+          "پارکینگ": true,
+          "انباری": true
+        },
+        "notes": "✅️عکس و توضیحات تماما واقعی✅️ ⭐️مطرح ترین برج باغ شمیرانات چاپ شده در مجلات معماری روز ایران⭐️ _ بهترین فرعی منتهی به سمت دره ساسان _ 2100 متر زمین\nدر کل 15 طبقه\n10 طبقه مسکونی\n5 طبقه مشاعات\nسازه فلزی 《آرشیتکت: مهندس افشین حجت》 مجموعا 32 واحد طبقه 1 تا 6 هر طبقه 4 واحد 245 متری 3 خوابه داری حدود 20 متر تراس سبز و 2 واحد پارکینگ. طبقه 7 تا 10 هر طبقه 2 واحدی 472 متری ‌. ‼️طبقه 6‼️\n‼️245 متر‼️ آشپز خانه فرنیش kuppersbusch + مطبخ مجزا سنگ آشپزخانه black cosmic برزیل 2 لاین آسانسور 18 نفره kohler آلمان سیستم هوشمند berker آلمان کاشی و سرامیک سرویس ها برند atlas concorde ایتالیا\nاکسسوری سرویسها cielo دست ساز ایتالیا\nشیرآلات hansgrohe و axor آلمان\nکابینت ها شرکت مینیاتور سینک ها Franke ایتالیا\nسنگ کف اسلبsivec یونان چیلرها شرکت hidros ایتالیا\nمشاعات شامل\nاستخر ،سونا ،جکوزی،استخر کودک ،حمام ترکی\nاتاق نمک و ماساژ\nسالن بیلیارد،سالن سینما،کتابخانه، واحد مانیتورینگ و مدیریت\nسالن اجتماعات ،روف گاردن، زمین مینی گلف، لابی و پارکینگها مشاور شما: اخلاقی ⭐️املاک امیران زعفرانیه⭐️",
+        "yearBuilt": 1402
+      },
+      "source": "divar",
+      "updatedAt": "2026-09-22T18:01:00.676Z"
     }
   ]
 }
