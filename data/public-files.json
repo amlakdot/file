@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-22T08:03:19.404Z",
+  "updatedAt": "2026-09-22T08:05:40.599Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -949,37 +949,6 @@
         "tenantNotes": "پارکینگ میخواد حتما",
         "amenities": [],
         "code": 1033
-      },
-      "source": "panel",
-      "updatedAt": "2026-09-21T11:26:43.046Z"
-    },
-    {
-      "id": "file-1789138967935-874-7hze1s9pd",
-      "code": 1034,
-      "type": "tenant",
-      "status": "active",
-      "title": "آپارتمان",
-      "data": {
-        "propertyType": "apartment",
-        "area": 0,
-        "rooms": 0,
-        "year": 0,
-        "totalFloors": 0,
-        "keyHolder": "owner",
-        "condition": "new",
-        "occupancy": "empty",
-        "salePrice": 0,
-        "currentDeposit": 0,
-        "currentRent": 0,
-        "suggestedDeposit": 0,
-        "suggestedRent": 0,
-        "capital": 0,
-        "tenantDeposit": 200000000,
-        "tenantRent": 2000000,
-        "familyStatus": "married",
-        "familySize": 0,
-        "amenities": [],
-        "code": 1034
       },
       "source": "panel",
       "updatedAt": "2026-09-21T11:26:43.046Z"
