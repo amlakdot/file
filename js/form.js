@@ -165,6 +165,7 @@ function resetFormFields() {
   });
 
   if ($("notes")) $("notes").value = "";
+  if ($("publicNotes")) $("publicNotes").value = "";
   if ($("plaque")) $("plaque").value = "";
   if ($("unitFloor")) $("unitFloor").value = "";
   if ($("totalFloors")) $("totalFloors").value = "";
@@ -245,6 +246,7 @@ export async function saveFile() {
   const tenantNotes = ($("tenantNotes")?.value || "").trim();
 
   const notes = ($("notes")?.value || "").trim();
+  const publicNotes = ($("publicNotes")?.value || "").trim();
 
   const amenities = Array.from(
     document.querySelectorAll(".amenity:checked")
@@ -408,6 +410,7 @@ export async function saveFile() {
     familySize,
     tenantNotes,
     notes,
+    publicNotes,
     amenities
   };
 
@@ -651,7 +654,8 @@ export function loadFileIntoForm(fileId) {
     familyStatus: data.familyStatus,
     familySize: data.familySize,
     tenantNotes: data.tenantNotes,
-    notes: data.notes
+    notes: data.notes,
+    publicNotes: data.publicNotes
   };
 
   Object.entries(textFields).forEach(([id, value]) => {
