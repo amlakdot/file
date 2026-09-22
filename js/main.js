@@ -51,6 +51,7 @@ import {
   getMatchTolerance,
   setMatchTolerance,
   getAllRentMatches,
+  getAllRentDirectMatches,
   getAllSaleMatches,
   getMatchStats,
   renderMatchList,
@@ -342,9 +343,31 @@ function refreshMatchResults() {
     statsEl.textContent = `فعال: ${stats.landlords} مالک · ${stats.tenants} مستأجر · ${stats.sales} فروشی · ${stats.buyers} خریدار · نرخ ${rate} · تلرانس ${Math.round(tolerance * 100)}٪`;
   }
 
+  const rateField = $("matchRateInput")?.closest?.(".match-field");
+  if (rateField) {
+    // نرخ تبدیل فقط برای حالت رهن‌کامل لازم است
+    rateField.style.display = _matchTab === "rent" ? "" : "none";
+  }
+
+  const hintEl = $("matchModeHint");
+  if (hintEl) {
+    if (_matchTab === "rent") {
+      hintEl.textContent =
+        "رهن و اجاره با نرخ تبدیل به «رهن کامل» یکسان می‌شود و بعد مقایسه می‌گردد.";
+    } else if (_matchTab === "rent-direct") {
+      hintEl.textContent =
+        "رهن با رهن و اجاره با اجاره جداگانه مقایسه می‌شود — بدون تبدیل.";
+    } else {
+      hintEl.textContent = "سرمایه خریدار با قیمت فروش ملک مقایسه می‌شود.";
+    }
+  }
+
   const opts = { rate, tolerance };
-  const matches =
-    _matchTab === "sale" ? getAllSaleMatches(opts) : getAllRentMatches(opts);
+  let matches;
+  if (_matchTab === "sale") matches = getAllSaleMatches(opts);
+  else if (_matchTab === "rent-direct") matches = getAllRentDirectMatches(opts);
+  else matches = getAllRentMatches(opts);
+
   const box = $("matchResults");
   if (box) box.innerHTML = renderMatchList(matches);
   appLog("debug", "ui", "تطبیق بروزرسانی شد", {
