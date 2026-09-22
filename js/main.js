@@ -48,13 +48,12 @@ import {
 import {
   getMatchRate,
   setMatchRate,
-  getMatchTolerance,
-  setMatchTolerance,
   getAllRentMatches,
   getAllRentDirectMatches,
   getAllSaleMatches,
   getMatchStats,
   renderMatchList,
+  setMatchFollowup,
   DEFAULT_RAHN_RATE
 } from "./match.js";
 
@@ -302,14 +301,23 @@ function renderLogsList() {
 /* ---------- Match panel ---------- */
 let _matchTab = "rent";
 
+function getSelectedMatchAmenities() {
+  return Array.from(
+    document.querySelectorAll("#matchAmenityChips input[type=checkbox]:checked")
+  ).map((el) => el.value);
+}
+
 function openMatchModal() {
   closeMoreMenu();
   const modal = $("matchModal");
   if (!modal) return;
   const rateEl = $("matchRateInput");
-  const tolEl = $("matchToleranceInput");
   if (rateEl) rateEl.value = String(getMatchRate());
-  if (tolEl) tolEl.value = String(Math.round(getMatchTolerance() * 100));
+  // فیلترها پیش‌فرض جمع
+  const panel = $("matchFiltersPanel");
+  const toggle = $("matchFiltersToggle");
+  if (panel) panel.classList.add("collapsed");
+  if (toggle) toggle.setAttribute("aria-expanded", "false");
   modal.classList.remove("hidden");
   document.body.style.overflow = "hidden";
   refreshMatchResults();
@@ -332,20 +340,19 @@ function closeMatchModal() {
 
 function refreshMatchResults() {
   const rate = setMatchRate($("matchRateInput")?.value || DEFAULT_RAHN_RATE);
-  const tolPct = Number($("matchToleranceInput")?.value);
-  const tolerance = setMatchTolerance(
-    Number.isFinite(tolPct) ? tolPct : 15
-  );
+  const amenities = getSelectedMatchAmenities();
+  const statusFilter = $("matchStatusFilter")?.value || "all";
 
   const stats = getMatchStats();
   const statsEl = $("matchStatsLine");
   if (statsEl) {
-    statsEl.textContent = `فعال: ${stats.landlords} مالک · ${stats.tenants} مستأجر · ${stats.sales} فروشی · ${stats.buyers} خریدار · نرخ ${rate} · تلرانس ${Math.round(tolerance * 100)}٪`;
+    const am =
+      amenities.length > 0 ? ` · فیلتر امکانات: ${amenities.length}` : "";
+    statsEl.textContent = `فعال: ${stats.landlords} مالک · ${stats.tenants} مستأجر · ${stats.sales} فروشی · ${stats.buyers} خریدار · نرخ ${rate}${am}`;
   }
 
-  const rateField = $("matchRateInput")?.closest?.(".match-field");
+  const rateField = $("matchRateField");
   if (rateField) {
-    // نرخ تبدیل فقط برای حالت رهن‌کامل لازم است
     rateField.style.display = _matchTab === "rent" ? "" : "none";
   }
 
@@ -353,28 +360,30 @@ function refreshMatchResults() {
   if (hintEl) {
     if (_matchTab === "rent") {
       hintEl.textContent =
-        "رهن و اجاره با نرخ تبدیل به «رهن کامل» یکسان می‌شود و بعد مقایسه می‌گردد.";
+        "امتیاز فقط بر اساس نزدیکی «رهن کامل معادل» است. امکانات فقط اگر فیلتر شوند اعمال می‌شوند.";
     } else if (_matchTab === "rent-direct") {
       hintEl.textContent =
-        "رهن با رهن و اجاره با اجاره جداگانه مقایسه می‌شود — بدون تبدیل.";
+        "امتیاز فقط بر اساس نزدیکی رهن با رهن و اجاره با اجاره است — بدون تبدیل.";
     } else {
-      hintEl.textContent = "سرمایه خریدار با قیمت فروش ملک مقایسه می‌شود.";
+      hintEl.textContent =
+        "امتیاز فقط بر اساس نزدیکی سرمایه خریدار به قیمت فروش است.";
     }
   }
 
-  const opts = { rate, tolerance };
+  const opts = { rate, amenities };
   let matches;
   if (_matchTab === "sale") matches = getAllSaleMatches(opts);
   else if (_matchTab === "rent-direct") matches = getAllRentDirectMatches(opts);
   else matches = getAllRentMatches(opts);
 
   const box = $("matchResults");
-  if (box) box.innerHTML = renderMatchList(matches);
+  if (box) box.innerHTML = renderMatchList(matches, { statusFilter });
   appLog("debug", "ui", "تطبیق بروزرسانی شد", {
     tab: _matchTab,
     count: matches.length,
     rate,
-    tolerance
+    amenities,
+    statusFilter
   });
 }
 
@@ -398,6 +407,23 @@ function setupMatchPanel() {
     showToast("تطبیق بروزرسانی شد.", "success");
   });
 
+  $("matchFiltersToggle")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    const panel = $("matchFiltersPanel");
+    const btn = $("matchFiltersToggle");
+    if (!panel || !btn) return;
+    panel.classList.toggle("collapsed");
+    const isCollapsed = panel.classList.contains("collapsed");
+    btn.setAttribute("aria-expanded", isCollapsed ? "false" : "true");
+  });
+
+  $("matchAmenityChips")?.addEventListener("change", () => {
+    refreshMatchResults();
+  });
+  $("matchStatusFilter")?.addEventListener("change", () => {
+    refreshMatchResults();
+  });
+
   document.querySelectorAll(".match-tab").forEach((tab) => {
     tab.addEventListener("click", () => {
       document.querySelectorAll(".match-tab").forEach((t) => t.classList.remove("active"));
@@ -407,7 +433,23 @@ function setupMatchPanel() {
     });
   });
 
-  // تماس و جزئیات داخل نتایج
+  // تماس و جزئیات و پیگیری داخل نتایج
+  $("matchResults")?.addEventListener("change", (e) => {
+    const sel = e.target?.closest?.(".match-followup-select");
+    if (!sel) return;
+    const demandId = sel.getAttribute("data-demand-id");
+    const supplyId = sel.getAttribute("data-supply-id");
+    const status = sel.value || "open";
+    if (!demandId || !supplyId) return;
+    setMatchFollowup(demandId, supplyId, status);
+    const row = sel.closest(".match-row");
+    if (row) row.setAttribute("data-followup", status);
+    showToast("وضعیت پیگیری ذخیره شد.", "success");
+    // اگر فیلتر وضعیت فعال است، لیست را تازه کن
+    const sf = $("matchStatusFilter")?.value || "all";
+    if (sf !== "all") refreshMatchResults();
+  });
+
   $("matchResults")?.addEventListener("click", (e) => {
     const callBtn = e.target?.closest?.(".match-call-btn");
     if (callBtn) {
