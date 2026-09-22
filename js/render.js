@@ -37,6 +37,7 @@ import {
   getActiveFiles,
   getFileTags
 } from "./files.js";
+import { matchButtonLabel } from "./match.js";
 
 function amenityLabels(list) {
   if (!Array.isArray(list)) return [];
@@ -512,7 +513,14 @@ export function renderFileCard(file) {
       ${amenitiesHtml}
 
       <div class="card-footer">
-        <div>${escapeHtml(formatDate(file.updatedAt || file.deletedAt))}</div>
+        <div class="card-footer-left">
+          <div class="card-date">${escapeHtml(formatDate(file.updatedAt || file.deletedAt))}</div>
+          ${
+            !isInTrash(file) && !isDeleted(file)
+              ? `<button type="button" class="card-match-btn" data-match-file-id="${escapeHtml(file.id)}" title="${escapeHtml(matchButtonLabel(file))}">${escapeHtml(matchButtonLabel(file))}</button>`
+              : ""
+          }
+        </div>
         <div class="status-badge" style="background:${getStatusColor(status)}">
           ${escapeHtml(getStatusLabel(status))}
         </div>
