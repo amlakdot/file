@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-22T15:10:42.875Z",
+  "updatedAt": "2026-09-22T15:13:06.553Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1643,6 +1643,43 @@
       },
       "source": "panel",
       "updatedAt": "2026-09-22T13:29:45.090Z"
+    },
+    {
+      "id": "file-1790089983734-f8acf9b488d97e26bda85c2f",
+      "code": 1078,
+      "type": "landlord",
+      "status": "active",
+      "title": "آپارتمان · 65 متر · 1 خواب · زیتون چهار راه",
+      "data": {
+        "code": 1078,
+        "propertyType": "apartment",
+        "area": 65,
+        "rooms": 1,
+        "year": 0,
+        "location": "زیتون چهار راه",
+        "unitFloor": "2",
+        "totalFloors": 2,
+        "keyHolder": "owner",
+        "condition": "new",
+        "occupancy": "empty",
+        "salePrice": 0,
+        "currentDeposit": 0,
+        "currentRent": 0,
+        "suggestedDeposit": 150000000,
+        "suggestedRent": 7000000,
+        "capital": 0,
+        "tenantDeposit": 0,
+        "tenantRent": 0,
+        "familyStatus": "single",
+        "familySize": 0,
+        "notes": "دو طبقه هر دو اجاره",
+        "amenities": [
+          "balcony",
+          "yard"
+        ]
+      },
+      "source": "panel",
+      "updatedAt": "2026-09-22T15:13:03.734Z"
     }
   ]
 }
