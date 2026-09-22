@@ -129,21 +129,53 @@ export function getSaleMoney(file) {
   return { amount: 0, label: "" };
 }
 
+/**
+ * امتیاز منطقه ۰–۱
+ * - بدون داده در هر دو طرف → خنثی (از وزن خارج می‌شود در محاسبه نهایی)
+ * - تطابق کامل / زیررشته / اشتراک توکن
+ */
 function locationScore(a, b) {
   const la = normalize(getFileLocation(a));
   const lb = normalize(getFileLocation(b));
-  if (!la || !lb) return 0.35; // بدون منطقه: امتیاز خنثی پایین
-  if (la === lb) return 1;
-  if (la.includes(lb) || lb.includes(la)) return 0.85;
-  // اشتراک کلمات
-  const wa = new Set(la.split(/\s+/).filter((w) => w.length >= 2));
-  const wb = new Set(lb.split(/\s+/).filter((w) => w.length >= 2));
+  if (!la && !lb) return { score: 0, hasData: false };
+  if (!la || !lb) return { score: 0.25, hasData: true }; // یکی خالی: ضعیف
+
+  if (la === lb) return { score: 1, hasData: true };
+  if (la.includes(lb) || lb.includes(la)) {
+    const ratio = Math.min(la.length, lb.length) / Math.max(la.length, lb.length);
+    return { score: 0.75 + 0.2 * ratio, hasData: true };
+  }
+
+  const tokenize = (s) =>
+    s
+      .split(/[\s،,/\-_]+/)
+      .map((w) => w.trim())
+      .filter((w) => w.length >= 2);
+
+  const wa = tokenize(la);
+  const wb = tokenize(lb);
+  if (!wa.length || !wb.length) return { score: 0.2, hasData: true };
+
+  const setB = new Set(wb);
   let common = 0;
-  for (const w of wa) if (wb.has(w)) common += 1;
-  if (common === 0) return 0.15;
-  return Math.min(1, 0.4 + common * 0.2);
+  for (const w of wa) if (setB.has(w)) common += 1;
+  const jaccard = common / (new Set([...wa, ...wb]).size || 1);
+  // اشتراک جزئی کلمات (مثلاً «ارکیده» داخل «ارکیده ۳»)
+  let partial = 0;
+  for (const x of wa) {
+    for (const y of wb) {
+      if (x !== y && (x.includes(y) || y.includes(x))) partial += 0.5;
+    }
+  }
+  const raw = Math.min(1, jaccard * 1.2 + partial * 0.15);
+  return { score: Math.max(0.05, raw), hasData: true };
 }
 
+/**
+ * متراژ و اتاق — پیوسته و اصولی
+ * متراژ: نسبت have/need با جریمه برای کمبود بیشتر از مازاد
+ * اتاق: تعداد دقیق یا نزدیک
+ */
 function areaRoomsScore(demand, supply) {
   const dd = getFileData(demand);
   const sd = getFileData(supply);
@@ -152,46 +184,151 @@ function areaRoomsScore(demand, supply) {
   const needRooms = Number(dd.rooms) || 0;
   const haveRooms = Number(sd.rooms) || 0;
 
-  let score = 0.5;
-  let parts = 0;
+  const parts = [];
 
   if (needArea > 0 && haveArea > 0) {
-    parts += 1;
-    if (haveArea >= needArea * 0.9) score += 0.3;
-    else if (haveArea >= needArea * 0.75) score += 0.15;
-    else score -= 0.2;
+    const ratio = haveArea / needArea;
+    let s;
+    if (ratio >= 0.95 && ratio <= 1.15) {
+      // نزدیک به نیاز
+      s = 1 - Math.abs(1 - ratio) * 1.5;
+    } else if (ratio > 1.15 && ratio <= 1.4) {
+      s = 0.85 - (ratio - 1.15) * 0.8; // مازاد ملایم
+    } else if (ratio >= 0.8 && ratio < 0.95) {
+      s = 0.55 + (ratio - 0.8) * 2; // کمی کوچک‌تر
+    } else if (ratio >= 0.65) {
+      s = 0.25 + (ratio - 0.65) * 1.5;
+    } else {
+      s = Math.max(0, ratio * 0.3);
+    }
+    parts.push(Math.max(0, Math.min(1, s)));
   }
+
   if (needRooms > 0 && haveRooms > 0) {
-    parts += 1;
-    if (haveRooms >= needRooms) score += 0.2;
-    else if (haveRooms >= needRooms - 1) score += 0.05;
-    else score -= 0.15;
+    const diff = haveRooms - needRooms;
+    let s;
+    if (diff === 0) s = 1;
+    else if (diff === 1) s = 0.85;
+    else if (diff > 1) s = Math.max(0.4, 0.85 - (diff - 1) * 0.15);
+    else if (diff === -1) s = 0.45;
+    else s = Math.max(0, 0.2 + diff * 0.1);
+    parts.push(s);
   }
-  if (parts === 0) return 0.4;
-  return Math.max(0, Math.min(1, score));
+
+  if (!parts.length) return { score: 0, hasData: false };
+  const avg = parts.reduce((a, b) => a + b, 0) / parts.length;
+  return { score: avg, hasData: true };
 }
 
+/**
+ * امتیاز قیمت ۰–۱ — پیوسته نسبت به فاصله نسبی
+ *
+ * ایده:
+ * - بودجه = قیمت → ۱
+ * - بودجه کمی بالاتر از قیمت (تا +۱۰٪) → نزدیک ۱ (توان پرداخت خوب)
+ * - بودجه کمتر از قیمت → سریع‌تر جریمه می‌شود
+ * - خارج از باند تلرانس → ۰ (فیلتر جداگانه)
+ */
 function priceScore(budget, ask, tolerance) {
   if (!budget || budget <= 0 || !ask || ask <= 0) return 0;
-  const ratio = budget / ask;
-  // ایده‌آل: بودجه نزدیک یا کمی بالاتر از قیمت
-  if (ratio >= 1 - tolerance && ratio <= 1 + tolerance) {
-    // نزدیک‌تر = بهتر؛ کمی بالاتر از قیمت کمی امتیاز بیشتر
-    const dist = Math.abs(1 - ratio);
-    return Math.max(0.55, 1 - dist / Math.max(tolerance, 0.01));
+  const ratio = budget / ask; // >1 یعنی بودجه بیشتر از قیمت
+  const tol = Math.max(tolerance || 0.15, 0.01);
+
+  // فاصله نسبی از نقطه ایده‌آل (۱)
+  // نقطه شیرین: کمی بالاتر از قیمت (ratio ≈ 1.02)
+  const ideal = 1.02;
+  let dist;
+  if (ratio >= ideal) {
+    // مازاد بودجه: جریمه ملایم‌تر
+    dist = (ratio - ideal) / (tol * 1.4);
+  } else {
+    // کمبود بودجه: جریمه تندتر
+    dist = (ideal - ratio) / tol;
   }
-  if (ratio > 1 + tolerance && ratio <= 1 + tolerance * 2) return 0.4;
-  if (ratio < 1 - tolerance && ratio >= 1 - tolerance * 2) return 0.25;
-  return 0;
+
+  if (dist <= 0) return 1;
+  if (dist >= 1.5) return 0;
+  // منحنی نرم: 1 در مرکز، ~0.55 روی لبه تلرانس
+  const s = Math.cos((Math.min(dist, 1) * Math.PI) / 2);
+  // بعد از لبه تلرانس تا 1.5 با شیب خطی به صفر
+  if (dist <= 1) return Math.max(0, Math.min(1, 0.5 + 0.5 * s));
+  return Math.max(0, 0.5 * (1.5 - dist) / 0.5);
 }
 
 function withinTolerance(budget, ask, tolerance) {
   if (!budget || !ask) return false;
-  const lo = ask * (1 - tolerance);
-  const hi = ask * (1 + tolerance);
-  // بودجه مستأجر/خریدار باید حداقل نزدیک کف باشد
-  // اجازه می‌دهیم بودجه کمی کمتر هم بیاید (تلرانس)
-  return budget >= lo && budget <= hi * 1.25;
+  const tol = Math.max(tolerance || 0.15, 0);
+  // بودجه در بازه [ask*(1-tol), ask*(1+tol*1.35)]
+  // کمی فضای بیشتر برای بودجه بالاتر (می‌تواند بخرد/اجاره کند)
+  const lo = ask * (1 - tol);
+  const hi = ask * (1 + tol * 1.35);
+  return budget >= lo && budget <= hi;
+}
+
+/**
+ * ترکیب وزن‌دار — فقط معیارهایی که داده دارند در مخرج می‌آیند
+ * قیمت همیشه هست (پیش‌شرط فیلتر)
+ */
+function combineScores({ price, location, specs }, mode) {
+  // وزن پایه
+  const weights =
+    mode === "sale"
+      ? { price: 0.55, location: 0.25, specs: 0.2 }
+      : { price: 0.5, location: 0.3, specs: 0.2 };
+
+  let totalW = weights.price;
+  let sum = price * weights.price;
+
+  if (location.hasData) {
+    totalW += weights.location;
+    sum += location.score * weights.location;
+  }
+  if (specs.hasData) {
+    totalW += weights.specs;
+    sum += specs.score * weights.specs;
+  }
+
+  if (totalW <= 0) return 0;
+  return Math.round((sum / totalW) * 1000) / 10; // یک رقم اعشار برای دقت بیشتر
+}
+
+function buildMatchResult({
+  mode,
+  demand,
+  supply,
+  budgetFull,
+  askFull,
+  demandMoney,
+  supplyMoney,
+  tolerance
+}) {
+  const pScore = priceScore(budgetFull, askFull, tolerance);
+  const lScore = locationScore(demand, supply);
+  const aScore = areaRoomsScore(demand, supply);
+  const total = combineScores(
+    { price: pScore, location: lScore, specs: aScore },
+    mode
+  );
+
+  const diffPct =
+    askFull > 0
+      ? Math.round(((budgetFull - askFull) / askFull) * 1000) / 10
+      : 0;
+
+  return {
+    mode,
+    demand,
+    supply,
+    score: total,
+    budgetFull,
+    askFull,
+    demandMoney,
+    supplyMoney,
+    diffPct,
+    priceScore: Math.round(pScore * 1000) / 10,
+    locationScore: lScore.hasData ? Math.round(lScore.score * 1000) / 10 : null,
+    areaScore: aScore.hasData ? Math.round(aScore.score * 1000) / 10 : null
+  };
 }
 
 /**
@@ -213,30 +350,18 @@ export function matchTenantToLandlords(tenant, opts = {}) {
     if (!lm.full) continue;
     if (!withinTolerance(tenantMoney.full, lm.full, tolerance)) continue;
 
-    const pScore = priceScore(tenantMoney.full, lm.full, tolerance);
-    const lScore = locationScore(tenant, land);
-    const aScore = areaRoomsScore(tenant, land);
-    const total = Math.round((pScore * 0.5 + lScore * 0.3 + aScore * 0.2) * 100);
-
-    const diffPct =
-      lm.full > 0
-        ? Math.round(((tenantMoney.full - lm.full) / lm.full) * 1000) / 10
-        : 0;
-
-    results.push({
-      mode: "rent",
-      demand: tenant,
-      supply: land,
-      score: total,
-      budgetFull: tenantMoney.full,
-      askFull: lm.full,
-      demandMoney: tenantMoney,
-      supplyMoney: lm,
-      diffPct,
-      priceScore: pScore,
-      locationScore: lScore,
-      areaScore: aScore
-    });
+    results.push(
+      buildMatchResult({
+        mode: "rent",
+        demand: tenant,
+        supply: land,
+        budgetFull: tenantMoney.full,
+        askFull: lm.full,
+        demandMoney: tenantMoney,
+        supplyMoney: lm,
+        tolerance
+      })
+    );
   }
 
   results.sort((a, b) => b.score - a.score || Math.abs(a.diffPct) - Math.abs(b.diffPct));
@@ -262,27 +387,18 @@ export function matchLandlordToTenants(landlord, opts = {}) {
     if (!tm.full) continue;
     if (!withinTolerance(tm.full, lm.full, tolerance)) continue;
 
-    const pScore = priceScore(tm.full, lm.full, tolerance);
-    const lScore = locationScore(ten, landlord);
-    const aScore = areaRoomsScore(ten, landlord);
-    const total = Math.round((pScore * 0.5 + lScore * 0.3 + aScore * 0.2) * 100);
-    const diffPct =
-      lm.full > 0 ? Math.round(((tm.full - lm.full) / lm.full) * 1000) / 10 : 0;
-
-    results.push({
-      mode: "rent",
-      demand: ten,
-      supply: landlord,
-      score: total,
-      budgetFull: tm.full,
-      askFull: lm.full,
-      demandMoney: tm,
-      supplyMoney: lm,
-      diffPct,
-      priceScore: pScore,
-      locationScore: lScore,
-      areaScore: aScore
-    });
+    results.push(
+      buildMatchResult({
+        mode: "rent",
+        demand: ten,
+        supply: landlord,
+        budgetFull: tm.full,
+        askFull: lm.full,
+        demandMoney: tm,
+        supplyMoney: lm,
+        tolerance
+      })
+    );
   }
 
   results.sort((a, b) => b.score - a.score || Math.abs(a.diffPct) - Math.abs(b.diffPct));
@@ -307,29 +423,18 @@ export function matchBuyerToSales(buyer, opts = {}) {
     if (!sm.amount) continue;
     if (!withinTolerance(bm.amount, sm.amount, tolerance)) continue;
 
-    const pScore = priceScore(bm.amount, sm.amount, tolerance);
-    const lScore = locationScore(buyer, sale);
-    const aScore = areaRoomsScore(buyer, sale);
-    const total = Math.round((pScore * 0.55 + lScore * 0.25 + aScore * 0.2) * 100);
-    const diffPct =
-      sm.amount > 0
-        ? Math.round(((bm.amount - sm.amount) / sm.amount) * 1000) / 10
-        : 0;
-
-    results.push({
-      mode: "sale",
-      demand: buyer,
-      supply: sale,
-      score: total,
-      budgetFull: bm.amount,
-      askFull: sm.amount,
-      demandMoney: bm,
-      supplyMoney: sm,
-      diffPct,
-      priceScore: pScore,
-      locationScore: lScore,
-      areaScore: aScore
-    });
+    results.push(
+      buildMatchResult({
+        mode: "sale",
+        demand: buyer,
+        supply: sale,
+        budgetFull: bm.amount,
+        askFull: sm.amount,
+        demandMoney: bm,
+        supplyMoney: sm,
+        tolerance
+      })
+    );
   }
 
   results.sort((a, b) => b.score - a.score || Math.abs(a.diffPct) - Math.abs(b.diffPct));
@@ -354,29 +459,18 @@ export function matchSaleToBuyers(sale, opts = {}) {
     if (!bm.amount) continue;
     if (!withinTolerance(bm.amount, sm.amount, tolerance)) continue;
 
-    const pScore = priceScore(bm.amount, sm.amount, tolerance);
-    const lScore = locationScore(buyer, sale);
-    const aScore = areaRoomsScore(buyer, sale);
-    const total = Math.round((pScore * 0.55 + lScore * 0.25 + aScore * 0.2) * 100);
-    const diffPct =
-      sm.amount > 0
-        ? Math.round(((bm.amount - sm.amount) / sm.amount) * 1000) / 10
-        : 0;
-
-    results.push({
-      mode: "sale",
-      demand: buyer,
-      supply: sale,
-      score: total,
-      budgetFull: bm.amount,
-      askFull: sm.amount,
-      demandMoney: bm,
-      supplyMoney: sm,
-      diffPct,
-      priceScore: pScore,
-      locationScore: lScore,
-      areaScore: aScore
-    });
+    results.push(
+      buildMatchResult({
+        mode: "sale",
+        demand: buyer,
+        supply: sale,
+        budgetFull: bm.amount,
+        askFull: sm.amount,
+        demandMoney: bm,
+        supplyMoney: sm,
+        tolerance
+      })
+    );
   }
 
   results.sort((a, b) => b.score - a.score || Math.abs(a.diffPct) - Math.abs(b.diffPct));
@@ -454,6 +548,21 @@ function moneyLineSale(money) {
   return formatMoney(money.amount || money);
 }
 
+function formatScorePct(v) {
+  if (v == null || Number.isNaN(Number(v))) return "—";
+  const n = Number(v);
+  return Number.isInteger(n) ? `${n}٪` : `${n.toFixed(1)}٪`;
+}
+
+function sideSpecs(file) {
+  const d = getFileData(file);
+  const bits = [];
+  if (d.area) bits.push(`${Number(d.area).toLocaleString("fa-IR")} متر`);
+  if (d.rooms) bits.push(`${Number(d.rooms).toLocaleString("fa-IR")} خواب`);
+  if (d.propertyType) bits.push(String(d.propertyType));
+  return bits.length ? bits.join(" · ") : "";
+}
+
 /**
  * HTML یک کارت پیشنهاد
  */
@@ -462,12 +571,14 @@ export function renderMatchCard(match) {
   const supply = match.supply;
   const dName = escapeHtml(getFileName(demand));
   const sName = escapeHtml(getFileName(supply));
-  const dLoc = escapeHtml(getFileLocation(demand) || "—");
-  const sLoc = escapeHtml(getFileLocation(supply) || "—");
+  const dLoc = escapeHtml(getFileLocation(demand) || "منطقه ثبت نشده");
+  const sLoc = escapeHtml(getFileLocation(supply) || "منطقه ثبت نشده");
   const dPhone = getFilePhone(demand) || "";
   const sPhone = getFilePhone(supply) || "";
   const dCode = demand.code != null ? escapeHtml(String(demand.code)) : "—";
   const sCode = supply.code != null ? escapeHtml(String(supply.code)) : "—";
+  const dSpecs = escapeHtml(sideSpecs(demand));
+  const sSpecs = escapeHtml(sideSpecs(supply));
 
   const isRent = match.mode === "rent";
   const budgetHtml = isRent
@@ -478,42 +589,62 @@ export function renderMatchCard(match) {
     : moneyLineSale(match.supplyMoney);
 
   const scoreClass =
-    match.score >= 75 ? "high" : match.score >= 50 ? "mid" : "low";
+    match.score >= 80 ? "high" : match.score >= 55 ? "mid" : "low";
 
   const demandRole = isRent ? "مستأجر" : "خریدار";
   const supplyRole = isRent ? "ملک / مالک" : "ملک فروشی";
 
+  const locLabel =
+    match.locationScore == null
+      ? "منطقه: بدون داده"
+      : `منطقه ${formatScorePct(match.locationScore)}`;
+  const specLabel =
+    match.areaScore == null
+      ? "مشخصات: بدون داده"
+      : `مشخصات ${formatScorePct(match.areaScore)}`;
+
   return `
   <article class="match-card" data-demand-id="${escapeHtml(demand.id)}" data-supply-id="${escapeHtml(supply.id)}">
     <div class="match-card-top">
-      <span class="match-score ${scoreClass}">${match.score}٪</span>
+      <span class="match-score ${scoreClass}" title="امتیاز کل تطبیق">${formatScorePct(match.score)}</span>
       <span class="match-diff">${escapeHtml(formatDiff(match.diffPct))}</span>
+    </div>
+    <div class="match-breakdown" title="جزئیات امتیاز">
+      <span class="mb-item">قیمت ${formatScorePct(match.priceScore)}</span>
+      <span class="mb-item">${escapeHtml(locLabel)}</span>
+      <span class="mb-item">${escapeHtml(specLabel)}</span>
     </div>
     <div class="match-pair">
       <div class="match-side">
         <div class="match-role">${demandRole}</div>
         <div class="match-name">${dName} <span class="match-code">#${dCode}</span></div>
-        <div class="match-meta">${dLoc}</div>
+        <div class="match-meta">📍 ${dLoc}</div>
+        ${dSpecs ? `<div class="match-specs">${dSpecs}</div>` : ""}
         <div class="match-money">${budgetHtml}</div>
-        ${
-          dPhone
-            ? `<button type="button" class="match-call-btn" data-phone="${escapeHtml(dPhone)}" data-role="demand">تماس ${demandRole}</button>`
-            : ""
-        }
-        <button type="button" class="match-open-btn ghost-mini" data-file-id="${escapeHtml(demand.id)}">جزئیات</button>
+        <div class="match-side-actions">
+          ${
+            dPhone
+              ? `<button type="button" class="match-call-btn" data-phone="${escapeHtml(dPhone)}" data-role="demand">تماس</button>`
+              : ""
+          }
+          <button type="button" class="match-open-btn" data-file-id="${escapeHtml(demand.id)}">جزئیات</button>
+        </div>
       </div>
       <div class="match-arrow" aria-hidden="true">↔</div>
       <div class="match-side">
         <div class="match-role">${supplyRole}</div>
         <div class="match-name">${sName} <span class="match-code">#${sCode}</span></div>
-        <div class="match-meta">${sLoc}</div>
+        <div class="match-meta">📍 ${sLoc}</div>
+        ${sSpecs ? `<div class="match-specs">${sSpecs}</div>` : ""}
         <div class="match-money">${askHtml}</div>
-        ${
-          sPhone
-            ? `<button type="button" class="match-call-btn" data-phone="${escapeHtml(sPhone)}" data-role="supply">تماس ${supplyRole}</button>`
-            : ""
-        }
-        <button type="button" class="match-open-btn ghost-mini" data-file-id="${escapeHtml(supply.id)}">جزئیات</button>
+        <div class="match-side-actions">
+          ${
+            sPhone
+              ? `<button type="button" class="match-call-btn" data-phone="${escapeHtml(sPhone)}" data-role="supply">تماس</button>`
+              : ""
+          }
+          <button type="button" class="match-open-btn" data-file-id="${escapeHtml(supply.id)}">جزئیات</button>
+        </div>
       </div>
     </div>
   </article>`;
