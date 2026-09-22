@@ -129,6 +129,7 @@
                 <div class="md-sheet-title">تنظیمات</div>
                 <button type="button" class="md-sheet-item" id="publishPublicButton" role="menuitem">انتشار برای عموم</button>
                 <a class="md-sheet-item" id="openPublicPageLink" href="public.html" target="_blank" rel="noopener" role="menuitem">باز کردن صفحه عمومی</a>
+                <button type="button" class="md-sheet-item" id="openLogsButton" role="menuitem">لاگ‌ها (دیباگ)</button>
                 <button type="button" class="md-sheet-item danger" id="logoutButton" role="menuitem">خروج از حساب</button>
             </div>
         </div>
@@ -576,13 +577,18 @@
             <div class="modal-body divar-import-body">
                 <div class="field">
                     <label for="divarUrlInput">لینک آگهی</label>
-                    <input
-                        id="divarUrlInput"
-                        type="url"
-                        dir="ltr"
-                        placeholder="https://divar.ir/v/..."
-                        autocomplete="off"
-                    >
+                    <div class="divar-url-row">
+                        <input
+                            id="divarUrlInput"
+                            type="url"
+                            dir="ltr"
+                            placeholder="https://divar.ir/v/..."
+                            autocomplete="off"
+                        >
+                        <button type="button" id="pasteDivarUrlButton" class="secondary-button paste-url-btn" title="چسباندن از کلیپ‌بورد">
+                            پیست
+                        </button>
+                    </div>
                     <small class="field-help">
                         فقط آگهی‌های خانه اجاره‌ای و فروشی پشتیبانی می‌شوند.
                         نام و شماره طرف از دیوار دریافت نمی‌شود و باید بعداً تکمیل شود.
@@ -617,7 +623,41 @@
     <!-- TOAST -->
     <div id="toast" class="toast hidden"></div>
 
-    
+    <!-- =========================
+         LOGS MODAL (دیباگ)
+    ========================== -->
+    <div id="logsModal" class="modal hidden">
+        <div class="modal-backdrop" id="logsModalBackdrop"></div>
+        <div class="modal-card logs-modal-card modal-sheet">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-eyebrow">دیباگ</div>
+                    <h2>لاگ‌ها</h2>
+                </div>
+                <button id="closeLogsButton" class="close-button" type="button" aria-label="بستن">×</button>
+            </div>
+            <div class="modal-body logs-modal-body">
+                <div class="logs-toolbar">
+                    <div class="logs-filters" role="group" aria-label="فیلتر دسته">
+                        <button type="button" class="logs-filter-btn active" data-log-cat="all">همه</button>
+                        <button type="button" class="logs-filter-btn" data-log-cat="divar">دیوار</button>
+                        <button type="button" class="logs-filter-btn" data-log-cat="network">شبکه</button>
+                        <button type="button" class="logs-filter-btn" data-log-cat="github">گیت‌هاب</button>
+                        <button type="button" class="logs-filter-btn" data-log-cat="auth">احراز</button>
+                        <button type="button" class="logs-filter-btn" data-log-cat="ui">رابط</button>
+                        <button type="button" class="logs-filter-btn" data-log-cat="error">خطا</button>
+                    </div>
+                    <div class="logs-actions">
+                        <button type="button" id="copyLogsButton" class="secondary-button">کپی همه</button>
+                        <button type="button" id="clearLogsButton" class="ghost-button">پاک کردن</button>
+                    </div>
+                </div>
+                <div id="logsList" class="logs-list" dir="ltr"></div>
+                <p id="logsEmpty" class="logs-empty hidden">لاگی ثبت نشده است.</p>
+            </div>
+        </div>
+    </div>
+
     <!-- =========================
          CALCULATOR MODAL
     ========================== -->
