@@ -314,6 +314,7 @@ export const FOLLOWUP_LABELS = {
 };
 
 export function getMatchFollowup(demandId, supplyId) {
+  if (!demandId || !supplyId) return "open";
   const map = loadFollowups();
   return map[pairKey(demandId, supplyId)] || "open";
 }
@@ -653,12 +654,12 @@ function formatDirectDiff(match) {
   return parts.length ? parts.join(" · ") : formatDiff(match.diffPct);
 }
 
-function moneyLineRent(money) {
+function moneyLineRent(money, { showFull = true } = {}) {
   const parts = [];
-  if (money.deposit) parts.push(`رهن ${formatMoney(money.deposit)}`);
-  if (money.rent) parts.push(`اجاره ${formatMoney(money.rent)}`);
-  parts.push(`معادل رهن کامل ${formatMoney(money.full)}`);
-  return parts.join(" · ");
+  if (money?.deposit) parts.push(`رهن ${formatMoney(money.deposit)}`);
+  if (money?.rent) parts.push(`اجاره ${formatMoney(money.rent)}`);
+  if (showFull && money?.full) parts.push(`رهن‌کامل ${formatMoney(money.full)}`);
+  return parts.length ? parts.join(" · ") : "—";
 }
 
 function moneyLineSale(money) {
@@ -685,9 +686,11 @@ function scoreClassOf(score) {
 }
 
 function moneyHtmlForMatch(match, side /* demand|supply */) {
-  const isRent = match.mode === "rent" || match.mode === "rent-direct";
+  const isDirect = match.mode === "rent-direct";
+  const isRent = match.mode === "rent" || isDirect;
   const money = side === "demand" ? match.demandMoney : match.supplyMoney;
-  return isRent ? moneyLineRent(money) : moneyLineSale(money);
+  if (isRent) return moneyLineRent(money, { showFull: !isDirect });
+  return moneyLineSale(money);
 }
 
 function breakdownForMatch(match) {
@@ -704,8 +707,9 @@ function breakdownForMatch(match) {
 
 /** یک ردیف پیشنهاد (ملک/طرف مقابل) داخل کارت گروه */
 function renderMatchRow(match) {
-  const supply = match.supply;
-  const demand = match.demand;
+  const supply = match?.supply;
+  const demand = match?.demand;
+  if (!supply || !demand) return "";
   const sName = escapeHtml(getFileName(supply));
   const sLoc = escapeHtml(getFileLocation(supply) || "منطقه ثبت نشده");
   const sPhone = getFilePhone(supply) || "";
@@ -803,9 +807,14 @@ export function renderMatchGroup(demand, matches) {
 }
 
 /** گروه‌بندی بر اساس demand (مستأجر / خریدار) */
+/** حداکثر پیشنهاد در هر کارت + حداقل امتیاز نمایش */
+const MAX_SUGGESTIONS_PER_CARD = 8;
+const MIN_SCORE_TO_SHOW = 12;
+
 export function groupMatchesByDemand(matches) {
   const map = new Map();
   for (const m of matches || []) {
+    if (!m || m.score < MIN_SCORE_TO_SHOW) continue;
     const id = m.demand?.id;
     if (!id) continue;
     if (!map.has(id)) map.set(id, { demand: m.demand, items: [] });
@@ -813,9 +822,11 @@ export function groupMatchesByDemand(matches) {
   }
   const groups = [...map.values()];
   for (const g of groups) {
-    g.items.sort((a, b) => b.score - a.score || Math.abs(a.diffPct) - Math.abs(b.diffPct));
+    g.items.sort((a, b) => b.score - a.score || Math.abs(a.diffPct || 0) - Math.abs(b.diffPct || 0));
+    if (g.items.length > MAX_SUGGESTIONS_PER_CARD) {
+      g.items = g.items.slice(0, MAX_SUGGESTIONS_PER_CARD);
+    }
   }
-  // گروه با بهترین امتیاز اول
   groups.sort((a, b) => (b.items[0]?.score || 0) - (a.items[0]?.score || 0));
   return groups;
 }
