@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-22T08:35:51.359Z",
+  "updatedAt": "2026-09-22T08:51:14.810Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -824,39 +824,6 @@
       },
       "source": "panel",
       "updatedAt": "2026-09-11T08:56:51.617Z"
-    },
-    {
-      "id": "file-1789117086117-216-yo5bhfoqu",
-      "code": 1029,
-      "type": "tenant",
-      "status": "active",
-      "title": "آپارتمان",
-      "data": {
-        "propertyType": "apartment",
-        "area": 0,
-        "rooms": 0,
-        "year": 0,
-        "totalFloors": 0,
-        "keyHolder": "owner",
-        "condition": "new",
-        "occupancy": "empty",
-        "salePrice": 0,
-        "currentDeposit": 0,
-        "currentRent": 0,
-        "suggestedDeposit": 0,
-        "suggestedRent": 0,
-        "capital": 0,
-        "tenantDeposit": 500000000,
-        "tenantRent": 0,
-        "familyStatus": "married",
-        "familySize": 0,
-        "tenantNotes": "دو نفر",
-        "notes": "محدوده حاج منصور",
-        "amenities": [],
-        "code": 1029
-      },
-      "source": "panel",
-      "updatedAt": "2026-09-11T08:58:06.117Z"
     },
     {
       "id": "file-1789117401682-110-84mxltgqd",
