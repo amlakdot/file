@@ -3,7 +3,7 @@
 ========================================================= */
 
 import { state } from "./state.js";
-import {
+import { formatMoney,
   $,
   setLoginError,
   parseMoney,
@@ -52,6 +52,8 @@ import {
   getAllRentDirectMatches,
   getAllSaleMatches,
   getMatchesForFile,
+  getRentMoney,
+  getSaleMoney,
   getMatchStats,
   renderMatchList,
   setMatchFollowup,
@@ -356,13 +358,17 @@ function openMatchModal({ fileId = null } = {}) {
     const preview = getMatchesForFile(file, { rate: getMatchRate() });
     _matchAllowedTabs = preview.tabs || ["rent", "rent-direct", "sale"];
     _matchTab = preview.defaultTab || _matchAllowedTabs[0];
-    if ($("matchModalTitle")) $("matchModalTitle").textContent = preview.title || "تطبیق";
-    if ($("matchModalEyebrow")) $("matchModalEyebrow").textContent = "تطبیق این فایل";
+    setMatchHeader(preview.title || "تطبیق", {
+      eyebrow: "تطبیق این فایل",
+      subtitle: focusMoneySubtitle(file)
+    });
   } else {
     _matchAllowedTabs = ["rent", "rent-direct", "sale"];
     _matchTab = "rent";
-    if ($("matchModalTitle")) $("matchModalTitle").textContent = "مرور همهٔ پیشنهادها";
-    if ($("matchModalEyebrow")) $("matchModalEyebrow").textContent = "پیشنهاد مشاور";
+    setMatchHeader("مرور همهٔ پیشنهادها", {
+      eyebrow: "پیشنهاد مشاور",
+      subtitle: ""
+    });
   }
 
   updateMatchTabsVisibility();
@@ -373,6 +379,38 @@ function openMatchModal({ fileId = null } = {}) {
 }
 
 /** سازگاری با منوی سراسری */
+
+function setMatchHeader(title, { eyebrow = "پیشنهاد مشاور", subtitle = "" } = {}) {
+  if ($("matchModalTitle")) $("matchModalTitle").textContent = title || "تطبیق";
+  if ($("matchModalEyebrow")) $("matchModalEyebrow").textContent = eyebrow;
+  const sub = $("matchModalSubtitle");
+  if (sub) {
+    if (subtitle) {
+      sub.textContent = subtitle;
+      sub.classList.remove("hidden");
+    } else {
+      sub.textContent = "";
+      sub.classList.add("hidden");
+    }
+  }
+}
+
+function focusMoneySubtitle(file) {
+  if (!file) return "";
+  const type = file.type || "";
+  if (type === "landlord" || type === "tenant") {
+    const m = getRentMoney(file);
+    const dep = m?.deposit ? formatMoney(m.deposit) : "—";
+    const rent = m?.rent ? formatMoney(m.rent) : "—";
+    return `رهن: ${dep}   اجاره: ${rent}`;
+  }
+  if (type === "sale" || type === "buyer") {
+    const sm = getSaleMoney(file);
+    return sm?.amount ? formatMoney(sm.amount) : "";
+  }
+  return "";
+}
+
 function openMatchModalAll() {
   openMatchModal({ fileId: null });
 }
@@ -435,8 +473,11 @@ function refreshMatchResults() {
       }
       const result = getMatchesForFile(file, opts);
       matches = result.matches || [];
-      if ($("matchModalTitle") && result.title) {
-        $("matchModalTitle").textContent = result.title;
+      if (result.title) {
+        setMatchHeader(result.title, {
+          eyebrow: "تطبیق این فایل",
+          subtitle: focusMoneySubtitle(file)
+        });
       }
     } else if (_matchTab === "sale") {
       matches = getAllSaleMatches(opts);
