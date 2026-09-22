@@ -4276,3 +4276,17 @@ button.match-open-btn {
 .match-focus-money {
     font-variant-numeric: tabular-nums;
 }
+
+.match-modal-subtitle {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: var(--text-soft, #bbb);
+    line-height: 1.45;
+    font-weight: 400;
+}
+.match-modal-subtitle.hidden {
+    display: none !important;
+}
+#matchModal .modal-header h2 {
+    margin-bottom: 0;
+}
