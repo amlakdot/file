@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-22T13:23:03.769Z",
+  "updatedAt": "2026-09-22T13:29:47.252Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1638,10 +1638,11 @@
         "tenantRent": 5000000,
         "familyStatus": "single",
         "familySize": 0,
+        "tenantNotes": "اطراف حاج منصور، مریم، شهرک",
         "amenities": []
       },
       "source": "panel",
-      "updatedAt": "2026-09-22T09:26:29.204Z"
+      "updatedAt": "2026-09-22T13:29:45.090Z"
     }
   ]
 }
