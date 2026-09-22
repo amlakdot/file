@@ -136,6 +136,7 @@ export function openDetailModal(fileId) {
   if ($("detailTitle")) $("detailTitle").textContent = getFileName(file);
 
   const inTrash = isInTrash(file);
+  $("detailMatchButton")?.classList.toggle("hidden", inTrash);
   $("detailEditButton")?.classList.toggle("hidden", inTrash);
   $("detailArchiveButton")?.classList.toggle("hidden", inTrash);
   $("detailRestoreButton")?.classList.toggle("hidden", !inTrash);
