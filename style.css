@@ -4251,3 +4251,28 @@ button.match-open-btn {
         font-size: 11px;
     }
 }
+
+.match-focus-summary {
+    padding: 10px 12px;
+    margin-bottom: 4px;
+    border: 1px solid var(--border, #333);
+    border-radius: 12px;
+    background: var(--surface-3, #151515);
+}
+.match-focus-title {
+    font-size: 14px;
+    color: var(--text, #eee);
+    margin-bottom: 6px;
+    line-height: 1.4;
+}
+.match-focus-prices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 18px;
+    font-size: 13px;
+    color: var(--text-soft, #ccc);
+    direction: rtl;
+}
+.match-focus-money {
+    font-variant-numeric: tabular-nums;
+}
