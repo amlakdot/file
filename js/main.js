@@ -454,8 +454,16 @@ function refreshMatchResults() {
       else if (ty === "landlord" || ty === "sale") perspective = "from-supply";
     }
 
+    const focusFile = _matchFocusFileId
+      ? state.files.find((x) => x && x.id === _matchFocusFileId) || null
+      : null;
+
     if (box) {
-      box.innerHTML = renderMatchList(matches, { statusFilter, perspective });
+      box.innerHTML = renderMatchList(matches, {
+        statusFilter,
+        perspective,
+        focusFile
+      });
     }
     appLog("debug", "ui", "تطبیق بروزرسانی شد", {
       tab: _matchTab,
