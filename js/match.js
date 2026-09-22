@@ -721,21 +721,21 @@ function breakdownForMatch(match) {
 /**
  * یک فایل پیشنهادی — ظاهر شبیه کارت لیست اصلی + نوار تطبیق
  */
-function renderMatchSuggestionCard(match) {
+function renderMatchSuggestionCard(match, showSide = "supply") {
   const supply = match?.supply;
   const demand = match?.demand;
   if (!supply || !demand) return "";
 
-  const type = supply.type || "sale";
-  const data = getFileData(supply);
-  const name = escapeHtml(getFileName(supply));
-  const loc = escapeHtml(getFileLocation(supply) || "—");
-  const phone = getFilePhone(supply) || "";
-  const code = supply.code != null ? escapeHtml(String(supply.code)) : "";
-  const specs = escapeHtml(sideSpecs(supply));
+  const file = showSide === "demand" ? demand : supply;
+  const type = file.type || "sale";
+  const data = getFileData(file);
+  const name = escapeHtml(getFileName(file));
+  const loc = escapeHtml(getFileLocation(file) || "—");
+  const phone = getFilePhone(file) || "";
+  const code = file.code != null ? escapeHtml(String(file.code)) : "";
   const isDirect = match.mode === "rent-direct";
   const isRent = match.mode === "rent" || isDirect;
-  const money = moneyHtmlForMatch(match, "supply");
+  const money = moneyHtmlForMatch(match, showSide === "demand" ? "demand" : "supply");
   const diffText = isDirect ? formatDirectDiff(match) : formatDiff(match.diffPct);
   const fu = getMatchFollowup(demand.id, supply.id);
   const fuOpts = ["open", "suggested", "called", "rejected", "done"]
@@ -792,10 +792,10 @@ function renderMatchSuggestionCard(match) {
     <div class="match-side-actions card-match-actions">
       ${
         phone
-          ? `<button type="button" class="match-call-btn" data-phone="${escapeHtml(phone)}" data-role="supply">تماس</button>`
+          ? `<button type="button" class="match-call-btn" data-phone="${escapeHtml(phone)}">تماس</button>`
           : ""
       }
-      <button type="button" class="match-open-btn" data-file-id="${escapeHtml(supply.id)}">جزئیات</button>
+      <button type="button" class="match-open-btn" data-file-id="${escapeHtml(file.id)}">جزئیات</button>
       <label class="match-followup-label">
         <select class="match-followup-select" data-demand-id="${escapeHtml(demand.id)}" data-supply-id="${escapeHtml(supply.id)}" title="وضعیت پیگیری">
           ${fuOpts}
@@ -805,9 +805,6 @@ function renderMatchSuggestionCard(match) {
   </article>`;
 }
 
-/**
- * هدر گروه: فایل مبدأ (تقاضا) + لیست کارت‌های پیشنهاد
- */
 export function renderMatchGroup(demand, matches) {
   if (!matches || !matches.length) return "";
   const sample = matches[0];
@@ -879,6 +876,13 @@ export function groupMatchesByDemand(matches) {
 
 export function renderMatchList(matches, opts = {}) {
   const statusFilter = opts.statusFilter || "all";
+  /**
+   * perspective:
+   * - "auto" / undefined: گروه‌بندی بر اساس متقاضی (مرور همه)
+   * - "from-demand": فقط کارت‌های ملک/فروشی (از روی مستأجر/خریدار)
+   * - "from-supply": فقط کارت‌های مستأجر/خریدار (از روی مالک/فروشی)
+   */
+  const perspective = opts.perspective || "auto";
   let list = matches || [];
   if (statusFilter && statusFilter !== "all") {
     list = list.filter((m) => {
@@ -887,9 +891,24 @@ export function renderMatchList(matches, opts = {}) {
       return st === statusFilter;
     });
   }
+  list = list.filter((m) => m && m.score >= MIN_SCORE_TO_SHOW);
+  list.sort((a, b) => b.score - a.score || Math.abs(a.diffPct || 0) - Math.abs(b.diffPct || 0));
+
   if (!list.length) {
     return `<p class="match-empty">پیشنهادی با امتیاز بالای ۷۰٪ پیدا نشد. فیلتر امکانات یا وضعیت پیگیری را عوض کنید.</p>`;
   }
+
+  // از روی یک فایل خاص: بدون هدر تکراری، فقط طرف مقابل
+  if (perspective === "from-demand") {
+    const capped = list.slice(0, MAX_SUGGESTIONS_PER_CARD);
+    return `<div class="match-card-grid">${capped.map((m) => renderMatchSuggestionCard(m, "supply")).join("")}</div>`;
+  }
+  if (perspective === "from-supply") {
+    const capped = list.slice(0, MAX_SUGGESTIONS_PER_CARD);
+    return `<div class="match-card-grid">${capped.map((m) => renderMatchSuggestionCard(m, "demand")).join("")}</div>`;
+  }
+
+  // مرور همه: گروه بر اساس متقاضی
   const groups = groupMatchesByDemand(list);
   if (!groups.length) {
     return `<p class="match-empty">پیشنهادی با امتیاز بالای ۷۰٪ پیدا نشد.</p>`;
