@@ -167,7 +167,23 @@ export function openDetailModal(fileId) {
 export function closeDetailModal(silent = false) {
   $("detailModal")?.classList.add("hidden");
   state.viewingFileId = null;
-  if (!silent && $("fileModal")?.classList.contains("hidden")) {
+
+  // برگشت به پنل تطبیق (اگر از آنجا آمده باشیم)
+  if (state.returnToMatch) {
+    state.returnToMatch = false;
+    const matchModal = $("matchModal");
+    if (matchModal) {
+      matchModal.classList.remove("hidden");
+      document.body.style.overflow = "hidden";
+      return;
+    }
+  }
+
+  if (
+    !silent &&
+    $("fileModal")?.classList.contains("hidden") &&
+    $("matchModal")?.classList.contains("hidden")
+  ) {
     document.body.style.overflow = "";
   }
 }
