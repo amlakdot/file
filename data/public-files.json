@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-22T07:56:18.065Z",
+  "updatedAt": "2026-09-22T07:57:43.922Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1705,6 +1705,39 @@
       },
       "source": "divar",
       "updatedAt": "2026-09-21T18:59:56.764Z"
+    },
+    {
+      "id": "file-1790063861294-5dbf77143cd6a70cf7ddb423",
+      "code": 1073,
+      "type": "landlord",
+      "status": "active",
+      "title": "آپارتمان · 180 متر · خیابون غنی",
+      "data": {
+        "code": 1073,
+        "propertyType": "apartment",
+        "area": 180,
+        "rooms": 0,
+        "year": 0,
+        "location": "خیابون غنی",
+        "totalFloors": 2,
+        "keyHolder": "owner",
+        "condition": "new",
+        "occupancy": "evacuating",
+        "salePrice": 0,
+        "currentDeposit": 0,
+        "currentRent": 0,
+        "suggestedDeposit": 800000000,
+        "suggestedRent": 0,
+        "capital": 0,
+        "tenantDeposit": 0,
+        "tenantRent": 0,
+        "familyStatus": "single",
+        "familySize": 0,
+        "notes": "دو واحدی",
+        "amenities": []
+      },
+      "source": "panel",
+      "updatedAt": "2026-09-22T07:57:41.294Z"
     }
   ]
 }
