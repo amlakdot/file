@@ -202,7 +202,11 @@ function setupDivarImport() {
       showToast("آگهی از دیوار ذخیره شد. نام و تلفن را تکمیل کنید.", "success");
       appLog("info", "divar", "import موفق", { id: file?.id, token });
       renderHome();
-      // باز کردن جزئیات فایل جدید
+      // صفحه عمومی را هم به‌روز کن
+      publishPublicFiles().catch((e) => {
+        console.warn("auto public after divar:", e);
+        showToast("انتشار عمومی خودکار نشد؛ از منو منتشر کنید.", "warning");
+      });
       if (file?.id) openDetailModal(file.id);
     } catch (err) {
       hadError = true;
