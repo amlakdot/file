@@ -16,7 +16,7 @@ import {
   setMoneyInputValue,
   isEncryptedPhonePlaceholder
 } from "./helpers.js";
-import { commitFiles } from "./github.js";
+import { commitFiles, publishPublicFiles } from "./github.js";
 import {
   getFileData,
   getFileName,
@@ -445,6 +445,19 @@ export async function saveFile() {
     if (success) {
       clearFormDirty();
       closeFileModal(true);
+      showToast("ذخیره شد. در حال به‌روزرسانی صفحه عمومی…", "success");
+      // انتشار عمومی در پس‌زمینه تا صفحه public قدیمی نماند
+      publishPublicFiles()
+        .then((ok) => {
+          if (ok) showToast("صفحه عمومی هم به‌روز شد.", "success");
+        })
+        .catch((e) => {
+          console.warn("auto public publish:", e);
+          showToast(
+            "ذخیره شد، ولی انتشار عمومی ناموفق بود. از منو «انتشار برای عموم» را بزنید.",
+            "warning"
+          );
+        });
     }
   } catch (err) {
     console.error(err);
@@ -488,6 +501,7 @@ export async function softDeleteFile(fileId) {
     showToast("به سطل بازیابی منتقل شد.", "success");
     clearFormDirty();
     closeFileModal(true);
+    publishPublicFiles().catch(() => {});
   }
   return success;
 }
@@ -500,7 +514,10 @@ export async function restoreFile(fileId) {
     return { ...rest, updatedAt: new Date().toISOString() };
   });
   const success = await commitFiles(newFiles, `Restore file ${fileId}`);
-  if (success) showToast("فایل بازگردانی شد.", "success");
+  if (success) {
+    showToast("فایل بازگردانی شد.", "success");
+    publishPublicFiles().catch(() => {});
+  }
   return success;
 }
 
@@ -514,7 +531,10 @@ export async function purgeFile(fileId) {
   if (!confirmed) return false;
   const newFiles = state.files.filter((f) => f.id !== fileId);
   const success = await commitFiles(newFiles, `Purge file ${fileId}`);
-  if (success) showToast("برای همیشه حذف شد.", "success");
+  if (success) {
+    showToast("برای همیشه حذف شد.", "success");
+    publishPublicFiles().catch(() => {});
+  }
   return success;
 }
 
