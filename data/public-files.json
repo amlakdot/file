@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-22T09:59:15.190Z",
+  "updatedAt": "2026-09-22T09:59:22.397Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1642,62 +1642,6 @@
       },
       "source": "panel",
       "updatedAt": "2026-09-22T09:26:29.204Z"
-    },
-    {
-      "id": "file-1790071153506-19b6e66dc071c9c2a10fa5d0",
-      "code": 1077,
-      "type": "landlord",
-      "status": "active",
-      "title": "ویلا / خانه · 80 متر · 2 خواب · بومهن",
-      "data": {
-        "code": 1077,
-        "propertyType": "villa",
-        "area": 80,
-        "rooms": 2,
-        "year": 1375,
-        "location": "بومهن، خ اسمی",
-        "totalFloors": 0,
-        "salePrice": 0,
-        "currentDeposit": 0,
-        "currentRent": 0,
-        "suggestedDeposit": 600000000,
-        "suggestedRent": 0,
-        "capital": 0,
-        "tenantDeposit": 0,
-        "tenantRent": 0,
-        "familySize": 0,
-        "notes": "عنوان دیوار: رهن کامل منزل مسکونی ✨ منزل مسکونی تمیز و خوش نقشه، مناسب برای خانواده در محیطی آرام و دنج ✨",
-        "amenities": [
-          "storage",
-          "balcony"
-        ],
-        "divarDescription": "✨ منزل مسکونی تمیز و خوش نقشه، مناسب برای خانواده در محیطی آرام و دنج ✨",
-        "divarImages": [
-          "https://s100.divarcdn.com/static/photo/neda/webp_post/EjR30O4VZ1JmiLGpIfrsTQ/9d8017be-9423-4927-8b08-33a0d24d9340.webp",
-          "https://s100.divarcdn.com/static/photo/neda/webp_post/SPxSHNKycyhS2qgQU4pZaA/dd97e624-3d8a-41f5-8031-b2e57af2fcfd.webp",
-          "https://s100.divarcdn.com/static/photo/neda/webp_post/sGvD4qAuGz1Me7-ef5gHPw/de0a1a26-0c1d-4be1-99f5-46640a45a5ba.webp",
-          "https://s100.divarcdn.com/static/photo/neda/webp_post/zrY4jl8pitfXcDIsARw1aA/7c1a3c41-4d76-4a71-9d74-0adb3a6cfd47.webp",
-          "https://s100.divarcdn.com/static/photo/neda/webp_post/sPcYR0qRIh54hP22pvozNQ/78869b61-2026-40fa-b954-454653715681.webp",
-          "https://s100.divarcdn.com/static/photo/neda/webp_post/0tF5MBY58a8JOVdrNBnshw/1a423752-b1e3-4c67-a086-dfd2532785c7.webp",
-          "https://mapimage.divarcdn.com/v8/mapimage?encrypted_data=MTIzNDU2Nzg5MTIzXDczwbwsy6zuQsiOmuoPNfpLZGvR_L2s3IIR_nc5hlct0Q=="
-        ],
-        "divarAttributes": {
-          "پارکینگ ندارد": false,
-          "انباری": true,
-          "بالکن": true,
-          "متراژ": "۸۰",
-          "ساخت": "۱۳۷۵",
-          "اتاق": "۲",
-          "تصویر‌ها برای همین ملک است؟": "بله",
-          "ودیعه": "‏۶۰۰,۰۰۰,۰۰۰ تومان",
-          "اجارهٔ ماهانه": "رایگان",
-          "ودیعه و اجاره": "غیر قابل تبدیل",
-          "متراژ زمین": "۱۵۰ متر مربع"
-        },
-        "yearBuilt": 1375
-      },
-      "source": "divar",
-      "updatedAt": "2026-09-22T09:59:13.505Z"
     }
   ]
 }
