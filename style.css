@@ -4161,3 +4161,93 @@ button.match-open-btn {
 .match-tab.hidden {
     display: none !important;
 }
+
+/* ---- Match suggestion cards = list cards + score bar ---- */
+.match-card-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 0 10px 12px;
+}
+.match-suggestion-card {
+    position: relative;
+    cursor: default;
+}
+.match-score-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px 0;
+}
+.match-suggestion-card .card-match-actions {
+    padding: 0 12px 12px;
+}
+.match-suggestion-card .card-price-block {
+    padding-inline: 12px;
+}
+
+/* موبایل: مودال تطبیق استاندارد */
+@media (max-width: 640px) {
+    #matchModal.modal {
+        align-items: flex-end;
+    }
+    #matchModal .match-modal-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: min(92vh, 100%) !important;
+        max-height: 92vh !important;
+        border-radius: 16px 16px 0 0 !important;
+        margin: 0 !important;
+    }
+    #matchModal .modal-header {
+        padding: 10px 14px !important;
+    }
+    #matchModal .modal-header h2 {
+        font-size: 1rem !important;
+        line-height: 1.35;
+    }
+    #matchModal .match-modal-body {
+        padding: 0 10px 10px !important;
+        gap: 6px !important;
+    }
+    #matchModal .match-tab {
+        font-size: 11px !important;
+        padding: 8px 4px !important;
+    }
+    #matchModal .match-filters-toggle {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+    #matchModal .match-filters-panel {
+        max-height: 32vh;
+        padding: 8px 10px;
+    }
+    #matchModal .match-group-head {
+        flex-direction: column;
+        gap: 8px;
+        padding: 10px 12px;
+    }
+    #matchModal .match-group-head-side {
+        flex-direction: row;
+        flex-wrap: wrap;
+        width: 100%;
+        justify-content: flex-start;
+        align-items: center;
+    }
+    #matchModal .match-suggestion-card {
+        font-size: 13px;
+    }
+    #matchModal .match-side-actions {
+        gap: 6px;
+    }
+    #matchModal .match-call-btn,
+    #matchModal .match-open-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+    #matchModal .match-followup-select {
+        max-width: 110px;
+        font-size: 11px;
+    }
+}
