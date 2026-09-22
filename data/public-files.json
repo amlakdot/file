@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-22T09:57:54.588Z",
+  "updatedAt": "2026-09-22T09:58:13.597Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1642,59 +1642,6 @@
       },
       "source": "panel",
       "updatedAt": "2026-09-22T09:26:29.204Z"
-    },
-    {
-      "id": "file-1790071072936-dfd54d5f499840137c6e99fd",
-      "code": 1075,
-      "type": "landlord",
-      "status": "active",
-      "title": "آپارتمان · 55 متر · 1 خواب · بومهن",
-      "data": {
-        "code": 1075,
-        "propertyType": "apartment",
-        "area": 55,
-        "rooms": 1,
-        "year": 1398,
-        "location": "بومهن",
-        "unitFloor": "4",
-        "totalFloors": 0,
-        "salePrice": 0,
-        "currentDeposit": 0,
-        "currentRent": 0,
-        "suggestedDeposit": 450000000,
-        "suggestedRent": 3000000,
-        "capital": 0,
-        "tenantDeposit": 0,
-        "tenantRent": 0,
-        "familySize": 0,
-        "notes": "عنوان دیوار: اجاره اپارتمان 60 متری بازسازی کامل اسانسور جای پارک فراوان\nهود گاز سینک ایفون کابینت تی وی وال کمد دیواری منظره زیبا همسایگان عالی دنج و ارام\nپنجره دو جداره مناسب زوج",
-        "amenities": [
-          "elevator",
-          "storage"
-        ],
-        "divarDescription": "بازسازی کامل \nاسانسور \nجای پارک فراوان\nهود گاز سینک ایفون کابینت \nتی وی وال \nکمد دیواری \nمنظره زیبا \nهمسایگان عالی \nدنج و ارام\nپنجره دو جداره \nمناسب زوج",
-        "divarImages": [
-          "https://s100.divarcdn.com/static/photo/neda/webp_post/oa9LoCYzZNbfWAfWimpKdw/1d7cbad8-88b3-4e8e-ae8d-57eceaaa8f34.webp",
-          "https://s100.divarcdn.com/static/photo/neda/webp_post/LSsHj9PuB5vO6CsVvKxhMg/131369a6-93d0-40f2-865b-0d062763130c.webp",
-          "https://s100.divarcdn.com/static/photo/neda/webp_post/TqhDhlOwNsap57dkiO8eqA/bd71e45a-2359-4f52-a95b-c48e6ef7aa18.webp",
-          "https://s100.divarcdn.com/static/photo/neda/webp_post/vOgpK1HqBkhjv_1U3YUt5w/52ebc68a-0a65-4e48-a7d8-aff838604072.webp",
-          "https://s100.divarcdn.com/static/photo/neda/webp_post/i0onxhgileEQaBYzMdc4qA/83c672f1-f56d-4d9b-b1d3-705675ae8516.webp",
-          "https://mapimage.divarcdn.com/v8/mapimage?encrypted_data=MTIzNDU2Nzg5MTIzXOIkdEdOyqzuQt8pEbnkNvpLHDxt5onP7Fg1HIoFbSyadA=="
-        ],
-        "divarAttributes": {
-          "متراژ": "۵۵",
-          "ساخت": "۱۳۹۸",
-          "اتاق": "۱",
-          "تصویر‌ها برای همین ملک است؟": "بله",
-          "طبقه": "۴",
-          "آسانسور": true,
-          "پارکینگ ندارد": false,
-          "انباری": true
-        },
-        "yearBuilt": 1398
-      },
-      "source": "divar",
-      "updatedAt": "2026-09-22T09:57:52.932Z"
     }
   ]
 }
