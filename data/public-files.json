@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-22T08:32:23.891Z",
+  "updatedAt": "2026-09-22T08:35:51.359Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -127,7 +127,7 @@
         "rooms": 0,
         "year": 0,
         "location": "ارکیده 3",
-        "keyHolder": "owner",
+        "keyHolder": "tenant",
         "condition": "new",
         "occupancy": "empty",
         "currentDeposit": 0,
@@ -151,7 +151,7 @@
         "salePrice": 0
       },
       "source": "panel",
-      "updatedAt": "2026-09-19T14:20:45.913Z"
+      "updatedAt": "2026-09-22T08:35:49.253Z"
     },
     {
       "id": "file-1789114972321-480-3iuki51h5",
