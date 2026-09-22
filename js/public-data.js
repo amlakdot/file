@@ -98,15 +98,23 @@ export function extractPropertyFields(file) {
     out[key] = value;
   }
 
-  // متن‌ها را از شماره پاک کن
-  for (const textKey of [
-    "notes",
-    "description",
-    "buyerNotes",
-    "tenantNotes"
-  ]) {
+  // توضیحات مشاور (notes) هرگز عمومی نمی‌شود
+  delete out.notes;
+
+  // فقط publicNotes (و در صورت نبود، description عمومی) در خروجی می‌ماند
+  if (out.publicNotes) {
+    out.notes = redactPhonesFromText(out.publicNotes);
+  } else {
+    delete out.notes;
+  }
+  delete out.publicNotes;
+
+  for (const textKey of ["description", "buyerNotes", "tenantNotes"]) {
     if (out[textKey]) out[textKey] = redactPhonesFromText(out[textKey]);
   }
+  // buyerNotes / tenantNotes هم خصوصی مشاورند — از عمومی حذف
+  delete out.buyerNotes;
+  delete out.tenantNotes;
 
   // یکدست‌سازی نام فیلد سال
   if (out.year && !out.yearBuilt) out.yearBuilt = out.year;
