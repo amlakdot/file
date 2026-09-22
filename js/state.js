@@ -19,5 +19,7 @@ export const state = {
   pollTimer: null,
   lastSyncSha: null,
   lastLocalChangeAt: 0,
-  lastPollAt: 0
+  lastPollAt: 0,
+  /** اگر true باشد با بستن جزئیات دوباره پنل تطبیق باز می‌شود */
+  returnToMatch: false
 };
