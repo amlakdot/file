@@ -7,7 +7,8 @@ import {
   generateFileId,
   generateFileCode,
   showToast,
-  toEnglishDigits
+  toEnglishDigits,
+  appLog
 } from "./helpers.js";
 import { state } from "./state.js";
 import { commitFiles } from "./github.js";
@@ -1594,7 +1595,7 @@ function unwrapDivarPayload(data) {
 async function proxyFetchText(proxyBase, targetUrl, accept, timeoutMs = 10000) {
   const url = `${proxyBase}/?url=${encodeURIComponent(targetUrl)}`;
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const timer = setTimeout(() => controller.abort("timeout"), timeoutMs);
   try {
     const res = await fetch(url, {
       method: "GET",
@@ -1606,6 +1607,17 @@ async function proxyFetchText(proxyBase, targetUrl, accept, timeoutMs = 10000) {
       signal: controller.signal
     });
     return res;
+  } catch (err) {
+    // مرورگرهای جدید: "signal is aborted without reason"
+    if (
+      err?.name === "AbortError" ||
+      /aborted/i.test(String(err?.message || ""))
+    ) {
+      const e = new Error("TIMEOUT");
+      e.name = "AbortError";
+      throw e;
+    }
+    throw err;
   } finally {
     clearTimeout(timer);
   }
@@ -1622,8 +1634,11 @@ async function fetchDivarPostFromBackend(token) {
     .replace(/\/$/, "");
 
   if (!proxyBase) {
+    appLog("error", "divar", "PROXY_NOT_CONFIGURED");
     throw new Error("PROXY_NOT_CONFIGURED");
   }
+
+  appLog("info", "divar", "شروع دریافت آگهی", { token, proxyBase });
 
   // فقط یک endpoint اصلی — سریع‌تر از تست چند مسیر پشت‌سرهم
   const apiCandidates = [
@@ -1635,6 +1650,7 @@ async function fetchDivarPostFromBackend(token) {
 
   for (const apiUrl of apiCandidates) {
     try {
+      appLog("debug", "network", "درخواست API دیوار", { apiUrl });
       const res = await proxyFetchText(
         proxyBase,
         apiUrl,
@@ -1669,10 +1685,18 @@ async function fetchDivarPostFromBackend(token) {
       }
 
       const post = unwrapDivarPayload(data);
-      if (post) return normalizeDivarPostShape(post);
+      if (post) {
+        appLog("info", "divar", "آگهی از API دریافت شد", { token });
+        return normalizeDivarPostShape(post);
+      }
 
       lastErr = new Error("UNRECOGNIZED_RESPONSE");
+      appLog("warn", "divar", "پاسخ API قابل تشخیص نبود", { status: res.status });
     } catch (e) {
+      appLog("warn", "network", "خطا در درخواست API دیوار", {
+        message: e?.message,
+        name: e?.name
+      });
       if (e?.message === "BACKEND_UNAUTHORIZED" || e?.message === "RATE_LIMIT") {
         throw e;
       }
@@ -1688,6 +1712,7 @@ async function fetchDivarPostFromBackend(token) {
   // Fallback: صفحه HTML آگهی (برای موبایل وقتی API کند/قطع است)
   try {
     const pageUrl = `https://divar.ir/v/${encodeURIComponent(token)}`;
+    appLog("debug", "network", "fallback HTML دیوار", { pageUrl });
     const res = await proxyFetchText(proxyBase, pageUrl, "text/html", 12000);
 
     if (res.status === 404) {
@@ -1699,19 +1724,34 @@ async function fetchDivarPostFromBackend(token) {
     if (res.ok) {
       const html = await res.text();
       const post = extractPostFromDivarHtml(html);
-      if (post) return post;
+      if (post) {
+        appLog("info", "divar", "آگهی از HTML استخراج شد", { token });
+        return post;
+      }
       lastErr = new Error("HTML_PARSE_FAILED");
+      appLog("warn", "divar", "HTML_PARSE_FAILED");
     } else {
       lastErr = new Error(`HTML_HTTP_${res.status}`);
+      appLog("warn", "network", `HTML_HTTP_${res.status}`);
     }
   } catch (e) {
+    appLog("error", "network", "خطا در fallback HTML", {
+      message: e?.message,
+      name: e?.name
+    });
     if (e?.notFound) throw e;
     lastErr = e;
   }
 
   if (sawNotFound && lastErr?.notFound) throw lastErr;
   if (lastErr?.notFound) throw lastErr;
-  if (lastErr) throw lastErr;
+  if (lastErr) {
+    appLog("error", "divar", "دریافت آگهی ناموفق", {
+      message: lastErr?.message,
+      name: lastErr?.name
+    });
+    throw lastErr;
+  }
   throw new Error("BACKEND_HTTP_0");
 }
 
@@ -1787,45 +1827,52 @@ export async function fetchDivarPost(
     let error =
       "دریافت آگهی از دیوار ناموفق بود.";
 
-
-    switch (err?.message) {
-
-      case "PROXY_NOT_CONFIGURED":
-        error =
-          "آدرس پروکسی دیوار تنظیم نشده. در js/config.js مقدار divarProxy را پر کنید.";
-        break;
-
-      case "BACKEND_UNAUTHORIZED":
-        error =
-          "احراز هویت پروکسی ناموفق است.";
-        break;
-
-      case "BACKEND_FORBIDDEN":
-        error =
-          "پروکسی اجازه دریافت آگهی دیوار را ندارد.";
-        break;
-
-      case "RATE_LIMIT":
-        error =
-          "تعداد درخواست‌ها زیاد است. کمی بعد دوباره تلاش کنید.";
-        break;
-
-      case "INVALID_JSON":
-      case "UNRECOGNIZED_RESPONSE":
-      case "HTML_PARSE_FAILED":
-      case "EMPTY_RESPONSE":
-        error =
-          "پاسخ دیوار قابل‌خواندن نبود. اتصال یا پروکسی را بررسی کنید.";
-        break;
-
-      default:
-
-        if (
-          err?.message
-        ) {
+    // Abort / timeout (signal is aborted without reason و مشابه)
+    if (
+      err?.name === "AbortError" ||
+      err?.message === "TIMEOUT" ||
+      /aborted/i.test(String(err?.message || ""))
+    ) {
+      error =
+        "درخواست منقضی شد یا قطع شد. اتصال اینترنت یا پروکسی دیوار را بررسی کنید و دوباره تلاش کنید.";
+    } else {
+      switch (err?.message) {
+        case "PROXY_NOT_CONFIGURED":
           error =
-            `${error} (${err.message})`;
-        }
+            "آدرس پروکسی دیوار تنظیم نشده. در js/config.js مقدار divarProxy را پر کنید.";
+          break;
+
+        case "BACKEND_UNAUTHORIZED":
+          error = "احراز هویت پروکسی ناموفق است.";
+          break;
+
+        case "BACKEND_FORBIDDEN":
+          error = "پروکسی اجازه دریافت آگهی دیوار را ندارد.";
+          break;
+
+        case "RATE_LIMIT":
+          error =
+            "تعداد درخواست‌ها زیاد است. کمی بعد دوباره تلاش کنید.";
+          break;
+
+        case "INVALID_JSON":
+        case "UNRECOGNIZED_RESPONSE":
+        case "HTML_PARSE_FAILED":
+        case "EMPTY_RESPONSE":
+          error =
+            "پاسخ دیوار قابل‌خواندن نبود. اتصال یا پروکسی را بررسی کنید.";
+          break;
+
+        case "TIMEOUT":
+          error =
+            "درخواست منقضی شد. اتصال اینترنت یا پروکسی را بررسی کنید.";
+          break;
+
+        default:
+          if (err?.message && !/aborted/i.test(err.message)) {
+            error = `${error} (${err.message})`;
+          }
+      }
     }
 
 
