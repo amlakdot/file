@@ -3631,3 +3631,52 @@ button.match-open-btn {
         display: none;
     }
 }
+
+/* ---- Match card improvements ---- */
+.match-breakdown {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+.match-breakdown .mb-item {
+    font-size: 11px;
+    color: var(--text-soft, #bbb);
+    background: var(--surface-3, #222);
+    border: 1px solid var(--border, #333);
+    border-radius: 999px;
+    padding: 2px 8px;
+}
+.match-specs {
+    font-size: 11px;
+    color: var(--text-muted, #999);
+    margin-top: 2px;
+}
+.match-side-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+    align-items: center;
+}
+.match-side-actions .match-call-btn {
+    margin-top: 0;
+}
+.match-side-actions .match-open-btn {
+    margin-top: 0;
+    margin-inline-start: 0;
+    border: 1px solid var(--border, #444);
+    background: transparent;
+    color: var(--text-soft, #ccc);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 12px;
+    cursor: pointer;
+}
+.match-side-actions .match-open-btn:active {
+    color: var(--primary, #4f8cff);
+}
+.match-score {
+    font-variant-numeric: tabular-nums;
+    direction: ltr;
+}
