@@ -716,78 +716,99 @@ function sideSpecs(file) {
   return bits.length ? bits.join(" · ") : "";
 }
 
-/**
- * HTML یک کارت پیشنهاد
- */
-export function renderMatchCard(match) {
-  const demand = match.demand;
-  const supply = match.supply;
-  const dName = escapeHtml(getFileName(demand));
-  const sName = escapeHtml(getFileName(supply));
-  const dLoc = escapeHtml(getFileLocation(demand) || "منطقه ثبت نشده");
-  const sLoc = escapeHtml(getFileLocation(supply) || "منطقه ثبت نشده");
-  const dPhone = getFilePhone(demand) || "";
-  const sPhone = getFilePhone(supply) || "";
-  const dCode = demand.code != null ? escapeHtml(String(demand.code)) : "—";
-  const sCode = supply.code != null ? escapeHtml(String(supply.code)) : "—";
-  const dSpecs = escapeHtml(sideSpecs(demand));
-  const sSpecs = escapeHtml(sideSpecs(supply));
+function scoreClassOf(score) {
+  return score >= 80 ? "high" : score >= 55 ? "mid" : "low";
+}
 
+function moneyHtmlForMatch(match, side /* demand|supply */) {
+  const isRent = match.mode === "rent" || match.mode === "rent-direct";
+  const money = side === "demand" ? match.demandMoney : match.supplyMoney;
+  return isRent ? moneyLineRent(money) : moneyLineSale(money);
+}
+
+function breakdownForMatch(match) {
+  const isDirect = match.mode === "rent-direct";
+  const bits = [];
+  if (isDirect) {
+    if (match.depositScore != null) bits.push(`رهن ${formatScorePct(match.depositScore)}`);
+    if (match.rentScore != null) bits.push(`اجاره ${formatScorePct(match.rentScore)}`);
+  } else {
+    bits.push(`قیمت ${formatScorePct(match.priceScore)}`);
+  }
+  if (match.locationScore != null) bits.push(`منطقه ${formatScorePct(match.locationScore)}`);
+  if (match.areaScore != null) bits.push(`مشخصات ${formatScorePct(match.areaScore)}`);
+  return bits.map((t) => `<span class="mb-item">${escapeHtml(t)}</span>`).join("");
+}
+
+/** یک ردیف پیشنهاد (ملک/طرف مقابل) داخل کارت گروه */
+function renderMatchRow(match) {
+  const supply = match.supply;
+  const sName = escapeHtml(getFileName(supply));
+  const sLoc = escapeHtml(getFileLocation(supply) || "منطقه ثبت نشده");
+  const sPhone = getFilePhone(supply) || "";
+  const sCode = supply.code != null ? escapeHtml(String(supply.code)) : "—";
+  const sSpecs = escapeHtml(sideSpecs(supply));
   const isDirect = match.mode === "rent-direct";
   const isRent = match.mode === "rent" || isDirect;
-  const budgetHtml = isRent
-    ? moneyLineRent(match.demandMoney)
-    : moneyLineSale(match.demandMoney);
-  const askHtml = isRent
-    ? moneyLineRent(match.supplyMoney)
-    : moneyLineSale(match.supplyMoney);
-  const scoreClass =
-    match.score >= 80 ? "high" : match.score >= 55 ? "mid" : "low";
-
-  const demandRole = isRent || isDirect ? "مستأجر" : "خریدار";
-  const supplyRole = isRent || isDirect ? "ملک / مالک" : "ملک فروشی";
-
-  const locLabel =
-    match.locationScore == null
-      ? "منطقه: بدون داده"
-      : `منطقه ${formatScorePct(match.locationScore)}`;
-  const specLabel =
-    match.areaScore == null
-      ? "مشخصات: بدون داده"
-      : `مشخصات ${formatScorePct(match.areaScore)}`;
-
+  const supplyRole = isRent ? "ملک / مالک" : "ملک فروشی";
+  const askHtml = moneyHtmlForMatch(match, "supply");
   const diffText = isDirect ? formatDirectDiff(match) : formatDiff(match.diffPct);
 
-  let breakdownItems = "";
-  if (isDirect) {
-    if (match.depositScore != null) {
-      breakdownItems += `<span class="mb-item">رهن ${formatScorePct(match.depositScore)}</span>`;
-    }
-    if (match.rentScore != null) {
-      breakdownItems += `<span class="mb-item">اجاره ${formatScorePct(match.rentScore)}</span>`;
-    }
-  } else {
-    breakdownItems += `<span class="mb-item">قیمت ${formatScorePct(match.priceScore)}</span>`;
-  }
-  breakdownItems += `<span class="mb-item">${escapeHtml(locLabel)}</span>`;
-  breakdownItems += `<span class="mb-item">${escapeHtml(specLabel)}</span>`;
+  return `
+  <div class="match-row" data-supply-id="${escapeHtml(supply.id)}">
+    <div class="match-row-top">
+      <span class="match-score ${scoreClassOf(match.score)}" title="امتیاز تطبیق">${formatScorePct(match.score)}</span>
+      <div class="match-row-title">
+        <span class="match-role">${supplyRole}</span>
+        <span class="match-name">${sName} <span class="match-code">#${sCode}</span></span>
+      </div>
+    </div>
+    <div class="match-meta">📍 ${sLoc}${sSpecs ? ` · ${sSpecs}` : ""}</div>
+    <div class="match-money">${askHtml}</div>
+    ${diffText ? `<div class="match-diff-line">${escapeHtml(diffText)}</div>` : ""}
+    <div class="match-breakdown">${breakdownForMatch(match)}</div>
+    <div class="match-side-actions">
+      ${
+        sPhone
+          ? `<button type="button" class="match-call-btn" data-phone="${escapeHtml(sPhone)}" data-role="supply">تماس</button>`
+          : ""
+      }
+      <button type="button" class="match-open-btn" data-file-id="${escapeHtml(supply.id)}">جزئیات</button>
+    </div>
+  </div>`;
+}
+
+/**
+ * کارت گروهی: یک طرف تقاضا + لیست همه پیشنهادهای مناسب
+ */
+export function renderMatchGroup(demand, matches) {
+  if (!matches || !matches.length) return "";
+  const sample = matches[0];
+  const isRent = sample.mode === "rent" || sample.mode === "rent-direct";
+  const demandRole = isRent ? "مستأجر" : "خریدار";
+  const dName = escapeHtml(getFileName(demand));
+  const dLoc = escapeHtml(getFileLocation(demand) || "منطقه ثبت نشده");
+  const dPhone = getFilePhone(demand) || "";
+  const dCode = demand.code != null ? escapeHtml(String(demand.code)) : "—";
+  const dSpecs = escapeHtml(sideSpecs(demand));
+  const budgetHtml = moneyHtmlForMatch(sample, "demand");
+  const best = matches[0].score;
+  const count = matches.length;
+
+  const rows = matches.map(renderMatchRow).join("");
 
   return `
-  <article class="match-card" data-demand-id="${escapeHtml(demand.id)}" data-supply-id="${escapeHtml(supply.id)}">
-    <div class="match-card-top">
-      <span class="match-score ${scoreClass}" title="امتیاز کل تطبیق">${formatScorePct(match.score)}</span>
-      <span class="match-diff">${escapeHtml(diffText)}</span>
-    </div>
-    <div class="match-breakdown" title="جزئیات امتیاز">
-      ${breakdownItems}
-    </div>
-    <div class="match-pair">
-      <div class="match-side">
+  <article class="match-group-card" data-demand-id="${escapeHtml(demand.id)}">
+    <header class="match-group-head">
+      <div class="match-group-head-main">
         <div class="match-role">${demandRole}</div>
         <div class="match-name">${dName} <span class="match-code">#${dCode}</span></div>
-        <div class="match-meta">📍 ${dLoc}</div>
-        ${dSpecs ? `<div class="match-specs">${dSpecs}</div>` : ""}
+        <div class="match-meta">📍 ${dLoc}${dSpecs ? ` · ${dSpecs}` : ""}</div>
         <div class="match-money">${budgetHtml}</div>
+      </div>
+      <div class="match-group-head-side">
+        <span class="match-score ${scoreClassOf(best)}" title="بهترین امتیاز">${formatScorePct(best)}</span>
+        <span class="match-count-badge">${count.toLocaleString("fa-IR")} پیشنهاد</span>
         <div class="match-side-actions">
           ${
             dPhone
@@ -797,31 +818,43 @@ export function renderMatchCard(match) {
           <button type="button" class="match-open-btn" data-file-id="${escapeHtml(demand.id)}">جزئیات</button>
         </div>
       </div>
-      <div class="match-arrow" aria-hidden="true">↔</div>
-      <div class="match-side">
-        <div class="match-role">${supplyRole}</div>
-        <div class="match-name">${sName} <span class="match-code">#${sCode}</span></div>
-        <div class="match-meta">📍 ${sLoc}</div>
-        ${sSpecs ? `<div class="match-specs">${sSpecs}</div>` : ""}
-        <div class="match-money">${askHtml}</div>
-        <div class="match-side-actions">
-          ${
-            sPhone
-              ? `<button type="button" class="match-call-btn" data-phone="${escapeHtml(sPhone)}" data-role="supply">تماس</button>`
-              : ""
-          }
-          <button type="button" class="match-open-btn" data-file-id="${escapeHtml(supply.id)}">جزئیات</button>
-        </div>
-      </div>
+    </header>
+    <div class="match-group-label">پیشنهادهای مناسب (مرتب‌شده بر اساس امتیاز)</div>
+    <div class="match-group-rows">
+      ${rows}
     </div>
   </article>`;
+}
+
+/** گروه‌بندی بر اساس demand (مستأجر / خریدار) */
+export function groupMatchesByDemand(matches) {
+  const map = new Map();
+  for (const m of matches || []) {
+    const id = m.demand?.id;
+    if (!id) continue;
+    if (!map.has(id)) map.set(id, { demand: m.demand, items: [] });
+    map.get(id).items.push(m);
+  }
+  const groups = [...map.values()];
+  for (const g of groups) {
+    g.items.sort((a, b) => b.score - a.score || Math.abs(a.diffPct) - Math.abs(b.diffPct));
+  }
+  // گروه با بهترین امتیاز اول
+  groups.sort((a, b) => (b.items[0]?.score || 0) - (a.items[0]?.score || 0));
+  return groups;
 }
 
 export function renderMatchList(matches) {
   if (!matches || !matches.length) {
     return `<p class="match-empty">پیشنهادی با این فیلتر پیدا نشد. تلرانس قیمت یا نرخ تبدیل را تغییر دهید.</p>`;
   }
-  return matches.map(renderMatchCard).join("");
+  const groups = groupMatchesByDemand(matches);
+  return groups.map((g) => renderMatchGroup(g.demand, g.items)).join("");
+}
+
+/** سازگاری با کد قدیمی */
+export function renderMatchCard(match) {
+  return renderMatchGroup(match.demand, [match]);
 }
 
 export function getMatchStats() {
