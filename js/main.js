@@ -51,11 +51,13 @@ import {
   getAllRentMatches,
   getAllRentDirectMatches,
   getAllSaleMatches,
+  getMatchesForFile,
   getMatchStats,
   renderMatchList,
   setMatchFollowup,
   DEFAULT_RAHN_RATE
 } from "./match.js";
+import { getFileName } from "./files.js";
 
 function setupLoginForm() {
   const form = $("loginForm");
@@ -300,6 +302,10 @@ function renderLogsList() {
 
 /* ---------- Match panel ---------- */
 let _matchTab = "rent";
+/** null = مرور همه؛ وگرنه id فایل فوکوس */
+let _matchFocusFileId = null;
+/** تب‌های مجاز برای حالت فعلی */
+let _matchAllowedTabs = ["rent", "rent-direct", "sale"];
 
 function getSelectedMatchAmenities() {
   return Array.from(
@@ -307,21 +313,68 @@ function getSelectedMatchAmenities() {
   ).map((el) => el.value);
 }
 
-function openMatchModal() {
+function updateMatchTabsVisibility() {
+  document.querySelectorAll(".match-tab").forEach((tab) => {
+    const key = tab.getAttribute("data-match-tab");
+    const ok = _matchAllowedTabs.includes(key);
+    tab.classList.toggle("hidden", !ok);
+    if (ok && key === _matchTab) tab.classList.add("active");
+    else if (key !== _matchTab) tab.classList.remove("active");
+  });
+  // اگر تب فعلی مجاز نیست، اولین مجاز را بردار
+  if (!_matchAllowedTabs.includes(_matchTab)) {
+    _matchTab = _matchAllowedTabs[0] || "rent";
+    document.querySelectorAll(".match-tab").forEach((tab) => {
+      tab.classList.toggle(
+        "active",
+        tab.getAttribute("data-match-tab") === _matchTab
+      );
+    });
+  }
+}
+
+function openMatchModal({ fileId = null } = {}) {
   closeMoreMenu();
   const modal = $("matchModal");
   if (!modal) return;
+
+  _matchFocusFileId = fileId || null;
   const rateEl = $("matchRateInput");
   if (rateEl) rateEl.value = String(getMatchRate());
-  // فیلترها پیش‌فرض جمع
+
   const panel = $("matchFiltersPanel");
   const toggle = $("matchFiltersToggle");
   if (panel) panel.classList.add("collapsed");
   if (toggle) toggle.setAttribute("aria-expanded", "false");
+
+  if (_matchFocusFileId) {
+    const file = state.files.find((f) => f && f.id === _matchFocusFileId);
+    if (!file) {
+      showToast("فایل پیدا نشد.", "error");
+      return;
+    }
+    const preview = getMatchesForFile(file, { rate: getMatchRate() });
+    _matchAllowedTabs = preview.tabs || ["rent", "rent-direct", "sale"];
+    _matchTab = preview.defaultTab || _matchAllowedTabs[0];
+    if ($("matchModalTitle")) $("matchModalTitle").textContent = preview.title || "تطبیق";
+    if ($("matchModalEyebrow")) $("matchModalEyebrow").textContent = "تطبیق این فایل";
+  } else {
+    _matchAllowedTabs = ["rent", "rent-direct", "sale"];
+    _matchTab = "rent";
+    if ($("matchModalTitle")) $("matchModalTitle").textContent = "مرور همهٔ پیشنهادها";
+    if ($("matchModalEyebrow")) $("matchModalEyebrow").textContent = "پیشنهاد مشاور";
+  }
+
+  updateMatchTabsVisibility();
   modal.classList.remove("hidden");
   document.body.style.overflow = "hidden";
   refreshMatchResults();
-  appLog("info", "ui", "باز شدن پنل تطبیق");
+  appLog("info", "ui", "باز شدن پنل تطبیق", { fileId: _matchFocusFileId });
+}
+
+/** سازگاری با منوی سراسری */
+function openMatchModalAll() {
+  openMatchModal({ fileId: null });
 }
 
 function closeMatchModal() {
@@ -370,13 +423,28 @@ function refreshMatchResults() {
     }
   }
 
-  const opts = { rate, amenities };
+  const opts = { rate, amenities, tab: _matchTab };
   const box = $("matchResults");
   try {
-    let matches;
-    if (_matchTab === "sale") matches = getAllSaleMatches(opts);
-    else if (_matchTab === "rent-direct") matches = getAllRentDirectMatches(opts);
-    else matches = getAllRentMatches(opts);
+    let matches = [];
+    if (_matchFocusFileId) {
+      const file = state.files.find((f) => f && f.id === _matchFocusFileId);
+      if (!file) {
+        if (box) box.innerHTML = `<p class="match-empty">فایل پیدا نشد.</p>`;
+        return;
+      }
+      const result = getMatchesForFile(file, opts);
+      matches = result.matches || [];
+      if ($("matchModalTitle") && result.title) {
+        $("matchModalTitle").textContent = result.title;
+      }
+    } else if (_matchTab === "sale") {
+      matches = getAllSaleMatches(opts);
+    } else if (_matchTab === "rent-direct") {
+      matches = getAllRentDirectMatches(opts);
+    } else {
+      matches = getAllRentMatches(opts);
+    }
 
     if (box) box.innerHTML = renderMatchList(matches, { statusFilter });
     appLog("debug", "ui", "تطبیق بروزرسانی شد", {
@@ -384,7 +452,8 @@ function refreshMatchResults() {
       count: matches.length,
       rate,
       amenities,
-      statusFilter
+      statusFilter,
+      focus: _matchFocusFileId
     });
   } catch (err) {
     console.error(err);
@@ -397,12 +466,10 @@ function refreshMatchResults() {
 }
 
 function setupMatchPanel() {
-  const open = (e) => {
-    e?.preventDefault?.();
-    openMatchModal();
-  };
-  $("openMatchButton")?.addEventListener("click", open);
-  $("openMatchHeaderButton")?.addEventListener("click", open);
+  $("openMatchButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    openMatchModalAll();
+  });
 
   $("closeMatchButton")?.addEventListener("click", (e) => {
     e.preventDefault();
@@ -435,11 +502,37 @@ function setupMatchPanel() {
 
   document.querySelectorAll(".match-tab").forEach((tab) => {
     tab.addEventListener("click", () => {
+      const key = tab.getAttribute("data-match-tab") || "rent";
+      if (!_matchAllowedTabs.includes(key)) return;
       document.querySelectorAll(".match-tab").forEach((t) => t.classList.remove("active"));
       tab.classList.add("active");
-      _matchTab = tab.getAttribute("data-match-tab") || "rent";
+      _matchTab = key;
       refreshMatchResults();
     });
+  });
+
+  // دکمه تطبیق روی کارت‌ها (delegation)
+  document.addEventListener("click", (e) => {
+    const btn = e.target?.closest?.(".card-match-btn");
+    if (!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const id = btn.getAttribute("data-match-file-id");
+    if (!id) return;
+    openMatchModal({ fileId: id });
+  });
+
+  $("detailMatchButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    const id = state.viewingFileId;
+    if (!id) {
+      showToast("فایلی انتخاب نشده.", "error");
+      return;
+    }
+    // جزئیات را باز نگه نمی‌داریم؛ با بستن تطبیق برنمی‌گردیم مگر returnToMatch
+    state.returnToMatch = false;
+    $("detailModal")?.classList.add("hidden");
+    openMatchModal({ fileId: id });
   });
 
   // تماس و جزئیات و پیگیری داخل نتایج
