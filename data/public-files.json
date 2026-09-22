@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-22T15:45:59.503Z",
+  "updatedAt": "2026-09-22T16:39:13.124Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -35,7 +35,6 @@
         ],
         "totalFloors": 0,
         "salePrice": 3400000000,
-        "notes": "شماره مدیر ساختمان فرقانی زنگ 13",
         "code": 1001
       },
       "source": "panel",
@@ -178,7 +177,6 @@
         "tenantRent": 0,
         "familyStatus": "single",
         "familySize": 0,
-        "notes": "تک برگ - شماره روبیکا",
         "amenities": [
           "elevator",
           "storage",
@@ -244,7 +242,6 @@
         "suggestedDeposit": 0,
         "suggestedRent": 0,
         "capital": 6000000000,
-        "buyerNotes": "ویلایی میخواد",
         "tenantDeposit": 0,
         "tenantRent": 0,
         "familyStatus": "single",
@@ -342,7 +339,6 @@
         "tenantRent": 0,
         "familyStatus": "single",
         "familySize": 0,
-        "notes": "خریدار کلنگی",
         "amenities": [],
         "code": 1011
       },
@@ -401,7 +397,6 @@
         "suggestedDeposit": 0,
         "suggestedRent": 0,
         "capital": 2000000000,
-        "buyerNotes": "شماره دوم",
         "tenantDeposit": 0,
         "tenantRent": 0,
         "familyStatus": "single",
@@ -464,7 +459,6 @@
         "suggestedDeposit": 0,
         "suggestedRent": 0,
         "capital": 2500000000,
-        "buyerNotes": "دو تا واحد میخواد",
         "tenantDeposit": 0,
         "tenantRent": 0,
         "familyStatus": "single",
@@ -497,7 +491,6 @@
         "suggestedDeposit": 0,
         "suggestedRent": 0,
         "capital": 4000000000,
-        "buyerNotes": "دربست ویلایی- یا واحد جدا همکف- دارا امتیاز",
         "tenantDeposit": 0,
         "tenantRent": 0,
         "familyStatus": "single",
@@ -533,7 +526,6 @@
         "tenantRent": 15000000,
         "familyStatus": "single",
         "familySize": 0,
-        "tenantNotes": "صنعتی سوله برای نجاری",
         "amenities": [],
         "code": 1017
       },
@@ -565,7 +557,6 @@
         "tenantRent": 7000000,
         "familyStatus": "married",
         "familySize": 0,
-        "tenantNotes": "دو نفر زوج - دربست میخواد",
         "amenities": [],
         "code": 1018
       },
@@ -597,7 +588,6 @@
         "tenantRent": 5000000,
         "familyStatus": "single",
         "familySize": 0,
-        "tenantNotes": "یک نفر مجرد",
         "amenities": [],
         "code": 1019
       },
@@ -629,7 +619,6 @@
         "tenantRent": 0,
         "familyStatus": "single",
         "familySize": 0,
-        "tenantNotes": "یک نفر",
         "amenities": [],
         "code": 1020
       },
@@ -661,7 +650,6 @@
         "tenantRent": 6000000,
         "familyStatus": "single",
         "familySize": 0,
-        "tenantNotes": "مستقل میخواد",
         "amenities": [],
         "code": 1022
       },
@@ -693,7 +681,6 @@
         "tenantRent": 0,
         "familyStatus": "family",
         "familySize": 2,
-        "tenantNotes": "ویلایی",
         "amenities": [],
         "code": 1023
       },
@@ -756,7 +743,6 @@
         "tenantRent": 15000000,
         "familyStatus": "single",
         "familySize": 0,
-        "tenantNotes": "شماره دو سه نفر مجرد",
         "amenities": [],
         "code": 1026
       },
@@ -881,7 +867,6 @@
         "tenantRent": 6000000,
         "familyStatus": "family",
         "familySize": 4,
-        "tenantNotes": "پارکینگ میخواد حتما",
         "amenities": [],
         "code": 1033
       },
@@ -909,7 +894,6 @@
         "suggestedDeposit": 0,
         "suggestedRent": 0,
         "capital": 4000000000,
-        "buyerNotes": "فاز 8 و 11",
         "tenantDeposit": 0,
         "tenantRent": 0,
         "familyStatus": "single",
@@ -941,7 +925,6 @@
         "suggestedDeposit": 0,
         "suggestedRent": 0,
         "capital": 4000000000,
-        "buyerNotes": "کم واحد\nآسانسور دار دو طبقه به بالا متراژ مهم نیست اگر خوب باشه",
         "tenantDeposit": 0,
         "tenantRent": 0,
         "familyStatus": "single",
@@ -977,7 +960,6 @@
         "tenantRent": 5000000,
         "familyStatus": "family",
         "familySize": 2,
-        "tenantNotes": "زوج جوان، خانه کوچک مهم نیست",
         "amenities": [],
         "code": 1037
       },
@@ -1009,7 +991,6 @@
         "tenantRent": 0,
         "familyStatus": "single",
         "familySize": 0,
-        "tenantNotes": "شهرک - شهرک طلاییه",
         "amenities": [],
         "code": 1038
       },
@@ -1043,7 +1024,6 @@
         "tenantRent": 0,
         "familyStatus": "single",
         "familySize": 0,
-        "notes": "دو طبقه 150 بنا هر طبقه 75\nدو نبش زرین\nبیست سال قولنامه کد رهگیری",
         "amenities": [],
         "code": 1043,
         "yearBuilt": 1360
@@ -1077,7 +1057,6 @@
         "tenantRent": 5000000,
         "familyStatus": "married",
         "familySize": 0,
-        "tenantNotes": "دو نفر",
         "amenities": []
       },
       "source": "panel",
@@ -1110,7 +1089,6 @@
         "tenantRent": 0,
         "familyStatus": "single",
         "familySize": 0,
-        "notes": "شمارهذاصلی",
         "amenities": [
           "parking",
           "elevator",
@@ -1149,7 +1127,6 @@
         "tenantRent": 10000000,
         "familyStatus": "single",
         "familySize": 0,
-        "tenantNotes": "پارکینگ دارد",
         "amenities": []
       },
       "source": "panel",
@@ -1208,7 +1185,6 @@
         "suggestedDeposit": 0,
         "suggestedRent": 0,
         "capital": 6000000000,
-        "buyerNotes": "برای مکانیکی، همکف",
         "tenantDeposit": 0,
         "tenantRent": 0,
         "familyStatus": "single",
@@ -1243,7 +1219,6 @@
         "tenantDeposit": 0,
         "tenantRent": 0,
         "familySize": 0,
-        "notes": "عنوان دیوار: اجاره خانه بازدید ازاد یک عدد واحد 70 متری تک خواب دو خواب شو به همراه پارکینگ حیاط و انباری و مخزن آب برق و تلفن جدا اب و گاز مشترک به اجاره میرود",
         "amenities": [
           "parking",
           "storage"
@@ -1299,7 +1274,6 @@
         "tenantDeposit": 0,
         "tenantRent": 0,
         "familySize": 0,
-        "notes": "عنوان دیوار: خانه 90 متری دربست خانه مسکونی 90 متری دربست آب برق گاز جدا حیاط دار جای پارکینگ داخل کوچه 2 ماشین 1 اتاق انباری کولر",
         "amenities": [
           "storage"
         ],
@@ -1354,7 +1328,6 @@
         "tenantDeposit": 0,
         "tenantRent": 0,
         "familySize": 0,
-        "notes": "عنوان دیوار: واحد 80م دوخوابه ط اول سلام واحد 80متری دوخوابه طبقه اول با بالکن بالای مغازه کلیه امکانات\nآب وبرق وگاز\nبر خیابان حاج منصور\n200متر داخل خیابان دسترسی 1دقیقه ای\nبه کلیه مایحتاج عمومی و رفاهی\nدرصورت لزوم مبله باکلیه وسایل اولیه زندگی اجاره داده میشود\nتخلیه بدون لوازم هم داده میشود\nآماده تخلیه میباشد *********** ********** ******* *** چهار",
         "amenities": [],
         "divarDescription": "سلام \nواحد ۸۰متری دوخوابه \nطبقه اول  با   بالکن \nبالای مغازه  کلیه امکانات\nآب وبرق وگاز\nبر خیابان حاج منصور\n۲۰۰متر داخل خیابان دسترسی ۱دقیقه ای\nبه کلیه مایحتاج عمومی و رفاهی\nدرصورت لزوم مبله باکلیه وسایل \nاولیه زندگی اجاره داده میشود\nتخلیه بدون لوازم هم داده میشود\nآماده  تخلیه میباشد\n *********** ********** ******* *** چهار",
         "divarImages": [
@@ -1410,7 +1383,6 @@
         "tenantRent": 5000000,
         "familyStatus": "family",
         "familySize": 2,
-        "tenantNotes": "پارکینگ انباری",
         "amenities": []
       },
       "source": "panel",
@@ -1440,7 +1412,6 @@
         "tenantDeposit": 0,
         "tenantRent": 0,
         "familySize": 0,
-        "notes": "خانه در مهرآباد بومهن سلام واحد فوق دارای کمد دیواری\nآسانسور\nسرامیک\nگاز و هود تمیز\nبالکن پارکینگ‌ داخل محوطه\nنور عالی",
         "amenities": [
           "parking",
           "elevator"
@@ -1498,7 +1469,6 @@
         "tenantDeposit": 0,
         "tenantRent": 0,
         "familySize": 0,
-        "notes": "اجاره و فروش : خونه 60 متری ستاره ستاره دوم بازدید تا 8 شب قیمت فروش 2.500.000.000 خونه تمیز کابینت های گلاس گاز رومیزی هود لوستر وجای پارک ماشین فراوان با همسایه های خوب محله ای ساکت",
         "amenities": [],
         "divarDescription": "خونه تمیز کابینت های گلاس گاز رومیزی هود لوستر وجای پارک ماشین فراوان با همسایه های خوب محله ای ساکت",
         "divarImages": [
@@ -1551,7 +1521,6 @@
         "tenantDeposit": 0,
         "tenantRent": 0,
         "familySize": 0,
-        "notes": "آپارتمان اجاره ای تک واحدی برق و گاز جدا و آب مشترک\nطبقه دوم کوچه بن بست\nمحیطی آرام",
         "amenities": [],
         "divarDescription": "برق و گاز جدا و آب مشترک\nطبقه دوم \nکوچه بن بست\nمحیطی آرام",
         "divarImages": [
@@ -1606,7 +1575,6 @@
         "tenantRent": 0,
         "familyStatus": "single",
         "familySize": 0,
-        "notes": "دو واحدی",
         "amenities": []
       },
       "source": "panel",
@@ -1638,7 +1606,6 @@
         "tenantRent": 5000000,
         "familyStatus": "single",
         "familySize": 0,
-        "tenantNotes": "اطراف حاج منصور، مریم، شهرک",
         "amenities": []
       },
       "source": "panel",
@@ -1672,7 +1639,6 @@
         "tenantRent": 0,
         "familyStatus": "single",
         "familySize": 0,
-        "notes": "دو طبقه هر دو اجاره",
         "amenities": [
           "balcony",
           "yard"
