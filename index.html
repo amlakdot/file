@@ -104,6 +104,10 @@
                     از دیوار
                 </button>
 
+                <button id="openMatchHeaderButton" class="header-button match-chip" type="button" title="تطبیق فایل‌ها" aria-label="تطبیق فایل‌ها">
+                    تطبیق
+                </button>
+
                 <button id="openCalculatorButton" class="header-button calc-chip" type="button" title="ماشین حساب" aria-label="ماشین حساب">
                     ماشین حساب
                 </button>
@@ -129,6 +133,7 @@
                 <div class="md-sheet-title">تنظیمات</div>
                 <button type="button" class="md-sheet-item" id="publishPublicButton" role="menuitem">انتشار برای عموم</button>
                 <a class="md-sheet-item" id="openPublicPageLink" href="public.html" target="_blank" rel="noopener" role="menuitem">باز کردن صفحه عمومی</a>
+                <button type="button" class="md-sheet-item" id="openMatchButton" role="menuitem">تطبیق فایل‌ها</button>
                 <button type="button" class="md-sheet-item" id="openLogsButton" role="menuitem">لاگ‌ها (دیباگ)</button>
                 <button type="button" class="md-sheet-item danger" id="logoutButton" role="menuitem">خروج از حساب</button>
             </div>
@@ -622,6 +627,41 @@
 
     <!-- TOAST -->
     <div id="toast" class="toast hidden"></div>
+
+    <!-- =========================
+         MATCH MODAL — تطبیق اجاره و خرید/فروش
+    ========================== -->
+    <div id="matchModal" class="modal hidden">
+        <div class="modal-backdrop" id="matchModalBackdrop"></div>
+        <div class="modal-card match-modal-card modal-sheet">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-eyebrow">پیشنهاد مشاور</div>
+                    <h2>تطبیق فایل‌ها</h2>
+                </div>
+                <button id="closeMatchButton" class="close-button" type="button" aria-label="بستن">×</button>
+            </div>
+            <div class="modal-body match-modal-body">
+                <div class="match-settings">
+                    <div class="match-field">
+                        <label for="matchRateInput">نرخ تبدیل (میلیون اجاره / ۱۰۰ میلیون رهن)</label>
+                        <input id="matchRateInput" type="number" min="0.5" max="20" step="0.5" value="3" dir="ltr">
+                    </div>
+                    <div class="match-field">
+                        <label for="matchToleranceInput">تلرانس قیمت (٪)</label>
+                        <input id="matchToleranceInput" type="number" min="5" max="50" step="5" value="15" dir="ltr">
+                    </div>
+                    <button type="button" id="matchRefreshButton" class="primary-button match-refresh-btn">بروزرسانی</button>
+                </div>
+                <p id="matchStatsLine" class="match-stats-line"></p>
+                <div class="match-tabs" role="tablist">
+                    <button type="button" class="match-tab active" data-match-tab="rent" role="tab">اجاره</button>
+                    <button type="button" class="match-tab" data-match-tab="sale" role="tab">خرید / فروش</button>
+                </div>
+                <div id="matchResults" class="match-results"></div>
+            </div>
+        </div>
+    </div>
 
     <!-- =========================
          LOGS MODAL (دیباگ)
