@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-23T14:45:58.081Z",
+  "updatedAt": "2026-09-23T14:53:24.445Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1698,6 +1698,58 @@
       },
       "source": "divar",
       "updatedAt": "2026-09-23T14:45:55.788Z"
+    },
+    {
+      "id": "file-1790175202229-265be872f4996706bb99a8b6",
+      "code": 1081,
+      "type": "sale",
+      "status": "active",
+      "title": "آپارتمان · 50 متر · 1 خواب · بومهن",
+      "data": {
+        "code": 1081,
+        "propertyType": "apartment",
+        "area": 50,
+        "rooms": 1,
+        "year": 1395,
+        "location": "بومهن، خ بهار دوم",
+        "unitFloor": "2",
+        "totalFloors": 0,
+        "salePrice": 44000000,
+        "currentDeposit": 0,
+        "currentRent": 0,
+        "suggestedDeposit": 0,
+        "suggestedRent": 0,
+        "capital": 0,
+        "tenantDeposit": 0,
+        "tenantRent": 0,
+        "familySize": 0,
+        "amenities": [],
+        "divarDescription": "ملک ۵۰ متری \nطبقه دوم \nبازسازی شده \nکناف کاری شده \nنور مخفی \nاب و هوا عالی",
+        "divarImages": [
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/paFQg-sWAnGZbWOB3ed_AA/145288f6-25b8-47b9-af5b-a742025f8df9.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/U3K8mraqKAc59NQuxNYRIA/a2e48507-38e7-47f3-881a-db3cfaaac984.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/6-C9z_2pwCXKOtGZ5JDq4A/d1922a62-f910-40b6-afb2-46d495e75e1f.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/gsfzEjSdtXZ4Ci8n3xj20A/35ad270c-034b-4931-94c1-52fc75db0fcd.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/dJ2Y6yXeHMWqSCHACQ71_g/779df792-37bd-402e-a593-7a2f7bfaa22a.webp",
+          "https://mapimage.divarcdn.com/v8/mapimage?encrypted_data=MTIzNDU2Nzg5MTIzXOQLPrmMyqzuQvznoYB5NPpLorj6L7ZMZw8IT-dZfyY-FA=="
+        ],
+        "divarAttributes": {
+          "متراژ": "۵۰",
+          "ساخت": "۱۳۹۵",
+          "اتاق": "۱",
+          "تصویر‌ها برای همین ملک است؟": "بله",
+          "قیمت کل": "‏۲,۲۰۰,۰۰۰,۰۰۰ تومان",
+          "قیمت هر متر": "‏۴۴,۰۰۰,۰۰۰ تومان",
+          "طبقه": "۲",
+          "آسانسور ندارد": false,
+          "پارکینگ ندارد": false,
+          "انباری ندارد": false
+        },
+        "notes": "ملک 50 متری طبقه دوم بازسازی شده کناف کاری شده نور مخفی اب و هوا عالی",
+        "yearBuilt": 1395
+      },
+      "source": "divar",
+      "updatedAt": "2026-09-23T14:53:22.228Z"
     }
   ]
 }
