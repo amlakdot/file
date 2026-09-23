@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-23T14:53:55.485Z",
+  "updatedAt": "2026-09-23T14:56:22.796Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1752,6 +1752,61 @@
       },
       "source": "divar",
       "updatedAt": "2026-09-23T14:53:53.596Z"
+    },
+    {
+      "id": "file-1790175380647-9c5bde41c87f88aa7566d07b",
+      "code": 1082,
+      "type": "sale",
+      "status": "active",
+      "title": "آپارتمان · 115 متر · 2 خواب · بومهن",
+      "data": {
+        "code": 1082,
+        "propertyType": "apartment",
+        "area": 115,
+        "rooms": 2,
+        "year": 1400,
+        "location": "بومهن، خ نارنجستان ۲",
+        "unitFloor": "3",
+        "totalFloors": 0,
+        "salePrice": 95652000,
+        "currentDeposit": 0,
+        "currentRent": 0,
+        "suggestedDeposit": 0,
+        "suggestedRent": 0,
+        "capital": 0,
+        "tenantDeposit": 0,
+        "tenantRent": 0,
+        "familySize": 0,
+        "amenities": [
+          "elevator",
+          "parking",
+          "storage"
+        ],
+        "divarDescription": "آپارتمان 115متری\nگرمایش پکیج\nسرمایش کولر\nکف سرامیک\n4طبقه تک واحدی\nواحد تخلیه و آماده تحویل می باشد.",
+        "divarImages": [
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/Hdgv7IvIiqw-v_DCQj-Buw/8760b61b-2b03-4cde-9a65-7a4a57719d07.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/4i60p2eUREJwVLm7U82-Ag/adcd98b0-89e4-4228-8ad6-4606085901ce.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/M188HGhdQlPfoJo8iVNB5w/66dab328-8d39-4d7e-9be8-55ccaea11c23.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/g0Jg4iu8r-E2LPYUvdWDsQ/40a71e1f-6483-4559-82ee-3a27e46e85d9.webp",
+          "https://mapimage.divarcdn.com/v8/mapimage?encrypted_data=MTIzNDU2Nzg5MTIzXKv6XLA3yazuQlLErNeENvpLGhPsTmE1Kf4PPqraYMQStg==&is_nearby=true"
+        ],
+        "divarAttributes": {
+          "متراژ": "۱۱۵",
+          "ساخت": "۱۴۰۰",
+          "اتاق": "۲",
+          "تصویر‌ها برای همین ملک است؟": "بله",
+          "قیمت کل": "‏۱۱,۰۰۰,۰۰۰,۰۰۰ تومان",
+          "قیمت هر متر": "‏۹۵,۶۵۲,۰۰۰ تومان",
+          "طبقه": "۳",
+          "آسانسور": true,
+          "پارکینگ": true,
+          "انباری": true
+        },
+        "notes": "آپارتمان 115متری\nگرمایش پکیج\nسرمایش کولر\nکف سرامیک\n4طبقه تک واحدی\nواحد تخلیه و آماده تحویل می باشد.",
+        "yearBuilt": 1400
+      },
+      "source": "divar",
+      "updatedAt": "2026-09-23T14:56:20.647Z"
     }
   ]
 }
