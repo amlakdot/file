@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-23T14:44:42.913Z",
+  "updatedAt": "2026-09-23T14:45:14.316Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1646,6 +1646,58 @@
       },
       "source": "panel",
       "updatedAt": "2026-09-22T15:13:03.734Z"
+    },
+    {
+      "id": "file-1790174712016-fe38fe8260e0fd7f5f70749d",
+      "code": 1080,
+      "type": "sale",
+      "status": "active",
+      "title": "ویلا / خانه · 176 متر · 2 خواب · بومهن",
+      "data": {
+        "code": 1080,
+        "propertyType": "villa",
+        "area": 176,
+        "rooms": 2,
+        "year": 1390,
+        "location": "بومهن، خ نگین",
+        "totalFloors": 0,
+        "salePrice": 92857000,
+        "currentDeposit": 0,
+        "currentRent": 0,
+        "suggestedDeposit": 0,
+        "suggestedRent": 0,
+        "capital": 0,
+        "tenantDeposit": 0,
+        "tenantRent": 0,
+        "familySize": 0,
+        "amenities": [],
+        "divarDescription": "زیر قیمت فروش فوری\n\n\n\nبومهن شهرک بهارطلاییه\n۳ طبقه ۱۷۶ متر بنا غیرمفید\nبصورت پلکانی ساخته شده با ویو بدون مشرف\nزمین ۷۰ متر ، ملک جنوبی غرق نور\nکوچه اختصاصی با عرض ۱ونیم و طول ۱۰ متر\nبا دسترسی عالی به تمام امکانات و آزادراه اصلی\n\nطبقه همکف یک سوییت حدودا ۲۰ متری\nطبقه اول یک واحد تک خواب حدود ۵۰ متری\nطبقه دوم یک واحد تک خواب حدود ۷۰ متری\n\nهر سه واحد کف سرامیک ، کابینت وکمددیواری فول ، دارای آبگرمکن \n۱ کنتور آب ، ۲ کنتور برق ، ۲ کنتور گاز ، ۲ خط تلفن\n\nملک بصورت قولنامه ای بفروش می‌رسد \nنقشه UTM شهرداری موجود می‌باشد",
+        "divarImages": [
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/Kb79p24dBw_L37hTd_C_ZQ/c2b39d6d-50f5-471f-96f1-7ca728e0f531.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/OgdDZTzOgtzzMnjY6GQMtQ/cff5610d-20ae-4499-9229-19327572816d.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/S7vW-MraR4BTGK83zaojWw/ddad0564-94d9-49eb-ad2d-002300d482c2.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/NJwsheZqffZljJGiaaEbHA/4d0fe54d-9322-4e59-9200-5e92e69cd4de.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/YLkdUhYCYIL-GJkK-jZSqg/d23f3161-5d78-4692-a870-6113b9860b82.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/_cYlUqrqbxNo4ldnVOCw8w/1bb5a062-4bdb-44e8-8049-883010505841.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/9raJbQA1KtjVwuQcJAMOHw/541faa14-4395-4863-b9f2-59f4c861624e.webp",
+          "https://mapimage.divarcdn.com/v8/mapimage?encrypted_data=MTIzNDU2Nzg5MTIzXM-uzOHGzKzuQkYeR9J1NfpLCA0xgdtr7sOiUPqeuTnjZQ==&is_nearby=true"
+        ],
+        "divarAttributes": {
+          "متراژ": "۱۷۶",
+          "ساخت": "۱۳۹۰",
+          "اتاق": "۲",
+          "تصویر‌ها برای همین ملک است؟": "بله",
+          "متراژ زمین": "۷۰ متر مربع",
+          "قیمت کل": "‏۶,۵۰۰,۰۰۰,۰۰۰ تومان",
+          "قیمت هر متر": "‏۹۲,۸۵۷,۰۰۰ تومان",
+          "پارکینگ ندارد": false,
+          "انباری ندارد": false
+        },
+        "notes": "زیر قیمت فروش فوری بومهن شهرک بهارطلاییه\n3 طبقه 176 متر بنا غیرمفید\nبصورت پلکانی ساخته شده با ویو بدون مشرف\nزمین 70 متر ، ملک جنوبی غرق نور\nکوچه اختصاصی با عرض 1ونیم و طول 10 متر\nبا دسترسی عالی به تمام امکانات و آزادراه اصلی طبقه همکف یک سوییت حدودا 20 متری\nطبقه اول یک واحد تک خواب حدود 50 متری\nطبقه دوم یک واحد تک خواب حدود 70 متری هر سه واحد کف سرامیک ، کابینت وکمددیواری فول ، دارای آبگرمکن 1 کنتور آب ، 2 کنتور برق ، 2 کنتور گاز ، 2 خط تلفن ملک بصورت قولنامه ای بفروش می‌رسد نقشه UTM شهرداری موجود می‌باشد",
+        "yearBuilt": 1390
+      },
+      "source": "divar",
+      "updatedAt": "2026-09-23T14:45:12.015Z"
     }
   ]
 }
