@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-23T14:56:22.796Z",
+  "updatedAt": "2026-09-23T14:56:55.348Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1778,8 +1778,8 @@
         "tenantRent": 0,
         "familySize": 0,
         "amenities": [
-          "elevator",
           "parking",
+          "elevator",
           "storage"
         ],
         "divarDescription": "آپارتمان 115متری\nگرمایش پکیج\nسرمایش کولر\nکف سرامیک\n4طبقه تک واحدی\nواحد تخلیه و آماده تحویل می باشد.",
@@ -1806,7 +1806,7 @@
         "yearBuilt": 1400
       },
       "source": "divar",
-      "updatedAt": "2026-09-23T14:56:20.647Z"
+      "updatedAt": "2026-09-23T14:56:53.520Z"
     }
   ]
 }
