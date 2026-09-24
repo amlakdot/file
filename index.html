@@ -116,7 +116,11 @@
                 </button>
 
                 <button id="moreMenuButton" class="icon-button" type="button" title="منو" aria-label="منو">
-                    ⋮
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <circle cx="12" cy="5" r="1.8"/>
+                        <circle cx="12" cy="12" r="1.8"/>
+                        <circle cx="12" cy="19" r="1.8"/>
+                    </svg>
                 </button>
             </div>
         </header>
@@ -188,15 +192,17 @@
                 </div>
             </div>
 
-            <div class="filters md-chip-row">
-                <button class="filter-button active" data-filter="all" type="button">همه <span class="filter-count">0</span></button>
-                <button class="filter-button" data-filter="sale" type="button">فروشی <span class="filter-count">0</span></button>
-                <button class="filter-button" data-filter="landlord" type="button">مالک / موجر <span class="filter-count">0</span></button>
-                <button class="filter-button" data-filter="buyer" type="button">خریدار <span class="filter-count">0</span></button>
-                <button class="filter-button" data-filter="tenant" type="button">مستاجر <span class="filter-count">0</span></button>
-                <button class="filter-button" data-filter="followup" type="button">پیگیری <span class="filter-count">0</span></button>
-                <button class="filter-button filter-review" data-filter="needs-review" type="button">نیاز به بررسی <span class="filter-count">0</span></button>
-                <button class="filter-button" data-filter="trash" type="button">سطل <span class="filter-count">0</span></button>
+            <div class="chip-row-wrap" id="filterChipWrap">
+                <div class="filters md-chip-row" id="filterChipRow">
+                    <button class="filter-button active" data-filter="all" type="button">همه <span class="filter-count">0</span></button>
+                    <button class="filter-button" data-filter="sale" type="button">فروشی <span class="filter-count">0</span></button>
+                    <button class="filter-button" data-filter="landlord" type="button">مالک / موجر <span class="filter-count">0</span></button>
+                    <button class="filter-button" data-filter="buyer" type="button">خریدار <span class="filter-count">0</span></button>
+                    <button class="filter-button" data-filter="tenant" type="button">مستاجر <span class="filter-count">0</span></button>
+                    <button class="filter-button" data-filter="followup" type="button">پیگیری <span class="filter-count">0</span></button>
+                    <button class="filter-button filter-review" data-filter="needs-review" type="button">نیاز به بررسی <span class="filter-count">0</span></button>
+                    <button class="filter-button" data-filter="trash" type="button">سطل <span class="filter-count">0</span></button>
+                </div>
             </div>
 
             <div class="list-meta-row">
@@ -250,7 +256,26 @@
             <form id="fileForm" novalidate>
                 <input id="editingFileId" type="hidden">
 
-                <!-- TYPE -->
+                <!-- Stepper indicator -->
+                <div class="form-stepper" id="formStepper" aria-label="مراحل فرم">
+                    <div class="form-step-dot active" data-step-dot="1">
+                        <span class="form-step-num">۱</span>
+                        <span class="form-step-label">اصلی</span>
+                    </div>
+                    <div class="form-step-line"></div>
+                    <div class="form-step-dot" data-step-dot="2">
+                        <span class="form-step-num">۲</span>
+                        <span class="form-step-label">قیمت</span>
+                    </div>
+                    <div class="form-step-line"></div>
+                    <div class="form-step-dot" data-step-dot="3">
+                        <span class="form-step-num">۳</span>
+                        <span class="form-step-label">نهایی</span>
+                    </div>
+                </div>
+
+                <!-- STEP 1: TYPE + COMMON -->
+                <div class="form-step" data-form-step="1">
                 <div class="form-section">
                     <div class="section-title">نوع فایل</div>
                     <div class="type-grid">
@@ -350,7 +375,10 @@
                         </div>
                     </div>
                 </div>
+                </div><!-- end form-step 1 -->
 
+                <!-- STEP 2: PRICE / PROPERTY / BUYER / TENANT -->
+                <div class="form-step hidden" data-form-step="2">
                 <!-- PROPERTY DETAILS -->
                 <div id="propertyDetailsSection" class="form-section">
                     <div class="section-title">وضعیت ملک</div>
@@ -465,7 +493,10 @@
                         </div>
                     </div>
                 </div>
+                </div><!-- end form-step 2 -->
 
+                <!-- STEP 3: AMENITIES + NOTES + STATUS -->
+                <div class="form-step hidden" data-form-step="3">
                 <!-- AMENITIES -->
                 <div id="amenitiesSection" class="form-section">
                     <div class="section-title">امکانات</div>
@@ -524,13 +555,16 @@
                         </div>
                     </div>
                 </div>
+                </div><!-- end form-step 3 -->
 
                 <!-- ACTIONS -->
-                <div class="modal-actions">
+                <div class="modal-actions form-step-actions">
                     <button id="cancelFormButton" type="button" class="ghost-button">انصراف</button>
+                    <button id="formPrevStepButton" type="button" class="ghost-button hidden">قبلی</button>
                     <button id="shareFileButton" type="button" class="secondary-button">اشتراک‌گذاری</button>
                     <button id="deleteFileButton" type="button" class="danger-button hidden">حذف فایل</button>
-                    <button id="saveFileButton" type="submit" class="primary-button">ذخیره</button>
+                    <button id="formNextStepButton" type="button" class="secondary-button">بعدی</button>
+                    <button id="saveFileButton" type="submit" class="primary-button hidden">ذخیره</button>
                 </div>
             </form>
         </div>
@@ -551,18 +585,26 @@
                 <button id="closeDetailButton" class="close-button" type="button" aria-label="بستن">×</button>
             </div>
             <div id="detailBody" class="detail-body"></div>
-            <div class="modal-actions detail-actions">
+            <div class="modal-actions detail-actions detail-actions-primary">
                 <a id="detailCallButton" class="primary-button detail-call-btn hidden" href="#">تماس</a>
                 <button id="detailWhatsAppButton" type="button" class="secondary-button">واتساپ</button>
-                <button id="detailCopyPhoneButton" type="button" class="ghost-button">کپی تلفن</button>
-                <button id="detailCopyAddressButton" type="button" class="ghost-button">کپی آدرس</button>
-                <button id="detailShareCopyButton" type="button" class="secondary-button">کپی متن</button>
-                <button id="detailDivarLinkButton" type="button" class="secondary-button hidden">مشاهده در دیوار</button>
-                <button id="detailMatchButton" type="button" class="secondary-button">تطبیق</button>
                 <button id="detailEditButton" type="button" class="primary-button">ویرایش</button>
-                <button id="detailArchiveButton" type="button" class="danger-button">انتقال به سطل</button>
-                <button id="detailRestoreButton" type="button" class="primary-button hidden">بازگردانی</button>
-                <button id="detailPurgeButton" type="button" class="danger-button hidden">حذف دائمی</button>
+                <button id="detailMoreButton" type="button" class="ghost-button detail-more-btn" aria-expanded="false" aria-haspopup="true">بیشتر ▾</button>
+            </div>
+            <div id="detailMoreSheet" class="md-sheet hidden" aria-hidden="true">
+                <div class="md-sheet-backdrop" id="detailMoreBackdrop"></div>
+                <div class="md-sheet-panel" role="menu">
+                    <div class="md-sheet-handle"></div>
+                    <div class="md-sheet-title">عملیات بیشتر</div>
+                    <button type="button" class="md-sheet-item" id="detailCopyPhoneButton" role="menuitem">کپی تلفن</button>
+                    <button type="button" class="md-sheet-item" id="detailCopyAddressButton" role="menuitem">کپی آدرس</button>
+                    <button type="button" class="md-sheet-item" id="detailShareCopyButton" role="menuitem">کپی متن</button>
+                    <button type="button" class="md-sheet-item hidden" id="detailDivarLinkButton" role="menuitem">مشاهده در دیوار</button>
+                    <button type="button" class="md-sheet-item" id="detailMatchButton" role="menuitem">تطبیق</button>
+                    <button type="button" class="md-sheet-item danger" id="detailArchiveButton" role="menuitem">انتقال به سطل</button>
+                    <button type="button" class="md-sheet-item hidden" id="detailRestoreButton" role="menuitem">بازگردانی</button>
+                    <button type="button" class="md-sheet-item danger hidden" id="detailPurgeButton" role="menuitem">حذف دائمی</button>
+                </div>
             </div>
         </div>
     </div>
@@ -596,8 +638,11 @@
                         </button>
                     </div>
                     <small class="field-help">
-                        فقط آگهی‌های خانه اجاره‌ای و فروشی پشتیبانی می‌شوند.
-                        نام و شماره طرف از دیوار دریافت نمی‌شود و باید بعداً تکمیل شود.
+                        فقط آگهی خانه اجاره/فروش. نام و شماره را بعداً تکمیل کنید.
+                        <button type="button" class="help-more-link" id="divarHelpToggle">راهنما</button>
+                    </small>
+                    <small id="divarHelpExtra" class="field-help hidden">
+                        نام و شماره تماس از دیوار دریافت نمی‌شود. پس از ذخیره، فرم ویرایش برای تکمیل باز می‌شود.
                     </small>
                 </div>
                 <div class="field">
@@ -650,8 +695,19 @@
                     <button type="button" class="match-tab" data-match-tab="sale" role="tab">خرید / فروش</button>
                 </div>
 
+                <div class="match-amenity-filters match-amenity-filters-always">
+                    <div class="match-filter-label">فیلتر امکانات:</div>
+                    <div class="match-amenity-chips" id="matchAmenityChips">
+                        <label class="match-amenity-chip"><input type="checkbox" value="parking"> پارکینگ</label>
+                        <label class="match-amenity-chip"><input type="checkbox" value="storage"> انباری</label>
+                        <label class="match-amenity-chip"><input type="checkbox" value="elevator"> آسانسور</label>
+                        <label class="match-amenity-chip"><input type="checkbox" value="balcony"> بالکن</label>
+                        <label class="match-amenity-chip"><input type="checkbox" value="yard"> حیاط</label>
+                        <label class="match-amenity-chip"><input type="checkbox" value="package"> پکیج</label>
+                    </div>
+                </div>
                 <button type="button" id="matchFiltersToggle" class="match-filters-toggle" aria-expanded="false">
-                    <span>فیلتر و تنظیمات</span>
+                    <span>تنظیمات بیشتر</span>
                     <span class="match-filters-chevron" aria-hidden="true">▾</span>
                 </button>
                 <div id="matchFiltersPanel" class="match-filters-panel collapsed">
@@ -661,17 +717,6 @@
                             <input id="matchRateInput" type="number" min="0.5" max="20" step="0.5" value="3" dir="ltr">
                         </div>
                         <button type="button" id="matchRefreshButton" class="primary-button match-refresh-btn">بروزرسانی</button>
-                    </div>
-                    <div class="match-amenity-filters">
-                        <div class="match-filter-label">فقط ملک‌هایی که این امکانات را دارند:</div>
-                        <div class="match-amenity-chips" id="matchAmenityChips">
-                            <label class="match-amenity-chip"><input type="checkbox" value="parking"> پارکینگ</label>
-                            <label class="match-amenity-chip"><input type="checkbox" value="storage"> انباری</label>
-                            <label class="match-amenity-chip"><input type="checkbox" value="elevator"> آسانسور</label>
-                            <label class="match-amenity-chip"><input type="checkbox" value="balcony"> بالکن</label>
-                            <label class="match-amenity-chip"><input type="checkbox" value="yard"> حیاط</label>
-                            <label class="match-amenity-chip"><input type="checkbox" value="package"> پکیج</label>
-                        </div>
                     </div>
                     <div class="match-status-filter-row">
                         <label for="matchStatusFilter">نمایش پیگیری:</label>
@@ -776,7 +821,7 @@
                         <div class="calc-rate-title">نرخ تبدیل</div>
                         <div class="calc-rate-row">
                             <input id="rate" type="number" value="3" min="0" step="0.1">
-                            <span class="calc-rate-text">میلیون تومان اجاره برای هر ۱۰۰ میلیون تومان رهن</span>
+                            <span class="calc-rate-text">میلیون اجاره / ۱۰۰ میلیون رهن</span>
                         </div>
                     </div>
 
