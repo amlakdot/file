@@ -4356,3 +4356,216 @@ button.match-open-btn {
         margin: 0 !important;
     }
 }
+
+/* =========================================================
+   UX IMPROVEMENTS 2026-09
+========================================================= */
+
+/* ---- Chip row scroll fade ---- */
+.chip-row-wrap {
+    position: relative;
+    margin-bottom: 12px;
+}
+.chip-row-wrap .md-chip-row {
+    margin-bottom: 0;
+}
+.chip-row-wrap::before,
+.chip-row-wrap::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 4px;
+    width: 28px;
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+.chip-row-wrap::before {
+    right: 0;
+    background: linear-gradient(to left, var(--bg) 10%, transparent);
+}
+.chip-row-wrap::after {
+    left: 0;
+    background: linear-gradient(to right, var(--bg) 10%, transparent);
+}
+.chip-row-wrap.has-scroll-start::before {
+    opacity: 1;
+}
+.chip-row-wrap.has-scroll-end::after {
+    opacity: 1;
+}
+
+/* ---- Form stepper ---- */
+.form-stepper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 4px 8px 16px;
+    margin-bottom: 8px;
+}
+.form-step-dot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 52px;
+}
+.form-step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    background: var(--surface-3);
+    border: 2px solid var(--border);
+    color: var(--text-muted);
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.form-step-dot.active .form-step-num,
+.form-step-dot.done .form-step-num {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #111;
+}
+.form-step-dot.done .form-step-num {
+    background: var(--accent-dark);
+    border-color: var(--accent-dark);
+}
+.form-step-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+.form-step-dot.active .form-step-label {
+    color: var(--accent);
+}
+.form-step-line {
+    flex: 1;
+    height: 2px;
+    max-width: 48px;
+    background: var(--border);
+    margin: 0 4px 18px;
+}
+.form-step-dot.done + .form-step-line,
+.form-step-line.done {
+    background: var(--accent-dark);
+}
+.form-step {
+    animation: ux-fade-up 0.22s ease;
+}
+.form-step-actions {
+    gap: 8px;
+}
+.form-step-actions #formNextStepButton,
+.form-step-actions #saveFileButton {
+    margin-right: auto;
+}
+.help-more-link {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: inherit;
+    font-weight: 600;
+    padding: 0 4px;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+/* ---- Detail primary actions ---- */
+.detail-actions-primary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+.detail-actions-primary .detail-call-btn {
+    order: -1;
+}
+.detail-more-btn {
+    margin-right: auto;
+}
+
+/* ---- Match amenity filters always visible ---- */
+.match-amenity-filters-always {
+    margin: 8px 0 4px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+}
+.match-amenity-filters-always .match-filter-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+.match-amenity-filters-always .match-amenity-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+/* ---- Calculator result emphasis ---- */
+.calc-result.show {
+    display: block;
+    background: rgba(231, 200, 75, 0.08);
+    border-color: rgba(231, 200, 75, 0.35);
+    animation: ux-fade-up 0.28s ease;
+}
+.calc-result-number {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--accent);
+    word-break: break-all;
+    direction: ltr;
+    text-align: right;
+}
+.calc-rate-text {
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--text-soft);
+}
+
+/* ---- Incomplete field highlight (divar import) ---- */
+.field-incomplete input,
+.field-incomplete textarea,
+input.field-incomplete,
+textarea.field-incomplete {
+    border-color: var(--warning) !important;
+    box-shadow: 0 0 0 2px rgba(227, 169, 63, 0.2);
+}
+.field-incomplete-banner {
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: rgba(227, 169, 63, 0.12);
+    border: 1px solid rgba(227, 169, 63, 0.35);
+    color: #e8c87a;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+    .form-step-label {
+        font-size: 10px;
+    }
+    .form-step-num {
+        width: 26px;
+        height: 26px;
+        font-size: 12px;
+    }
+    .calc-result-number {
+        font-size: 24px;
+    }
+    .detail-actions-primary .primary-button,
+    .detail-actions-primary .secondary-button {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+}
