@@ -101,6 +101,9 @@ function calculateRahn() {
 
   if ($("resultDetailTab1")) $("resultDetailTab1").textContent = detail;
   $("resultTab1")?.classList.add("show");
+  requestAnimationFrame(() => {
+    $("resultTab1")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  });
 }
 
 function clearRahn() {
@@ -149,8 +152,12 @@ function calculateCommission() {
   }
 
   if ($("resultNumberTab2")) $("resultNumberTab2").textContent = formatMoney(commission);
+  if ($("resultUnitTab2")) $("resultUnitTab2").textContent = "تومان کمیسیون (هر طرف)";
   if ($("resultDetailTab2")) $("resultDetailTab2").textContent = detail;
   $("resultTab2")?.classList.add("show");
+  requestAnimationFrame(() => {
+    $("resultTab2")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  });
 }
 
 function clearCommission() {
