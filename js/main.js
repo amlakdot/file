@@ -37,7 +37,9 @@ import {
   resetFormFields,
   softDeleteFile,
   restoreFile,
-  purgeFile
+  purgeFile,
+  highlightIncompleteFields,
+  setFormStep
 } from "./form.js";
 import { applyFilters, renderHome } from "./render.js";
 import {
@@ -121,6 +123,11 @@ function setupDivarImport() {
   $("cancelDivarImportButton")?.addEventListener("click", (e) => {
     e.preventDefault();
     closeDivarImportModal();
+  });
+
+  $("divarHelpToggle")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    $("divarHelpExtra")?.classList.toggle("hidden");
   });
 
   $("divarImportModal")?.querySelector(".modal-backdrop")?.addEventListener("click", () => {
@@ -207,7 +214,13 @@ function setupDivarImport() {
         console.warn("auto public after divar:", e);
         showToast("انتشار عمومی خودکار نشد؛ از منو منتشر کنید.", "warning");
       });
-      if (file?.id) openDetailModal(file.id);
+      // باز کردن فرم ویرایش برای تکمیل نام و تلفن
+      if (file?.id) {
+        state.editingFileId = file.id;
+        openFileModal({ skipAutoFocus: true });
+        highlightIncompleteFields(file);
+        setFormStep(1);
+      }
     } catch (err) {
       hadError = true;
       appLog("error", "divar", "import ناموفق", {
@@ -837,6 +850,11 @@ function setupSearchAndFilters() {
       if (filter) {
         state.currentFilter = filter;
         applyFilters();
+        // اسکرول به چیپ فعال
+        requestAnimationFrame(() => {
+          btn.scrollIntoView({ inline: "nearest", block: "nearest", behavior: "smooth" });
+          updateChipScrollFades();
+        });
       }
     });
   });
@@ -852,7 +870,32 @@ function setupSearchAndFilters() {
     btn?.classList.toggle("open", !isCollapsed);
   });
 
+  // نشانه اسکرول افقی فیلترها
+  const chipRow = $("filterChipRow");
+  if (chipRow) {
+    chipRow.addEventListener("scroll", updateChipScrollFades, { passive: true });
+    window.addEventListener("resize", updateChipScrollFades);
+    requestAnimationFrame(updateChipScrollFades);
+  }
+
   updateActiveFiltersBadge();
+}
+
+function updateChipScrollFades() {
+  const row = $("filterChipRow");
+  const wrap = $("filterChipWrap");
+  if (!row || !wrap) return;
+  const maxScroll = row.scrollWidth - row.clientWidth;
+  if (maxScroll <= 4) {
+    wrap.classList.remove("has-scroll-start", "has-scroll-end");
+    return;
+  }
+  // RTL: scrollLeft اغلب منفی یا معکوس است
+  const sl = Math.abs(row.scrollLeft);
+  const atStart = sl <= 4;
+  const atEnd = sl >= maxScroll - 4;
+  wrap.classList.toggle("has-scroll-start", !atStart);
+  wrap.classList.toggle("has-scroll-end", !atEnd);
 }
 
 function setupDetailActions() {
