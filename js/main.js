@@ -214,12 +214,12 @@ function setupDivarImport() {
         console.warn("auto public after divar:", e);
         showToast("انتشار عمومی خودکار نشد؛ از منو منتشر کنید.", "warning");
       });
-      // باز کردن فرم ویرایش برای تکمیل نام و تلفن
+      // باز کردن فرم ویرایش برای تکمیل نام و تلفن (مرحله ۳)
       if (file?.id) {
         state.editingFileId = file.id;
         openFileModal({ skipAutoFocus: true });
         highlightIncompleteFields(file);
-        setFormStep(1);
+        setFormStep(3);
       }
     } catch (err) {
       hadError = true;
