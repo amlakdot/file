@@ -98,14 +98,14 @@ export function openFileModal(opts = {}) {
     form.addEventListener("change", markFormDirty);
   }
 
-  // ثبت سریع: فوکوس روی نام برای فایل جدید
+  // فوکوس روی اولین فیلد مرحله ۱ (نام و تلفن در انتهای فرم هستند)
   if (!state.editingFileId && !opts.skipAutoFocus) {
     requestAnimationFrame(() => {
-      const nameInput = $("name");
-      if (nameInput) {
-        nameInput.focus();
-        nameInput.select?.();
-      }
+      const first =
+        document.querySelector(
+          '.form-step[data-form-step="1"] select, .form-step[data-form-step="1"] input:not([type="hidden"]):not([type="radio"])'
+        ) || $("location");
+      first?.focus?.();
     });
   }
 }
