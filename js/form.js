@@ -86,7 +86,8 @@ export function setFormStep(step) {
 }
 
 function validateFormStep(step) {
-  if (step === 1) {
+  // نام و شماره فقط در مرحله ۳ (انتهای فرم) و هنگام ذخیره چک می‌شوند
+  if (step === 3) {
     const name = ($("name")?.value || "").trim();
     const phone = ($("phone")?.value || "").trim();
     const editingId = state.editingFileId;
@@ -301,7 +302,8 @@ export function highlightIncompleteFields(file) {
     $("phone")?.classList.add("field-incomplete");
     $("phone")?.closest(".field")?.classList.add("field-incomplete");
   }
-  setFormStep(1);
+  // نام و شماره در مرحله ۳ هستند
+  setFormStep(3);
   requestAnimationFrame(() => {
     const focusEl = needsName ? $("name") : $("phone");
     focusEl?.focus();
@@ -421,11 +423,13 @@ export async function saveFile() {
 
   if (!name && !isDivarSource) {
     showToast("لطفاً نام را وارد کنید.", "error");
+    setFormStep(3);
     $("name")?.focus();
     return;
   }
   if (!phone && !isDivarSource) {
     showToast("لطفاً شماره تلفن را وارد کنید.", "error");
+    setFormStep(3);
     $("phone")?.focus();
     return;
   }
@@ -449,6 +453,7 @@ export async function saveFile() {
           "لطفاً شماره تلفن صحیح وارد کنید (09xxxxxxxxx).",
           "error"
         );
+        setFormStep(3);
         $("phone")?.focus();
         return;
       }
