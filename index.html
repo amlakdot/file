@@ -260,7 +260,7 @@
                 <div class="form-stepper" id="formStepper" aria-label="مراحل فرم">
                     <div class="form-step-dot active" data-step-dot="1">
                         <span class="form-step-num">۱</span>
-                        <span class="form-step-label">اصلی</span>
+                        <span class="form-step-label">ملک</span>
                     </div>
                     <div class="form-step-line"></div>
                     <div class="form-step-dot" data-step-dot="2">
@@ -270,7 +270,7 @@
                     <div class="form-step-line"></div>
                     <div class="form-step-dot" data-step-dot="3">
                         <span class="form-step-num">۳</span>
-                        <span class="form-step-label">نهایی</span>
+                        <span class="form-step-label">تماس</span>
                     </div>
                 </div>
 
@@ -298,18 +298,10 @@
                     </div>
                 </div>
 
-                <!-- COMMON -->
+                <!-- COMMON (بدون نام و تلفن — آن‌ها در مرحله ۳) -->
                 <div class="form-section">
-                    <div class="section-title">اطلاعات اصلی</div>
+                    <div class="section-title">اطلاعات ملک</div>
                     <div class="form-grid">
-                        <div class="field">
-                            <label for="name">نام</label>
-                            <input id="name" type="text" placeholder="نام مالک / مشتری">
-                        </div>
-                        <div class="field">
-                            <label for="phone">شماره تماس</label>
-                            <input id="phone" type="tel" placeholder="09...">
-                        </div>
                         <div class="field property-field">
                             <label for="propertyType">نوع ملک</label>
                             <select id="propertyType">
@@ -552,6 +544,21 @@
                         <div class="field">
                             <label for="followUpDays">پیگیری بعد از چند روز؟</label>
                             <input id="followUpDays" type="number" min="1" value="10">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONTACT — نام و شماره در انتهای فرم -->
+                <div class="form-section">
+                    <div class="section-title">نام و شماره تماس</div>
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="name">نام</label>
+                            <input id="name" type="text" placeholder="نام مالک / مشتری">
+                        </div>
+                        <div class="field">
+                            <label for="phone">شماره تماس</label>
+                            <input id="phone" type="tel" placeholder="09...">
                         </div>
                     </div>
                 </div>
