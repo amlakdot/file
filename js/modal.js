@@ -61,11 +61,12 @@ export function confirmDiscardIfDirty() {
   );
 }
 
-export function openFileModal() {
+export function openFileModal(opts = {}) {
   const modal = $("fileModal");
   if (!modal) return;
 
   closeDetailModal(true);
+  closeDetailMoreSheet();
 
   modal.classList.remove("hidden");
   document.body.style.overflow = "hidden";
@@ -98,7 +99,7 @@ export function openFileModal() {
   }
 
   // ثبت سریع: فوکوس روی نام برای فایل جدید
-  if (!state.editingFileId) {
+  if (!state.editingFileId && !opts.skipAutoFocus) {
     requestAnimationFrame(() => {
       const nameInput = $("name");
       if (nameInput) {
@@ -109,6 +110,22 @@ export function openFileModal() {
   }
 }
 
+export function openDetailMoreSheet() {
+  const sheet = $("detailMoreSheet");
+  if (!sheet) return;
+  sheet.classList.remove("hidden");
+  sheet.setAttribute("aria-hidden", "false");
+  $("detailMoreButton")?.setAttribute("aria-expanded", "true");
+}
+
+export function closeDetailMoreSheet() {
+  const sheet = $("detailMoreSheet");
+  if (!sheet) return;
+  sheet.classList.add("hidden");
+  sheet.setAttribute("aria-hidden", "true");
+  $("detailMoreButton")?.setAttribute("aria-expanded", "false");
+}
+
 export function closeFileModal(force = false) {
   if (!force && !confirmDiscardIfDirty()) return false;
   $("fileModal")?.classList.add("hidden");
@@ -116,6 +133,10 @@ export function closeFileModal(force = false) {
   clearFormDirty();
   document.body.style.overflow = "";
   setEditActionButtons(false);
+  $("formIncompleteBanner")?.remove();
+  document.querySelectorAll(".field-incomplete").forEach((el) => {
+    el.classList.remove("field-incomplete");
+  });
   return true;
 }
 
@@ -127,6 +148,7 @@ export function openDetailModal(fileId) {
   }
 
   state.viewingFileId = fileId;
+  closeDetailMoreSheet();
   const modal = $("detailModal");
   if (!modal) return;
 
@@ -141,6 +163,7 @@ export function openDetailModal(fileId) {
   $("detailArchiveButton")?.classList.toggle("hidden", inTrash);
   $("detailRestoreButton")?.classList.toggle("hidden", !inTrash);
   $("detailPurgeButton")?.classList.toggle("hidden", !inTrash);
+  $("detailWhatsAppButton")?.classList.toggle("hidden", inTrash);
 
   const phone = getFilePhone(file);
   const callBtn = $("detailCallButton");
@@ -166,6 +189,7 @@ export function openDetailModal(fileId) {
 }
 
 export function closeDetailModal(silent = false) {
+  closeDetailMoreSheet();
   $("detailModal")?.classList.add("hidden");
   state.viewingFileId = null;
 
@@ -269,6 +293,7 @@ export function setupModalClose() {
 
   $("closeDetailButton")?.addEventListener("click", (e) => {
     e.preventDefault();
+    closeDetailMoreSheet();
     closeDetailModal();
   });
   $("detailModal")?.addEventListener("click", (e) => {
@@ -276,12 +301,35 @@ export function setupModalClose() {
       e.target === $("detailModal") ||
       e.target.classList.contains("modal-backdrop")
     ) {
+      closeDetailMoreSheet();
       closeDetailModal();
     }
   });
 
+  $("detailMoreButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    const sheet = $("detailMoreSheet");
+    if (sheet && sheet.classList.contains("hidden")) openDetailMoreSheet();
+    else closeDetailMoreSheet();
+  });
+  $("detailMoreBackdrop")?.addEventListener("click", () => {
+    closeDetailMoreSheet();
+  });
+  // بستن sheet بعد از انتخاب آیتم
+  ["detailCopyPhoneButton", "detailCopyAddressButton", "detailShareCopyButton",
+   "detailDivarLinkButton", "detailMatchButton", "detailArchiveButton",
+   "detailRestoreButton", "detailPurgeButton"].forEach((id) => {
+    $(id)?.addEventListener("click", () => {
+      closeDetailMoreSheet();
+    });
+  });
+
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;
+    if ($("detailMoreSheet") && !$("detailMoreSheet").classList.contains("hidden")) {
+      closeDetailMoreSheet();
+      return;
+    }
     if ($("fileModal") && !$("fileModal").classList.contains("hidden")) {
       closeFileModal();
       return;
