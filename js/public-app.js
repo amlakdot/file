@@ -20,9 +20,7 @@ import {
 const TYPE_FILTERS = [
   { id: "all", label: "همه" },
   { id: "sale", label: "فروشی" },
-  { id: "landlord", label: "اجاره" },
-  { id: "buyer", label: "تقاضای خرید" },
-  { id: "tenant", label: "تقاضای اجاره" }
+  { id: "landlord", label: "اجاره" }
 ];
 
 let allFiles = [];
