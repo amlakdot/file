@@ -44,6 +44,71 @@ const MONEY_FIELD_IDS = [
   "tenantRent"
 ];
 
+const FORM_TOTAL_STEPS = 3;
+let formCurrentStep = 1;
+
+export function getFormCurrentStep() {
+  return formCurrentStep;
+}
+
+export function setFormStep(step) {
+  const s = Math.max(1, Math.min(FORM_TOTAL_STEPS, Number(step) || 1));
+  formCurrentStep = s;
+
+  document.querySelectorAll("[data-form-step]").forEach((el) => {
+    const n = Number(el.getAttribute("data-form-step"));
+    el.classList.toggle("hidden", n !== s);
+  });
+
+  document.querySelectorAll("[data-step-dot]").forEach((dot) => {
+    const n = Number(dot.getAttribute("data-step-dot"));
+    dot.classList.toggle("active", n === s);
+    dot.classList.toggle("done", n < s);
+  });
+
+  document.querySelectorAll(".form-step-line").forEach((line, idx) => {
+    line.classList.toggle("done", idx + 1 < s);
+  });
+
+  const prevBtn = $("formPrevStepButton");
+  const nextBtn = $("formNextStepButton");
+  const saveBtn = $("saveFileButton");
+  if (prevBtn) prevBtn.classList.toggle("hidden", s <= 1);
+  if (nextBtn) nextBtn.classList.toggle("hidden", s >= FORM_TOTAL_STEPS);
+  if (saveBtn) saveBtn.classList.toggle("hidden", s < FORM_TOTAL_STEPS);
+
+  const formBody = $("fileForm");
+  if (formBody) {
+    const modalCard = formBody.closest(".modal-card");
+    if (modalCard) modalCard.scrollTop = 0;
+    formBody.scrollTop = 0;
+  }
+}
+
+function validateFormStep(step) {
+  if (step === 1) {
+    const name = ($("name")?.value || "").trim();
+    const phone = ($("phone")?.value || "").trim();
+    const editingId = state.editingFileId;
+    const existing = editingId
+      ? state.files.find((f) => f.id === editingId)
+      : null;
+    const isDivar =
+      existing?.source === "divar" || !!existing?.divarToken;
+    if (!name && !isDivar) {
+      showToast("لطفاً نام را وارد کنید.", "error");
+      $("name")?.focus();
+      return false;
+    }
+    if (!phone && !isDivar) {
+      showToast("لطفاً شماره تلفن را وارد کنید.", "error");
+      $("phone")?.focus();
+      return false;
+    }
+  }
+  return true;
+}
+
 export function setupFileForm() {
   const form = $("fileForm");
   if (!form) return;
@@ -58,7 +123,23 @@ export function setupFileForm() {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     e.stopPropagation();
+    if (formCurrentStep < FORM_TOTAL_STEPS) {
+      if (!validateFormStep(formCurrentStep)) return;
+      setFormStep(formCurrentStep + 1);
+      return;
+    }
     await saveFile();
+  });
+
+  $("formNextStepButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    if (!validateFormStep(formCurrentStep)) return;
+    setFormStep(formCurrentStep + 1);
+  });
+
+  $("formPrevStepButton")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    setFormStep(formCurrentStep - 1);
   });
 
   $("deleteFileButton")?.addEventListener("click", async (e) => {
@@ -73,14 +154,13 @@ export function setupFileForm() {
     await shareCurrentFile();
   });
 
-  // دکمه ذخیره مستقیم هم bind شود (برای اطمینان)
   $("saveFileButton")?.addEventListener("click", async (e) => {
-    // اگر type=submit است، رویداد submit هم می‌آید؛ جلوگیری از دوبار اجرا
-    // فقط اگر خارج از submit native بود
+    // type=submit handles via form submit
   });
 
   setupMoneyInputs(form);
   updateFormVisibility();
+  setFormStep(1);
 }
 
 export function updateFormVisibility() {
@@ -180,6 +260,52 @@ function resetFormFields() {
     'input[name="fileType"][value="sale"]'
   );
   if (saleRadio) saleRadio.checked = true;
+
+  clearIncompleteHighlights();
+  setFormStep(1);
+}
+
+export function clearIncompleteHighlights() {
+  document.querySelectorAll(".field-incomplete").forEach((el) => {
+    el.classList.remove("field-incomplete");
+  });
+  $("formIncompleteBanner")?.remove();
+}
+
+export function highlightIncompleteFields(file) {
+  clearIncompleteHighlights();
+  const name = (getFileName(file) || "").trim();
+  const phone = (getFilePhone(file) || "").trim();
+  const needsName = !name || name.startsWith("آگهی دیوار");
+  const needsPhone = !phone;
+
+  if (!needsName && !needsPhone) return;
+
+  const form = $("fileForm");
+  if (form && !$("formIncompleteBanner")) {
+    const banner = document.createElement("div");
+    banner.id = "formIncompleteBanner";
+    banner.className = "field-incomplete-banner";
+    banner.textContent =
+      "این فایل از دیوار آمده. نام و شماره تماس را تکمیل کنید.";
+    const stepper = $("formStepper");
+    if (stepper) stepper.insertAdjacentElement("afterend", banner);
+    else form.prepend(banner);
+  }
+
+  if (needsName) {
+    $("name")?.classList.add("field-incomplete");
+    $("name")?.closest(".field")?.classList.add("field-incomplete");
+  }
+  if (needsPhone) {
+    $("phone")?.classList.add("field-incomplete");
+    $("phone")?.closest(".field")?.classList.add("field-incomplete");
+  }
+  setFormStep(1);
+  requestAnimationFrame(() => {
+    const focusEl = needsName ? $("name") : $("phone");
+    focusEl?.focus();
+  });
 }
 
 function setSaveButtonLoading(loading) {
@@ -717,6 +843,7 @@ export function loadFileIntoForm(fileId) {
   });
 
   updateFormVisibility();
+  setFormStep(1);
 }
 
 export { resetFormFields };
