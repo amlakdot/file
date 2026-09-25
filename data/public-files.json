@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T12:40:35.783Z",
+  "updatedAt": "2026-09-25T12:42:01.545Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1838,6 +1838,38 @@
       },
       "source": "panel",
       "updatedAt": "2026-09-24T14:19:29.347Z"
+    },
+    {
+      "id": "file-1790340119596-8422cbb38405cb1a66b5d177",
+      "code": 1084,
+      "type": "tenant",
+      "status": "active",
+      "title": "آپارتمان · بومهن آزار",
+      "data": {
+        "code": 1084,
+        "propertyType": "apartment",
+        "area": 0,
+        "rooms": 0,
+        "year": 0,
+        "location": "بومهن آزار",
+        "totalFloors": 0,
+        "keyHolder": "owner",
+        "condition": "new",
+        "occupancy": "empty",
+        "salePrice": 0,
+        "currentDeposit": 0,
+        "currentRent": 0,
+        "suggestedDeposit": 0,
+        "suggestedRent": 0,
+        "capital": 0,
+        "tenantDeposit": 200000000,
+        "tenantRent": 4000000,
+        "familyStatus": "family",
+        "familySize": 2,
+        "amenities": []
+      },
+      "source": "panel",
+      "updatedAt": "2026-09-25T12:41:59.596Z"
     }
   ]
 }
