@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-26T09:12:44.679Z",
+  "updatedAt": "2026-09-26T09:27:00.966Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1870,6 +1870,37 @@
       },
       "source": "panel",
       "updatedAt": "2026-09-25T12:41:59.596Z"
+    },
+    {
+      "id": "file-1790414819132-7a7bcaa523d2c45176689e8c",
+      "code": 1085,
+      "type": "tenant",
+      "status": "active",
+      "title": "آپارتمان",
+      "data": {
+        "code": 1085,
+        "propertyType": "apartment",
+        "area": 0,
+        "rooms": 0,
+        "year": 0,
+        "totalFloors": 0,
+        "keyHolder": "owner",
+        "condition": "new",
+        "occupancy": "empty",
+        "salePrice": 0,
+        "currentDeposit": 0,
+        "currentRent": 0,
+        "suggestedDeposit": 0,
+        "suggestedRent": 0,
+        "capital": 0,
+        "tenantDeposit": 150000000,
+        "tenantRent": 5000000,
+        "familyStatus": "single",
+        "familySize": 0,
+        "amenities": []
+      },
+      "source": "panel",
+      "updatedAt": "2026-09-26T09:26:59.132Z"
     }
   ]
 }
