@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T14:41:24.588Z",
+  "updatedAt": "2026-10-06T14:43:36.907Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1965,6 +1965,38 @@
       },
       "source": "panel",
       "updatedAt": "2026-10-03T13:39:42.017Z"
+    },
+    {
+      "id": "file-1791297814147-2b56607057aeca46f676ea01",
+      "code": 1088,
+      "type": "tenant",
+      "status": "active",
+      "title": "آپارتمان · حاج منصور",
+      "data": {
+        "code": 1088,
+        "propertyType": "apartment",
+        "area": 0,
+        "rooms": 0,
+        "year": 0,
+        "location": "حاج منصور",
+        "totalFloors": 0,
+        "keyHolder": "owner",
+        "condition": "new",
+        "occupancy": "empty",
+        "salePrice": 0,
+        "currentDeposit": 0,
+        "currentRent": 0,
+        "suggestedDeposit": 0,
+        "suggestedRent": 0,
+        "capital": 0,
+        "tenantDeposit": 150000000,
+        "tenantRent": 5000000,
+        "familyStatus": "family",
+        "familySize": 2,
+        "amenities": []
+      },
+      "source": "panel",
+      "updatedAt": "2026-10-06T14:43:34.147Z"
     }
   ]
 }
