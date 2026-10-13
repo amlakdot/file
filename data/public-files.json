@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-13T07:14:59.910Z",
+  "updatedAt": "2026-10-13T07:15:21.194Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1573,37 +1573,6 @@
         "capital": 0,
         "tenantDeposit": 0,
         "tenantRent": 0,
-        "familyStatus": "single",
-        "familySize": 0,
-        "amenities": []
-      },
-      "source": "panel",
-      "updatedAt": "2026-10-02T14:25:18.421Z"
-    },
-    {
-      "id": "file-1790069189204-2533e09d9e72ab7aff40e6b6",
-      "code": 1074,
-      "type": "tenant",
-      "status": "active",
-      "title": "آپارتمان",
-      "data": {
-        "code": 1074,
-        "propertyType": "apartment",
-        "area": 0,
-        "rooms": 0,
-        "year": 0,
-        "totalFloors": 0,
-        "keyHolder": "owner",
-        "condition": "new",
-        "occupancy": "empty",
-        "salePrice": 0,
-        "currentDeposit": 0,
-        "currentRent": 0,
-        "suggestedDeposit": 0,
-        "suggestedRent": 0,
-        "capital": 0,
-        "tenantDeposit": 200000000,
-        "tenantRent": 5000000,
         "familyStatus": "single",
         "familySize": 0,
         "amenities": []
