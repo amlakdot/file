@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-13T07:15:57.295Z",
+  "updatedAt": "2026-10-13T07:16:04.231Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -655,37 +655,6 @@
       },
       "source": "panel",
       "updatedAt": "2026-09-11T08:47:16.694Z"
-    },
-    {
-      "id": "file-1789116491562-759-4gryc67kq",
-      "code": 1023,
-      "type": "tenant",
-      "status": "active",
-      "title": "آپارتمان",
-      "data": {
-        "propertyType": "apartment",
-        "area": 0,
-        "rooms": 0,
-        "year": 0,
-        "totalFloors": 0,
-        "keyHolder": "owner",
-        "condition": "new",
-        "occupancy": "empty",
-        "salePrice": 0,
-        "currentDeposit": 0,
-        "currentRent": 0,
-        "suggestedDeposit": 0,
-        "suggestedRent": 0,
-        "capital": 0,
-        "tenantDeposit": 800000000,
-        "tenantRent": 0,
-        "familyStatus": "family",
-        "familySize": 2,
-        "amenities": [],
-        "code": 1023
-      },
-      "source": "panel",
-      "updatedAt": "2026-10-01T13:50:14.593Z"
     },
     {
       "id": "file-1789116701629-433-3397gt71l",
