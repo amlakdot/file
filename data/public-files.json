@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-13T07:17:07.128Z",
+  "updatedAt": "2026-10-13T07:17:18.428Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -714,37 +714,6 @@
         "familySize": 4,
         "amenities": [],
         "code": 1027
-      },
-      "source": "panel",
-      "updatedAt": "2026-09-26T09:12:42.690Z"
-    },
-    {
-      "id": "file-1789117011617-576-y4tudhehk",
-      "code": 1028,
-      "type": "tenant",
-      "status": "active",
-      "title": "آپارتمان",
-      "data": {
-        "propertyType": "apartment",
-        "area": 0,
-        "rooms": 0,
-        "year": 0,
-        "totalFloors": 0,
-        "keyHolder": "owner",
-        "condition": "new",
-        "occupancy": "empty",
-        "salePrice": 0,
-        "currentDeposit": 0,
-        "currentRent": 0,
-        "suggestedDeposit": 0,
-        "suggestedRent": 0,
-        "capital": 0,
-        "tenantDeposit": 70000000,
-        "tenantRent": 4000000,
-        "familyStatus": "married",
-        "familySize": 0,
-        "amenities": [],
-        "code": 1028
       },
       "source": "panel",
       "updatedAt": "2026-09-26T09:12:42.690Z"
