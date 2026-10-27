@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-19T09:46:24.836Z",
+  "updatedAt": "2026-10-27T12:23:16.553Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -1592,7 +1592,7 @@
         "amenities": []
       },
       "source": "panel",
-      "updatedAt": "2026-10-06T14:43:34.147Z"
+      "updatedAt": "2026-10-27T12:23:16.220Z"
     },
     {
       "id": "file-1791507786885-4a421e30808ec0bc3ef2e460",
@@ -1656,7 +1656,7 @@
         "amenities": []
       },
       "source": "panel",
-      "updatedAt": "2026-10-12T08:15:13.540Z"
+      "updatedAt": "2026-10-27T12:23:16.221Z"
     }
   ]
 }
