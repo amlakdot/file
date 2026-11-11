@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>چاپ آگهی املاک — املاک DOT</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0d0f;
+      --surface: #111417;
+      --surface-2: #171b1f;
+      --surface-3: #1d2227;
+      --border: #292f35;
+      --border-light: #343b42;
+      --text: #f2f2f2;
+      --text-soft: #aeb5bb;
+      --text-muted: #727a82;
+      --accent: #e7c84b;
+      --accent-dark: #b79c2d;
+      --danger: #e05252;
+      --success: #55b878;
+      --warning: #e3a93f;
+      --radius: 12px;
+      --radius-small: 8px;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Vazirmatn", Tahoma, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 0 0 40px;
+      direction: rtl;
+      min-height: 100vh;
+    }
+
+    /* ===== هدر ===== */
+    .page-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 20px;
+      background: rgba(11, 13, 15, 0.94);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(10px);
+    }
+
+    .page-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .page-brand-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: #fff;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    .page-brand-mark img {
+      width: 28px;
+      height: 28px;
+    }
+
+    .page-brand-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+
+    .page-brand-name {
+      font-weight: 800;
+      font-size: 15px;
+    }
+
+    .page-brand-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .page-topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-soft);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .btn-back:hover {
+      background: var(--surface-2);
+      color: var(--text);
+      border-color: var(--border-light);
+    }
+
+    /* ===== فرم ورودی ===== */
+    .form-section {
+      max-width: 980px;
+      margin: 24px auto 28px;
+      background: var(--surface);
+      padding: 22px 22px 20px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    .form-section h2 {
+      text-align: center;
+      margin-bottom: 18px;
+      color: var(--text);
+      font-weight: 800;
+      font-size: 1.25rem;
+    }
+
+    .form-section h2 span {
+      color: var(--accent);
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .cards-form {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .card-form {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 14px 12px;
+      background: var(--surface-2);
+      position: relative;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .card-form:focus-within {
+      border-color: var(--accent-dark);
+      background: var(--surface-3);
+    }
+
+    .card-form h3 {
+      margin-bottom: 12px;
+      color: var(--accent);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .form-group {
+      margin-bottom: 10px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      margin-bottom: 4px;
+      color: var(--text-soft);
+      font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-small);
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--surface);
+      color: var(--text);
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--accent-dark);
+      background: var(--surface-3);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 58px;
+    }
+
+    .actions {
+      text-align: center;
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 11px 20px;
+      font-size: 14px;
+      border: none;
+      border-radius: var(--radius-small);
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 700;
+      transition: background 0.15s, transform 0.12s, opacity 0.15s;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-print {
+      background: var(--accent);
+      color: #111;
+    }
+
+    .btn-print:hover {
+      background: #f0d35c;
+    }
+
+    .btn-add {
+      background: rgba(85, 184, 120, 0.16);
+      border: 1px solid rgba(85, 184, 120, 0.4);
+      color: #7dcea0;
+    }
+
+    .btn-add:hover {
+      background: rgba(85, 184, 120, 0.26);
+      color: #9be0b5;
+    }
+
+    .btn-remove {
+      background: rgba(224, 82, 82, 0.12);
+      border: 1px solid rgba(224, 82, 82, 0.35);
+      color: #f27777;
+    }
+
+    .btn-remove:hover {
+      background: rgba(224, 82, 82, 0.22);
+    }
+
+    .btn-reset {
+      background: var(--surface-3);
+      color: var(--text-soft);
+      border: 1px solid var(--border-light);
+    }
+
+    .btn-reset:hover {
+      color: var(--text);
+      background: var(--surface-2);
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .hint {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 12px;
+      margin-top: 12px;
+    }
+
+    /* ===== ناحیه چاپ (پیش‌نمایش روی صفحه) ===== */
+    .print-label {
+      max-width: 980px;
+      margin: 0 auto 12px;
+      padding: 0 12px;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .print-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+      padding: 0 12px 24px;
+    }
+
+    .print-page {
+      width: 210mm;
+      height: 297mm;
+      min-height: 297mm;
+      background: white;
+      padding: 12mm 10mm;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 6mm;
+      justify-content: flex-start;
+      align-items: stretch;
+      overflow: hidden;
+      color: #000;
+    }
+
+    .ad-card {
+      border: 2.5px solid #000;
+      border-radius: 5px;
+      padding: 14px 16px 12px;
+      position: relative;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      text-align: center;
+      height: auto;
+      flex: 0 0 auto;
+    }
+
+    .ad-title {
+      font-size: 26px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      line-height: 1.35;
+      color: #000;
+      padding: 4px 60px 8px;
+      letter-spacing: -0.3px;
+      position: relative;
+    }
+
+    .ad-title::after {
+      content: '';
+      display: block;
+      width: 48px;
+      height: 3px;
+      background: #000;
+      margin: 8px auto 0;
+      border-radius: 2px;
+    }
+
+    .ad-desc {
+      font-size: 18px;
+      line-height: 1.75;
+      margin-bottom: 10px;
+      color: #111;
+      font-weight: 500;
+    }
+
+    .ad-price {
+      font-size: 17px;
+      font-weight: 700;
+      margin-top: 6px;
+      padding-top: 10px;
+      border-top: 1.5px dashed #888;
+      color: #000;
+    }
+
+    .ad-code {
+      position: absolute;
+      top: 12px;
+      left: 14px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #333;
+      background: #f0f0f0;
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid #bbb;
+    }
+
+    .placeholder-text {
+      color: #bbb !important;
+      font-weight: 400 !important;
+    }
+
+    .placeholder-text.ad-title::after {
+      background: #ddd;
+    }
+
+    /* ===== حالت چاپ ===== */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+        margin: 0;
+        color: #000;
+      }
+
+      .form-section,
+      .no-print,
+      .page-topbar,
+      .print-label {
+        display: none !important;
+      }
+
+      .print-wrapper {
+        gap: 0;
+        padding: 0;
+      }
+
+      .print-page {
+        width: 210mm;
+        height: 297mm;
+        min-height: 297mm;
+        margin: 0;
+        padding: 11mm 9mm;
+        box-shadow: none;
+        border: none;
+        border-radius: 0;
+        page-break-after: always;
+        break-after: page;
+        overflow: hidden;
+      }
+
+      .print-page:last-child {
+        page-break-after: auto;
+        break-after: auto;
+      }
+
+      .ad-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      @page {
+        size: A4;
+        margin: 0;
+      }
+    }
+
+    @media screen {
+      .print-wrapper {
+        margin-top: 8px;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .form-section {
+        margin: 16px 12px 20px;
+        padding: 16px;
+      }
+
+      .cards-form {
+        grid-template-columns: 1fr;
+      }
+
+      .print-page {
+        width: 100%;
+        min-height: auto;
+        height: auto;
+      }
+
+      .page-brand-sub {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="page-topbar no-print">
+    <a class="page-brand" href="index.html">
+      <div class="page-brand-mark">
+        <img src="favicon.svg" alt="املاک DOT" width="28" height="28">
+      </div>
+      <div class="page-brand-text">
+        <span class="page-brand-name">املاک DOT</span>
+        <span class="page-brand-sub">چاپ آگهی A4</span>
+      </div>
+    </a>
+    <div class="page-topbar-actions">
+      <a class="btn-back" href="index.html">← بازگشت به برنامه</a>
+    </div>
+  </header>
+
+  <!-- فرم ورودی -->
+  <div class="form-section no-print">
+    <h2>ورود اطلاعات <span>آگهی‌های املاک</span></h2>
+
+    <div class="toolbar">
+      <button class="btn btn-add" id="btnAdd" type="button" onclick="addAd()">+ افزودن آگهی</button>
+      <button class="btn btn-remove" id="btnRemove" type="button" onclick="removeAd()">− حذف آخرین</button>
+    </div>
+
+    <div class="cards-form" id="formsContainer">
+      <!-- کارت‌ها با JS ساخته می‌شوند -->
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-print" type="button" onclick="window.print()">چاپ صفحه A4</button>
+      <button class="btn btn-reset" type="button" onclick="resetAll()">پاک کردن همه</button>
+    </div>
+    <p class="hint">حداکثر ۱۰ آگهی · هر صفحه A4 تا ۵ کارت · پیش‌نمایش پایین صفحه</p>
+  </div>
+
+  <div class="print-label no-print">پیش‌نمایش چاپ</div>
+
+  <!-- ناحیه چاپ -->
+  <div class="print-wrapper" id="printWrapper">
+    <!-- صفحات چاپ با JS ساخته می‌شوند -->
+  </div>
+
+  <script>
+    const MAX_ADS = 10;
+    const ADS_PER_PAGE = 5;
+
+    let ads = [];
+
+    function createEmptyAd() {
+      return { title: '', desc: '', price: '', code: '' };
+    }
+
+    function init() {
+      ads = [createEmptyAd()];
+      renderAll();
+    }
+
+    function addAd() {
+      if (ads.length >= MAX_ADS) return;
+      ads.push(createEmptyAd());
+      renderAll();
+    }
+
+    function removeAd() {
+      if (ads.length <= 1) return;
+      ads.pop();
+      renderAll();
+    }
+
+    function resetAll() {
+      ads = ads.map(() => createEmptyAd());
+      renderAll();
+    }
+
+    function updateAd(index, field, value) {
+      ads[index][field] = value;
+      renderPrint();
+    }
+
+    function renderAll() {
+      renderForms();
+      renderPrint();
+      updateButtons();
+    }
+
+    function updateButtons() {
+      document.getElementById('btnAdd').disabled = ads.length >= MAX_ADS;
+      document.getElementById('btnRemove').disabled = ads.length <= 1;
+    }
+
+    function renderForms() {
+      const container = document.getElementById('formsContainer');
+      container.innerHTML = '';
+
+      ads.forEach((ad, i) => {
+        const card = document.createElement('div');
+        card.className = 'card-form';
+        card.innerHTML = `
+          <h3>آگهی شماره ${i + 1}</h3>
+          <div class="form-group">
+            <label>عنوان</label>
+            <input type="text" data-index="${i}" data-field="title" placeholder="مثال: خانه اجاره‌ای / آپارتمان فروش" value="${escapeHtml(ad.title)}">
+          </div>
+          <div class="form-group">
+            <label>توضیحات</label>
+            <textarea data-index="${i}" data-field="desc" placeholder="مثال: ۶۰ متری دو خواب پارکینگ‌دار طبقه دوم">${escapeHtml(ad.desc)}</textarea>
+          </div>
+          <div class="form-group">
+            <label>قیمت / رهن و اجاره</label>
+            <input type="text" data-index="${i}" data-field="price" placeholder="مثال: رهن ۱۰۰ میلیون اجاره ۱۰ میلیون" value="${escapeHtml(ad.price)}">
+          </div>
+          <div class="form-group">
+            <label>کد فایل</label>
+            <input type="text" data-index="${i}" data-field="code" placeholder="مثال: ۱۲۳" value="${escapeHtml(ad.code)}">
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      container.querySelectorAll('input, textarea').forEach(el => {
+        el.addEventListener('input', (e) => {
+          const idx = parseInt(e.target.dataset.index);
+          const field = e.target.dataset.field;
+          updateAd(idx, field, e.target.value);
+        });
+      });
+    }
+
+    function renderPrint() {
+      const wrapper = document.getElementById('printWrapper');
+      wrapper.innerHTML = '';
+
+      for (let p = 0; p < ads.length; p += ADS_PER_PAGE) {
+        const pageAds = ads.slice(p, p + ADS_PER_PAGE);
+        const page = document.createElement('div');
+        page.className = 'print-page';
+
+        pageAds.forEach((ad) => {
+          const card = document.createElement('div');
+          card.className = 'ad-card';
+
+          const titleText = ad.title.trim() || 'عنوان آگهی';
+          const descText = ad.desc.trim() || 'توضیحات آگهی در اینجا نوشته می‌شود';
+          const priceText = ad.price.trim() || 'قیمت / رهن و اجاره';
+          const codeText = ad.code.trim() || '—';
+
+          const titleClass = ad.title.trim() ? 'ad-title' : 'ad-title placeholder-text';
+          const descClass = ad.desc.trim() ? 'ad-desc' : 'ad-desc placeholder-text';
+          const priceClass = ad.price.trim() ? 'ad-price' : 'ad-price placeholder-text';
+
+          card.innerHTML = `
+            <div class="ad-code">کد فایل ${escapeHtml(codeText)}</div>
+            <div class="${titleClass}">${escapeHtml(titleText)}</div>
+            <div class="${descClass}">${escapeHtml(descText)}</div>
+            <div class="${priceClass}">${escapeHtml(priceText)}</div>
+          `;
+          page.appendChild(card);
+        });
+
+        wrapper.appendChild(page);
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    init();
+  </script>
+</body>
+</html>
