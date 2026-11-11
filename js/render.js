@@ -32,6 +32,7 @@ import {
   getFileLocation,
   getFilePrice,
   isFollowUp,
+  isExclusiveFollowUp,
   isDeleted,
   isInTrash,
   getActiveFiles,
@@ -57,7 +58,9 @@ export function getFilteredFiles() {
     if (state.currentFilter === "followup") {
       result = result.filter((f) => isFollowUp(f));
     } else if (state.currentFilter === "needs-review") {
+      // پیگیری‌های قدیمی‌تر از ۵ روز فقط در بخش پیگیری می‌مانند
       result = result.filter((f) => {
+        if (isExclusiveFollowUp(f)) return false;
         const tags = getFileTags(f);
         if (tags.includes("needs-review-from-ad") || tags.includes("needs-review")) {
           return true;
@@ -69,7 +72,12 @@ export function getFilteredFiles() {
       state.currentFilter !== "all" &&
       state.currentFilter !== "trash"
     ) {
-      result = result.filter((f) => f.type === state.currentFilter);
+      result = result.filter(
+        (f) => f.type === state.currentFilter && !isExclusiveFollowUp(f)
+      );
+    } else if (state.currentFilter === "all") {
+      // از «همه» هم فایل‌های پیگیری قدیمی‌تر از ۵ روز حذف شوند
+      result = result.filter((f) => !isExclusiveFollowUp(f));
     }
   }
 
@@ -211,7 +219,7 @@ function followUpBadgeText(file) {
 export function getFilterCounts() {
   const active = getActiveFiles();
   const counts = {
-    all: active.length,
+    all: 0,
     sale: 0,
     landlord: 0,
     buyer: 0,
@@ -222,17 +230,24 @@ export function getFilterCounts() {
   };
 
   for (const f of active) {
-    if (f.type && counts[f.type] != null) counts[f.type] += 1;
+    const exclusive = isExclusiveFollowUp(f);
+    // شمارش نوع و «همه» بدون پیگیری‌های قدیمی‌تر از ۵ روز
+    if (!exclusive) {
+      counts.all += 1;
+      if (f.type && counts[f.type] != null) counts[f.type] += 1;
+    }
     if (isFollowUp(f)) counts.followup += 1;
-    const tags = getFileTags(f);
-    const name = (getFileName(f) || "").trim();
-    if (
-      tags.includes("needs-review-from-ad") ||
-      tags.includes("needs-review") ||
-      name.startsWith("آگهی دیوار") ||
-      (f.source === "divar" && !getFilePhone(f))
-    ) {
-      counts["needs-review"] += 1;
+    if (!exclusive) {
+      const tags = getFileTags(f);
+      const name = (getFileName(f) || "").trim();
+      if (
+        tags.includes("needs-review-from-ad") ||
+        tags.includes("needs-review") ||
+        name.startsWith("آگهی دیوار") ||
+        (f.source === "divar" && !getFilePhone(f))
+      ) {
+        counts["needs-review"] += 1;
+      }
     }
   }
 
