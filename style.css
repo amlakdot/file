@@ -1777,6 +1777,21 @@ textarea:focus-visible {
     color: #9be0b5;
 }
 
+.agahi-chip {
+    background: rgba(100, 149, 237, 0.14);
+    border: 1px solid rgba(100, 149, 237, 0.4);
+    color: #8ab4f8;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.agahi-chip:hover {
+    background: rgba(100, 149, 237, 0.24);
+    color: #a8c7fa;
+}
+
 .followup-chip {
     display: inline-flex;
     align-items: center;
@@ -3204,7 +3219,8 @@ button.info-value.card-phone-copy,
 
     .divar-chip,
     .match-chip,
-    .calc-chip {
+    .calc-chip,
+    .agahi-chip {
         padding: 0 8px;
         min-height: 36px;
         height: 36px;
@@ -3252,6 +3268,11 @@ button.info-value.card-phone-copy,
         font-size: 10.5px;
         min-height: 34px;
         height: 34px;
+    }
+
+    /* روی عرض کم دکمه چاپ آگهی فقط از منوی بیشتر در دسترس است */
+    .agahi-chip {
+        display: none;
     }
 
     /* روی عرض خیلی کم: متن ماشین حساب کوتاه‌تر */
