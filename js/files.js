@@ -6,6 +6,11 @@ import { state } from "./state.js";
 import { $ } from "./helpers.js";
 
 export const TRASH_DAYS = 30;
+/** بعد از این تعداد روز تأخیر پیگیری، فقط در بخش پیگیری دیده شود */
+export const FOLLOWUP_EXCLUSIVE_DAYS = 5;
+/** بعد از این تعداد روز تأخیر پیگیری، فایل به سطل منتقل شود */
+export const FOLLOWUP_DELETE_DAYS = 30;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 export function getFileData(file) {
   if (!file || typeof file !== "object") return {};
@@ -98,6 +103,14 @@ export function getFilePrice(file) {
   return 0;
 }
 
+/** تعداد روز تأخیر نسبت به موعد پیگیری (منفی = هنوز نرسیده) */
+export function getFollowUpOverdueDays(file) {
+  if (!file?.followUpDate) return null;
+  const ts = new Date(file.followUpDate).getTime();
+  if (!Number.isFinite(ts)) return null;
+  return Math.floor((Date.now() - ts) / DAY_MS);
+}
+
 export function isFollowUp(file) {
   if (!file || isDeleted(file)) return false;
   if (file.status === "archived" || file.status === "done") return false;
@@ -114,8 +127,23 @@ export function isFollowUp(file) {
   return file.status === "followup";
 }
 
+/**
+ * پیگیری‌های قدیمی‌تر از ۵ روز فقط در بخش پیگیری دیده شوند
+ * و از فیلترهای «همه / فروشی / ...» حذف شوند.
+ */
+export function isExclusiveFollowUp(file) {
+  if (!isFollowUp(file)) return false;
+  const overdue = getFollowUpOverdueDays(file);
+  if (overdue == null) {
+    // status=followup بدون تاریخ → مثل انحصاری رفتار کن
+    return file.status === "followup";
+  }
+  return overdue > FOLLOWUP_EXCLUSIVE_DAYS;
+}
+
 export function updateFollowUpStatuses() {
   let changed = false;
+  const nowIso = new Date().toISOString();
 
   for (const file of state.files) {
     if (!file || isDeleted(file)) continue;
@@ -123,13 +151,23 @@ export function updateFollowUpStatuses() {
     if (!file.followUpDate) continue;
 
     const deadline = new Date(file.followUpDate).getTime();
-    if (
-      Number.isFinite(deadline) &&
-      deadline <= Date.now() &&
-      file.status !== "followup"
-    ) {
+    if (!Number.isFinite(deadline)) continue;
+
+    const overdueDays = Math.floor((Date.now() - deadline) / DAY_MS);
+
+    // بیش از ۳۰ روز تأخیر → انتقال به سطل (حذف نرم)
+    if (overdueDays > FOLLOWUP_DELETE_DAYS) {
+      file.deletedAt = nowIso;
+      file.updatedAt = nowIso;
+      if (file.status !== "followup") file.status = "followup";
+      changed = true;
+      continue;
+    }
+
+    // موعد گذشته → وضعیت پیگیری
+    if (deadline <= Date.now() && file.status !== "followup") {
       file.status = "followup";
-      file.updatedAt = new Date().toISOString();
+      file.updatedAt = nowIso;
       changed = true;
     }
   }
