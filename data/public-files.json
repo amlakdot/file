@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-21T12:50:11.895Z",
+  "updatedAt": "2026-11-21T12:50:31.930Z",
   "files": [
     {
       "id": "file-1789110789988-137-i7u9ug3gj",
@@ -500,6 +500,62 @@
       },
       "source": "panel",
       "updatedAt": "2026-10-27T12:23:16.221Z"
+    },
+    {
+      "id": "file-1795265430135-81a6670af14340effc3b8e90",
+      "code": 1091,
+      "type": "landlord",
+      "status": "active",
+      "title": "آپارتمان · 60 متر · 1 خواب · بومهن",
+      "data": {
+        "code": 1091,
+        "propertyType": "apartment",
+        "area": 60,
+        "rooms": 1,
+        "year": 1395,
+        "location": "بومهن، خ حسینیه",
+        "unitFloor": "1",
+        "totalFloors": 0,
+        "salePrice": 0,
+        "currentDeposit": 0,
+        "currentRent": 0,
+        "suggestedDeposit": 200000000,
+        "suggestedRent": 7500000,
+        "capital": 0,
+        "tenantDeposit": 0,
+        "tenantRent": 0,
+        "familySize": 0,
+        "amenities": [],
+        "divarDescription": "ملک دارای تمام امکانات آب برق گاز نزدیک ب خیابان اصلی بسیار شیک و تمیز",
+        "divarImages": [
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/8UJ_03XjtTtrG3M5SvU6IA/2542d91c-9e5f-4822-9486-bd17f5ce2f31.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/flq7yAfE5xVvBQwwsmJqcQ/b7c43761-a441-4858-9654-53b200216a74.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/TvHmvysHZqneE60Z7Id0MA/08f40e8b-7ccc-4b16-abd3-8becfa6e9fca.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/bLcRlf91XS5sx2DFmqTxCA/03010178-2f53-427f-afd8-6d46594c9063.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/vFVTPvKGiXYXDGzA4jDnQQ/7f7284d5-3824-4c44-b2df-0425b5a77395.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/Rl-tWw11MqAvw14cogmMdg/9ac69732-040c-4f39-badd-94fc51caefa8.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/ayqlc7I9s-8ssBhbdPKr5A/56ef803b-2467-4a11-8021-aed4aebeb772.webp",
+          "https://s100.divarcdn.com/static/photo/neda/webp_post/YkoUBvwEj5zcA7b5RHIn8A/038027f6-8a1b-4e7c-a7bc-4356e9fc1986.webp",
+          "https://mapimage.divarcdn.com/v8/mapimage?encrypted_data=MTIzNDU2Nzg5MTIzXM2V4nl9yqzuQj_ytpLfNPpLFqdil8TheYEnr5d9dYQ7Rg=="
+        ],
+        "divarAttributes": {
+          "متراژ": "۶۰",
+          "ساخت": "۱۳۹۵",
+          "اتاق": "۱",
+          "تصویر‌ها برای همین ملک است؟": "بله",
+          "ودیعه": "‏۲۰۰,۰۰۰,۰۰۰ تومان",
+          "اجارهٔ ماهانه": "‏۷,۵۰۰,۰۰۰ تومان",
+          "ودیعه و اجاره": "غیر قابل تبدیل",
+          "طبقه": "۱",
+          "آسانسور ندارد": false,
+          "پارکینگ ندارد": false,
+          "انباری ندارد": false
+        },
+        "notes": "ملک دارای تمام امکانات آب برق گاز نزدیک ب خیابان اصلی بسیار شیک و تمیز",
+        "yearBuilt": 1395
+      },
+      "source": "divar",
+      "updatedAt": "2026-11-21T12:50:30.134Z"
     }
   ]
 }
